@@ -9,8 +9,8 @@
                 <header>
                     <button name="action_confirm" string="Confirm" class="oe_highlight" type="object" invisible="state!='draft'" groups="acs_hms_surgery.group_acs_hms_surgery_approver"/>
                     <button name="action_done" string="Done" invisible="state!='confirm'" type="object" class="oe_highlight" groups="acs_hms_surgery.group_acs_hms_surgery_approver"/>
-                    <button name="action_cancel" string="Cancel" invisible="state!='confirm'" type="object" class="oe_highlight"  groups="acs_hms_surgery.group_acs_hms_surgery_approver"/>
-                    <button name="action_draft" string="Draft" invisible="state!='cancel'" type="object" class="oe_highlight"  groups="acs_hms_surgery.group_acs_hms_surgery_approver"/>
+                    <button name="action_cancel" string="Cancel" invisible="state!='confirm'" type="object" groups="acs_hms_surgery.group_acs_hms_surgery_approver"/>
+                    <button name="action_draft" string="Draft" invisible="state!='cancel'" type="object" groups="acs_hms_surgery.group_acs_hms_surgery_approver"/>
                     <button name="action_create_invoice" string="Create Invoice" groups="account.group_account_invoice" invisible="invoice_id or invoice_exempt" type="object" class="oe_highlight"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirm,done"/>
                 </header>
@@ -30,6 +30,9 @@
                             <field name="age" invisible="1"/>
                             <field name="diseases_ids" widget="many2many_tags" readonly="state in ['cancel','done']"/>
                             <field name="surgery_name" required="1" readonly="state in ['cancel','done']"/>
+                            <div>
+                                <field name="_barcode_scanned" widget="barcode_handler"/> 
+                            </div>
                         </group>
                         <group>
                             <label for="start_date" string="Date"/>
@@ -38,40 +41,42 @@
                                 <i class="fa fa-long-arrow-right mx-2" aria-label="Arrow icon" title="Arrow"/>
                                 <field name="end_date" widget="daterange" nolabel="1" class="oe_inline" options="{'related_start_date': 'start_date'}" readonly="state in ['cancel','done']"/>
                             </div>
+                            <field name="surgery_template_id" readonly="state in ['cancel','done']"/>
                             <field name="invoice_id" invisible="1"/>
                             <field name="state" invisible="1"/>
                             <field name='invoice_exempt' invisible="1"/>
+                            <field name="surgery_product_id" invisible="1"/>
                         </group>
                     </group>
                     <notebook groups="acs_hms.group_hms_nurse">
                         <page string="General Information" name="general">
                             <group>
-                                <group string="Template Details">
-                                    <field name="surgery_template_id" readonly="state in ['cancel','done']"/>
-                                    <field name="surgery_product_id" domain="[('hospital_product_type','=','surgery')]" context="{'default_hospital_product_type':'surgery'}" readonly="state in ['cancel','done']"/>
-                                </group>
                                 <group string="Surgeon Details">
                                     <field name="primary_physician_id" required="1" readonly="state in ['cancel','done']"/>
                                     <field name="primary_physician_ids" widget="many2many_tags"
                                         domain="[('is_primary_surgeon', '=', True)]" readonly="state in ['cancel','done']"/>
                                     <field name="assisting_surgeon_ids" widget="many2many_tags" readonly="state in ['cancel','done']"/>
                                 </group>
+                                <group string="Anesthesia Details">
+                                    <field name="anesthetist_id" readonly="state in ['cancel','done']"/>
+                                    <field name="anesthesia_id" readonly="state in ['cancel','done']"/>
+                                </group>
                             </group>
-                            <group>
-                                <group string="Other Details">
-                                    <field name="scrub_nurse_id" readonly="state in ['cancel','done']"/>
+                            <group string="Other Details">
+                                <group>
+                                    <field name="package_id" readonly="state in ['cancel','done']"/>
                                     <field name="appointment_id" readonly="state in ['cancel','done']"/>
                                     <field name="treatment_id" readonly="state in ['cancel','done']"/>
-                                    <field name="department_id" readonly="state in ['cancel','done']"/>
+                                    <field name="department_id" readonly="state in ['cancel','done']" options="{'no_open': True, 'no_create': True}"/>
+                                </group>
+                                <group>
+                                    <field name="surgery_product_id" domain="[('hospital_product_type','=','surgery')]" context="{'default_hospital_product_type':'surgery'}" readonly="state in ['cancel','done']"/>
+                                    <field name="scrub_nurse_id" readonly="state in ['cancel','done']"/>
                                     <label for="invoice_exempt"/>
                                     <div name='invoice_exemption'>
                                         <field name='invoice_exempt' class="oe_inline" nolabel="1" readonly="1"/>
                                         <button name="acs_apply_invoice_exemption" string="Apply/Remove" type="object" class="oe_inline fa fa-arrow-right oe_link" invisible="invoice_id" groups="acs_hms_base.group_acs_invoice_exemption"/>
                                     </div>
-                                </group>
-                                <group string="Anesthesia Details">
-                                    <field name="anesthetist_id" readonly="state in ['cancel','done']"/>
-                                    <field name="anesthesia_id" readonly="state in ['cancel','done']"/>
                                 </group>
                             </group>
                         </page>
@@ -80,7 +85,7 @@
                                 <field name="pre_operative_checklist_done" widget="percentpie" string="Checked" readonly="state in ['cancel','done']"/>
                             </div>
                             <field name="pre_operative_checklist_ids" readonly="state in ['cancel','done']">
-                                <list editable="top">
+                                <list editable="bottom">
                                     <field name="name"/>
                                     <field name="is_done"/>
                                     <field name="remark"/>
@@ -88,40 +93,63 @@
                             </field>
                         </page>
                         <page name="medication" string="Medication">
-                            <group string="Consumables">
+                            <group string="Consumed Products/Services">
                                 <field name="consumable_line_ids" nolabel="1" colspan="2" context="{'default_patient_id': patient_id, 'default_department_id': department_id, 'default_physician_id': primary_physician_id}" readonly="state in ['cancel','done']">
-                                    <list string="Line" editable="top">
+                                    <list string="Line" editable="bottom">
+                                        <control>
+                                            <create name="add_line_control" string="Add a line"/>
+                                            <button name="action_add_from_catalog" type="object" string="Catalog" class="px-4 btn-link" context="{'model': 'hms.surgery', 'order_id': parent.id}"/>
+                                        </control>
                                         <field name="product_id" required="1" context="{'default_hospital_product_type':'medicament'}"/>
-                                        <field name="product_uom_id" required="1" groups="uom.group_uom"/>
+                                        <field name="product_uom_id" required="1" groups="uom.group_uom" optional="show"/>
                                         <field name="qty" required="1"/>
                                         <field name="lot_id" context="{'acs_product_id': product_id}" options="{'no_create': True}" readonly="tracking=='none'" required="tracking!='none'"/>
-                                        <field name="price_unit" readonly="1" force_save="1"/>
-                                        <field name="subtotal" readonly="1" sum="Total" optional="show"/>
+                                        <field name="price_unit" readonly="1" force_save="1" groups="acs_hms_base.acs_group_show_consumed_product_prices"/>
+                                        <field name="subtotal" readonly="1" sum="Total" optional="show" groups="acs_hms_base.acs_group_show_consumed_product_prices"/>
                                         <field name="tracking" column_invisible="1"/>
                                         <field name="product_uom_category_id" column_invisible="1"/>
                                         <field name="pricelist_id" column_invisible="1"/>
-                                        <field name="move_id" column_invisible="1"/>
                                         <field name="physician_id" optional="show"/>
                                         <field name="department_id" column_invisible="1"/>
                                         <field name="patient_id" column_invisible="1"/>
+                                        <field name="ignore_stock_move" optional="hide"/>
+                                        <field name="move_id" groups="base.group_user" optional="hide" widget="many2onebutton" readonly="1"/>
+                                        <field name="hospital_product_type" column_invisible="1"/>
+                                        <field name="acs_date_start" optional="hide"/>
+                                        <field name="acs_date_end" optional="hide"/>
+                                        <button name="action_start" string="Start" type="object" class="oe_stat_button" icon="fa-play" invisible="acs_date_start or hospital_product_type!='time_service'"/>
+                                        <button name="action_stop" string="Stop" type="object" class="oe_stat_button" icon="fa-stop" invisible="not acs_date_start or acs_date_end or  hospital_product_type!='time_service'"/>
                                     </list>
                                 </field>
-                            </group>
+                            </group> 
                             <group string="Medication Plan">
-                                <button name="button_pres_request" string="Create Prescription" type="object" class="oe_highlight" groups="acs_hms_surgery.group_acs_hms_surgery_approver"/>
-                                <field name="medicament_line_ids" nolabel="1" colspan="2" readonly="state in ['cancel','done']">
-                                    <list string="Line" editable="top">
-                                        <field name="product_id" expand="1" required="1"/>
-                                        <field name="active_component_ids" widget="many2many_tags"/>
-                                        <field name="form_id"/>
-                                        <field name="dose"/>
-                                        <field name="days"/>
-                                        <field name="medicine_uom_id" required="1" string="Dosage Unit"/>
-                                        <field name="product_uom_category_id" column_invisible="1"/>
+                                <button name="acs_create_prescription" colspan="2" string="Create Prescription" type="object" class="oe_highlight" groups="acs_hms_surgery.group_acs_hms_surgery_approver"/>
+                                <field name="medicament_line_ids" nolabel="1" colspan="2" readonly="state in ['cancel','done']" widget="product_label_section_and_note_field_o2m" >
+                                    <list string="Line" editable="bottom">
+                                        <control>
+                                            <create name="add_line_control" string="Add a line"/>
+                                            <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
+                                            <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note'}"/>
+                                        </control>
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="product_id" string="Medicine" widget="product_label_section_and_note_field"/>
+                                        <field name="name" required="1" widget="section_and_note_text" optional="hide"/>
+                                        <field name="active_component_ids" widget="many2many_tags" optional="hide"/>
+                                        <field name="route_id" optional="hide"/>
                                         <field name="common_dosage_id"/>
+                                        <field name="dose" required="not display_type" string="Qty Dose"/>
+                                        <field name="dosage_uom_id" optional="hide" groups="uom.group_uom"/>
+                                        <field name="qty_per_day" required="not display_type" optional="hide"/>
+                                        <field name="days" required="not display_type"/>
+                                        <field name="quantity" required="not display_type" readonly="not manual_prescription_qty" string="Total Qty" force_save="1" optional="show"/>
+                                        <field name="qty_available" readonly="1" optional="hide"/>
+                                        <field name="short_comment"/>
+                                        <!-- Others fields -->
+                                        <field name="id" force_save="1" column_invisible="1"/>
+                                        <field name="display_type" force_save="1" column_invisible="1"/>
                                         <field name="product_uom_category_id" column_invisible="1"/>
-                                        <field name="qty" required="1" string="Units"/>
-                                        <field name="instruction"/>
+                                        <field name="manual_prescription_qty" column_invisible="1"/>
+                                        <field name="manual_quantity" column_invisible="1"/>
                                     </list>
                                 </field>
                             </group>
@@ -141,8 +169,8 @@
                         <page name="discharge_summary" string="Discharge Summary">
                             <group string="Diagnosis"/>
                                 <field name="diagnosis" colspan="2" readonly="state in ['cancel','done']"/>
-                            <group string="Clinincal History"/>
-                                <field name="clinincal_history" colspan="2" readonly="state in ['cancel','done']"/>
+                            <group string="Clinical History"/>
+                                <field name="clinical_history" colspan="2" readonly="state in ['cancel','done']"/>
                             <group string="Examination"/>
                                 <field name="examination" colspan="2" readonly="state in ['cancel','done']"/>
                             <group string="Investigations"/>
@@ -153,12 +181,7 @@
                     </notebook>
                     <field name="notes" colspan="2" placeholder="Operative Notes" readonly="state in ['cancel','done']"/>
                 </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers"
-                        groups="base.group_user"/>
-                    <field name="activity_ids" widget="mail_activity"/>
-                    <field name="message_ids" widget="mail_thread"/>
-                </div>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -183,7 +206,7 @@
                 <filter string="Done" name="done" domain="[('state','=','done')]"/>
                 <group expand="0" string="Group By">
                     <filter name="group_by_anesthesia" string="Anesthesia" context="{'group_by':'anesthesia_id'}"/>
-                    <filter name="group_by_surgery_poduct" string="Surgery Product" context="{'group_by':'surgery_product_id'}"/>
+                    <filter name="group_by_surgery_product" string="Surgery Product" context="{'group_by':'surgery_product_id'}"/>
                     <filter string="Patient" name="patient_groupby" domain="[]" context="{'group_by':'patient_id'}"/>
                     <filter string="State" name="state_groupby" domain="[]" context="{'group_by':'state'}"/>
                     <filter string="Disease" name="disease_groupby" domain="[]" context="{'group_by':'diseases_ids'}"/>
@@ -192,7 +215,7 @@
         </field>
     </record>
 
-    <record id="hms_surgery_tree" model="ir.ui.view">
+    <record id="hms_surgery_list" model="ir.ui.view">
         <field name="name">Surgery Lists</field>
         <field name="model">hms.surgery</field>
         <field name="arch" type="xml">
@@ -227,6 +250,7 @@
 
     <record id="action_hms_surgery" model="ir.actions.act_window">
         <field name="name">Surgery</field>
+        <field name="path">almightyhms-surgery</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">hms.surgery</field>
         <field name="view_mode">list,calendar,form</field>

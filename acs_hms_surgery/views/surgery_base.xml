@@ -21,8 +21,8 @@
         </field>
     </record>
 
-    <record id="check_list_conf_tree_view" model="ir.ui.view">
-        <field name="name">pre.operative.check.list.template.tree</field>
+    <record id="check_list_conf_list_view" model="ir.ui.view">
+        <field name="name">pre.operative.check.list.template.list</field>
         <field name="model">pre.operative.check.list.template</field>
         <field name="arch" type="xml">
             <list>
@@ -33,10 +33,11 @@
 
     <record id="action_check_list_conf_view" model="ir.actions.act_window">
         <field name="name">Pre-Operative Checklist</field>
+        <field name="path">almightyhms-pre-operative-checklist</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">pre.operative.check.list.template</field>
         <field name="view_mode">list,form</field>
-        <field name="view_id" ref="check_list_conf_tree_view" />
+        <field name="view_id" ref="check_list_conf_list_view" />
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Click to add a Pre-Operative Checklist.
@@ -63,8 +64,8 @@
         </field>
     </record>
 
-    <record id="acs_hms_anesthesia_tree_view" model="ir.ui.view">
-        <field name="name">hms.anesthesia.tree</field>
+    <record id="acs_hms_anesthesia_list_view" model="ir.ui.view">
+        <field name="name">hms.anesthesia.list</field>
         <field name="model">hms.anesthesia</field>
         <field name="arch" type="xml">
             <list>
@@ -75,10 +76,11 @@
 
     <record id="action_acs_hms_anesthesia" model="ir.actions.act_window">
         <field name="name">Anesthesia</field>
+        <field name="path">almightyhms-anesthesia</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">hms.anesthesia</field>
         <field name="view_mode">list,form</field>
-        <field name="view_id" ref="acs_hms_anesthesia_tree_view" />
+        <field name="view_id" ref="acs_hms_anesthesia_list_view" />
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Click to add a Anesthesia.

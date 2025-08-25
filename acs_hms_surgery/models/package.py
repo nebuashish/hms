@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError, UserError
@@ -10,21 +11,33 @@ class AcsHmsPackage(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Package'
 
-    @api.depends('order_line.price_total')
+    @api.depends('order_line.price_total', 'product_id')
     def _amount_all(self):
         """
         Compute the total amounts of the order.
         """
-        for order in self:
+        for package in self:
             amount_untaxed = amount_tax = 0.0
-            for line in order.order_line:
+            for line in package.order_line:
                 amount_untaxed += line.price_subtotal
                 amount_tax += line.price_tax
-            order.update({
-                'amount_untaxed': order.company_id.currency_id.round(amount_untaxed),
-                'amount_tax': order.company_id.currency_id.round(amount_tax),
-                'amount_total': amount_untaxed + amount_tax,
-            })
+            package.amount_untaxed = package.company_id.currency_id.round(amount_untaxed)
+            package.amount_tax = package.company_id.currency_id.round(amount_tax)
+            package.amount_total = amount_untaxed + amount_tax
+
+            service_amount = service_tax = 0.0
+            if package.product_id:
+                product = package.product_id
+                price = product.with_context(acs_pricelist_id=package.pricelist_id.id)._acs_get_partner_price()
+                service_amount = price
+                # We are not computing the taxes for the service product
+                # taxes = product.taxes_id.compute_all(
+                #     price, package.currency_id, 1.0,
+                #     product=product,
+                #     partner=package.create_uid.partner_id
+                # )
+                # service_tax = sum(t['amount'] for t in taxes.get('taxes', []))
+            package.service_amount = package.company_id.currency_id.round(service_amount)
 
     name = fields.Char(string='Name', required=True, tracking=True)
     start_date = fields.Datetime("Start Date", required=True)
@@ -39,7 +52,10 @@ class AcsHmsPackage(models.Model):
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist', check_company=True, 
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         help="If you change the pricelist, only newly added lines will be affected.")
-
+    product_id = fields.Many2one('product.product', string='Service Product', help="Used for invoicing this package as a single service line.")
+    package_type = fields.Selection([('fixed', 'Fixed Package'),('dynamic', 'Dynamic Package')], string="Package Type", default="fixed", required=True, tracking=True)
+    service_amount = fields.Monetary(string='Service Amount', store=True, readonly=True, compute='_amount_all')
+    
     _sql_constraints = [
         ('date_check2', "CHECK (start_date <= end_date)", "The start date must be anterior to the end date."),
     ]
@@ -129,3 +145,44 @@ class AcsHmsPackageLine(models.Model):
         vals['name'] = name
         self.update(vals)
         return {'domain': domain}
+    
+class AcsPackageInvoiceLine(models.Model):
+    _name = "acs.package.invoice.line"
+    _description = "Package Invoice Line"
+
+    @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id')
+    def _compute_amount(self):
+        """
+        Compute the amounts of the line.
+        """
+        for line in self:
+            if not line.display_type:
+                price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+                taxes = line.tax_id.compute_all(price, line.move_id.company_id.currency_id, line.product_uom_qty, product=line.product_id, partner=line.move_id.create_uid.partner_id)
+                line.update({
+                    'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
+                    'price_total': taxes['total_included'],
+                    'price_subtotal': taxes['total_excluded'],
+                })
+            else:
+                line.price_tax = 0
+                line.price_total = 0
+                line.price_subtotal = 0
+
+    sequence = fields.Integer(string='Sequence', default=10)
+    package_id = fields.Many2one('acs.hms.package', string='Package')
+    move_id = fields.Many2one('account.move', string='Move', readonly=True)
+    product_id = fields.Many2one('product.product', string='Product', domain=[('sale_ok', '=', True)], change_default=True, ondelete='restrict')
+    allowed_qty = fields.Float(string='Allowed Quantity', default=1.0)
+    remaining_qty = fields.Float(string='Remaining Quantity', default=1.0)
+    product_uom_qty = fields.Float(string='Quantity', digits=('Product Unit of Measure'), default=1.0)
+    product_uom_id = fields.Many2one('uom.uom', string='Unit of Measure', domain="[('category_id', '=', product_uom_category_id)]")
+    product_uom_category_id = fields.Many2one('uom.category', related='product_id.uom_id.category_id')
+    price_unit = fields.Float()
+    discount = fields.Float()
+    tax_id = fields.Many2many('account.tax', string='Taxes', domain=['|', ('active', '=', False), ('active', '=', True)])
+    price_subtotal = fields.Monetary(compute='_compute_amount', string='Subtotal', readonly=True, store=True)
+    price_tax = fields.Float(compute='_compute_amount', string='Taxes Amount', readonly=True, store=True)
+    price_total = fields.Monetary(compute='_compute_amount', string='Total', readonly=True, store=True)
+    currency_id = fields.Many2one(related='move_id.company_id.currency_id', store=True, string='Currency', readonly=True)
+    display_type = fields.Selection([('line_section', "Section")], help="Technical field for UX purpose.")

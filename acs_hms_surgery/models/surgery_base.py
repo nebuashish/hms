@@ -1,4 +1,5 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 from odoo import api, fields, models,_
 
 
@@ -10,7 +11,7 @@ class Anesthesia(models.Model):
     name = fields.Char('Anesthesia Name', required=True)
 
 
-class PreOpetativeCheckListTemplate(models.Model):
+class PreOperativeCheckListTemplate(models.Model):
     _name="pre.operative.check.list.template"
     _description = "Pre Operative Checklist Template"
 
@@ -18,7 +19,7 @@ class PreOpetativeCheckListTemplate(models.Model):
     remark = fields.Char(string="Remarks")
 
 
-class PreOpetativeCheckList(models.Model):
+class PreOperativeCheckList(models.Model):
     _name="pre.operative.check.list"
     _description = "Pre Operative Checklist"
 
@@ -35,9 +36,9 @@ class ACSDietplan(models.Model):
     name = fields.Char(string='Name', required=True)
 
 
-class PastSurgerys(models.Model):
+class PastSurgeries(models.Model):
     _name = "past.surgeries"
-    _description = "Past Surgerys"
+    _description = "Past Surgeries"
 
     result = fields.Char(string='Result')
     date = fields.Date(string='Date')
@@ -45,31 +46,3 @@ class PastSurgerys(models.Model):
     description = fields.Char(string='Description', size=128)
     complication = fields.Text("Complication")
     patient_id = fields.Many2one('hms.patient', ondelete="restrict", string='Patient ID', help="Mention the past surgeries of this patient.")
-
-
-class ACSMedicamentLine(models.Model):
-    _name = "medicament.line"
-    _description = "Medicine Lines"
-    
-    product_id = fields.Many2one('product.product', ondelete="cascade", string='Medicine Name')
-    name = fields.Char(string='Name')
-    product_uom_category_id = fields.Many2one('uom.category', related='product_id.uom_id.category_id')
-    medicine_uom_id = fields.Many2one('uom.uom', string='Unit', help='Amount of medication (eg, 250 mg) per dose', domain="[('category_id', '=', product_uom_category_id)]")
-    qty = fields.Float(string='Qty',default=1.0)
-    active_component_ids = fields.Many2many('active.comp','medica_line_comp_rel','medica_id','line_id',string='Active Component')
-    form_id = fields.Many2one('drug.form', ondelete="cascade", string='Form', help='Drug form, such as tablet or gel')
-    dose = fields.Float(string='Dosage', digits=(16, 2) ,help="Amount of medication (eg, 250 mg) per dose")
-    days = fields.Integer("Days")
-    common_dosage_id = fields.Many2one('medicament.dosage', ondelete="cascade", string='Frequency', help='Drug form, such as tablet or gel')    
-    surgery_template_id = fields.Many2one('hms.surgery.template', ondelete="cascade", string='Surgery Template')
-    surgery_id = fields.Many2one('hms.surgery', ondelete="cascade", string='Surgery')
-    instruction = fields.Char("Instructions")
-
-    @api.onchange('product_id')
-    def onchange_product_id(self):
-        if self.product_id:
-            self.form_id = self.product_id.form_id.id
-            self.dose = self.product_id.dosage
-            self.medicine_uom_id = self.product_id.uom_id.id
-            self.common_dosage_id = self.product_id.common_dosage_id.id
-            self.active_component_ids = [(6, 0, [x.id for x in self.product_id.active_component_ids])]

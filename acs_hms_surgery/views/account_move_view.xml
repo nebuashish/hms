@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="acs_invoice_package_form" model="ir.ui.view">
+        <field name="name">account.move.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="acs_hms.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='price_unit']" position="after">
+                <field name="acs_package_id" optional="hide"/>
+            </xpath>
+
+            <xpath expr="//page[@name='invoice_tab']" position="after">
+                <page name="package_inv_data" string="Package Data" invisible="not acs_package_id">
+                    <group>
+                        <field name="acs_package_id" readonly="1" options="{'no_create': True}"/>
+                    </group>
+                    <field name="acs_package_invoice_line_ids" widget="section_and_note_one2many">
+                        <list string="Package Lines" create="false" editable="bottom">
+                            <control>
+                                <create string="Add a line"/>
+                                <create string="Add a section" context="{'default_display_type': 'line_section'}"/>
+                            </control>
+                            
+                            <field name="sequence" widget="handle"/>
+                            <field name="product_id" required="not display_type"/>
+                            <field name="package_id" readonly="1"/>
+                            <field name="allowed_qty" string="Allowed Qty" readonly="1" optional="show"/>
+                            <field name="product_uom_qty" string="Qty" required="not display_type"/>
+                            <field name="product_uom_id" options="{&quot;no_open&quot;: True}" required="not display_type" groups="uom.group_uom"/>
+                            <field name="remaining_qty" string="Remaining Qty" readonly="1" optional="hide"/>
+                            <field name="price_unit"/>
+                            <field name="discount"/>
+                            <field name="tax_id" widget="many2many_tags"/>
+                            <field name="price_subtotal"/>
+                            <field name="product_uom_category_id" column_invisible="True"/>
+                            <field name="display_type" column_invisible="True"/>
+                        </list>
+                    </field>
+                    <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
+                        <field name="acs_package_total_amount" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                        <field name="acs_used_amount" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                        <field name="acs_remaining_amount" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

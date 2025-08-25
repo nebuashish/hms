@@ -1,18 +1,18 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 from odoo import api, fields, models,_
-
-
-class AccountMove(models.Model):
-    _inherit = "account.move"
-
-    surgery_id = fields.Many2one('hms.surgery', string='Surgery')
-    hospital_invoice_type = fields.Selection(selection_add=[('surgery', 'Surgery')])
-
 
 class HmsPrescription(models.Model):
     _inherit = "prescription.order"
 
     surgery_id = fields.Many2one('hms.surgery', string='Surgery')
+
+
+class ACSPrescriptionLine(models.Model):
+    _inherit = 'prescription.line'
+    
+    surgery_template_id = fields.Many2one('hms.surgery.template', ondelete="cascade", string='Surgery Template')
+    surgery_id = fields.Many2one('hms.surgery', ondelete="cascade", string='Surgery')
 
 
 class ACSAppointment(models.Model):
@@ -34,7 +34,7 @@ class ACSAppointment(models.Model):
     #Method to collect common invoice related records data
     def acs_appointment_common_data(self, invoice_id):
         data = super().acs_appointment_common_data(invoice_id)
-        surgery_ids = self.surgery_ids.filtered(lambda s: not s.invoice_id)
+        surgery_ids = self.sudo().surgery_ids.filtered(lambda s: not s.invoice_id)
         data += surgery_ids.acs_common_invoice_surgery_data(invoice_id)
         return data
 
@@ -59,7 +59,7 @@ class ACSPatient(models.Model):
 
     surgery_ids = fields.One2many('hms.surgery', 'patient_id', string='Surgery', groups="acs_hms_surgery.group_acs_hms_surgery_user")
     surgery_count = fields.Integer(compute='_rec_count', string='# Surgery', groups="acs_hms_surgery.group_acs_hms_surgery_user")
-    past_surgeries_ids = fields.One2many('past.surgeries', 'patient_id', string='Past Surgerys')
+    past_surgeries_ids = fields.One2many('past.surgeries', 'patient_id', string='Past Surgeries')
 
     def action_view_surgery(self):
         action = self.env["ir.actions.actions"]._for_xml_id("acs_hms_surgery.action_hms_surgery")

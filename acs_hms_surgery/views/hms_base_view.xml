@@ -15,7 +15,7 @@
             <xpath expr="//notebook/page[@name='diseases']//field[@name='patient_diseases_ids']" position="after">
                 <separator string="Past Surgeries" groups="acs_hms_surgery.group_acs_hms_surgery_user"/>
                 <field name="past_surgeries_ids" groups="acs_hms_surgery.group_acs_hms_surgery_user">
-                    <list editable="top">
+                    <list editable="bottom">
                         <field name="date"/>
                         <field name="description"/>
                         <field name="complication"/>

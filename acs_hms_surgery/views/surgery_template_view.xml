@@ -19,9 +19,9 @@
                     </group>
                     <notebook groups="acs_hms.group_hms_nurse">
                         <page name="surgery" string="Surgery">
-                            <group name="consumables" string="Consumables">
+                            <group name="consumables" string="Consumable Products/Services">
                                 <field name="consumable_line_ids" nolabel="1" colspan="2">
-                                    <list string="Line" editable="top">
+                                    <list string="Line" editable="bottom">
                                         <field name="product_id" expand="1" required="1" context="{'default_hospital_product_type':'medicament'}"/>
                                         <field name="product_uom_id" required="1" groups="uom.group_uom"/>
                                         <field name="qty" required="1"/>
@@ -30,23 +30,38 @@
                                         <field name="tracking" column_invisible="1"/>
                                         <field name="product_uom_category_id" column_invisible="1"/>
                                         <field name="move_id" column_invisible="1"/>
+                                        <field name="ignore_stock_move" optional="hide"/>
                                     </list>
                                 </field>
                             </group>
                             <group name="medication_plan" string="Medication Plan">
-                                <field name="medicament_line_ids" nolabel="1" colspan="2" >
-                                <list string="Line" editable="top">
-                                    <field name="product_id" expand="1" required="1"/>
-                                    <field name="active_component_ids" widget="many2many_tags"/>
-                                    <field name="form_id"/>
-                                    <field name="dose"/>
-                                    <field name="days"/>
-                                    <field name="medicine_uom_id" required="1" string="Dosage Unit"/>
-                                    <field name="common_dosage_id"/>
-                                    <field name="product_uom_category_id" invisible="1"/>
-                                    <field name="qty" required="1" string="Units"/>
-                                    <field name="instruction"/>
-                                </list>
+                                <field name="medicament_line_ids" nolabel="1" colspan="2" widget="product_label_section_and_note_field_o2m" >
+                                    <list string="Line" editable="bottom">
+                                        <control>
+                                            <create name="add_line_control" string="Add a line"/>
+                                            <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
+                                            <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note'}"/>
+                                        </control>
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="product_id" string="Medicine" widget="product_label_section_and_note_field"/>
+                                        <field name="name" required="1" widget="section_and_note_text" optional="hide"/>
+                                        <field name="active_component_ids" widget="many2many_tags" optional="hide"/>
+                                        <field name="route_id" optional="hide"/>
+                                        <field name="common_dosage_id"/>
+                                        <field name="dose" required="not display_type" string="Qty Dose"/>
+                                        <field name="dosage_uom_id" optional="hide" groups="uom.group_uom"/>
+                                        <field name="qty_per_day" required="not display_type" optional="hide"/>
+                                        <field name="days" required="not display_type"/>
+                                        <field name="quantity" required="not display_type" readonly="not manual_prescription_qty" string="Total Qty" force_save="1" optional="show"/>
+                                        <field name="qty_available" readonly="1" optional="hide"/>
+                                        <field name="short_comment"/>
+                                        <!-- Others fields -->
+                                        <field name="id" force_save="1" column_invisible="1"/>
+                                        <field name="display_type" force_save="1" column_invisible="1"/>
+                                        <field name="product_uom_category_id" column_invisible="1"/>
+                                        <field name="manual_prescription_qty" column_invisible="1"/>
+                                        <field name="manual_quantity" column_invisible="1"/>
+                                    </list>
                                 </field>
                             </group>
                             <group string="Special Precautions"/>
@@ -58,8 +73,8 @@
                         <page name="discharge_summary" string="Discharge Summary">
                             <group string="Diagnosis"/>
                                 <field name="diagnosis" colspan="2"/>
-                            <group string="Clinincal History"/>
-                                <field name="clinincal_history" colspan="2"/>
+                            <group string="Clinical History"/>
+                                <field name="clinical_history" colspan="2"/>
                             <group string="Examination"/>
                                 <field name="examination" colspan="2"/>
                             <group string="Investigations"/>
@@ -73,7 +88,7 @@
         </field>
     </record>
 
-    <record id="hms_surgery_template_tree" model="ir.ui.view">
+    <record id="hms_surgery_template_list" model="ir.ui.view">
         <field name="name">Surgery Template</field>
         <field name="model">hms.surgery.template</field>
         <field name="arch" type="xml">
@@ -96,7 +111,7 @@
                 <field name="surgery_product_id"/>
                 <group expand="0" string="Group By">
                     <filter name="group_by_disease" string="Disease" context="{'group_by':'diseases_ids'}"/>
-                    <filter name="group_by_surgery_poduct" string="Surgery Product" context="{'group_by':'surgery_product_id'}"/>
+                    <filter name="group_by_surgery_product" string="Surgery Product" context="{'group_by':'surgery_product_id'}"/>
                 </group>
             </search>
         </field>
@@ -104,6 +119,7 @@
 
     <record id="action_hms_surgery_template" model="ir.actions.act_window">
         <field name="name">Surgery Template</field>
+        <field name="path">almightyhms-surgery-template</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">hms.surgery.template</field>
         <field name="view_mode">list,form</field>

@@ -6,7 +6,7 @@
         </record>
 
         <record id="pre_operational_checklist_data_02" model="pre.operative.check.list.template">
-            <field name="name">Jewelery, Bangles, etc removed ?</field>
+            <field name="name">Jewelry, Bangles, etc removed ?</field>
         </record>
 
         <record id="pre_operational_checklist_data_03" model="pre.operative.check.list.template">

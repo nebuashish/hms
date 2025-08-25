@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 #╔══════════════════════════════════════════════════════════════════════╗
 #║                                                                      ║
 #║                  ╔═══╦╗       ╔╗  ╔╗     ╔═══╦═══╗                   ║
@@ -22,10 +23,11 @@
     'description': """
     Manage Medical Surgery related operations hospital management system medical ACS HMS
     """,
-    'version': '1.0.4',
+    'version': '1.0.7',
     'author': 'Almighty Consulting Solutions Pvt. Ltd.',
     'support': 'info@almightycs.com',
     'website': 'www.almightycs.com',
+    'live_test_url': 'https://youtu.be/Om1SEJFPQyA',
     'license': 'OPL-1',
     'depends': ['acs_hms'],
     'data': [
@@ -42,6 +44,7 @@
         'views/package_view.xml',
         'views/res_config_settings_views.xml',
         'views/digest_view.xml',
+        'views/account_move_view.xml',
         'views/menu_item.xml',
     ],
     'demo': [

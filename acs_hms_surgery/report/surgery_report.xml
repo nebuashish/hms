@@ -66,9 +66,9 @@
             <div class="ml32" t-field="surgery.diagnosis"/>
         </div>
 
-        <div t-if="surgery.clinincal_history" class="col-12 mt8 mt8" style="page-break-inside: avoid;">
+        <div t-if="surgery.clinical_history" class="col-12 mt8 mt8" style="page-break-inside: avoid;">
             <strong><t t-if="print_surgery">Surgery </t>Clinical History: </strong><br/>
-            <div class="ml32" t-field="surgery.clinincal_history"/>
+            <div class="ml32" t-field="surgery.clinical_history"/>
         </div>
 
         <div t-if="surgery.examination" class="col-12 mt8 mt8" style="page-break-inside: avoid;">
@@ -109,11 +109,12 @@
 
     <template id="report_acs_surgery_document">
         <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context({'lang':doc.patient_id.lang})"/>
             <div class="page acs_report">
 
                 <div class="mt32 mb32 text-center">
                     <h2>
-                        <strong>Surgey Summary</strong>
+                        <strong>Surgery Summary</strong>
                     </h2>
                 </div>
                 
@@ -221,7 +222,7 @@
     <template id="report_acs_surgery">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
-                <t t-call="acs_hms_surgery.report_acs_surgery_document" t-lang="doc.patient_id.partner_id.lang"/>
+                <t t-call="acs_hms_surgery.report_acs_surgery_document"/>
             </t>
         </t>
     </template>
@@ -239,4 +240,3 @@
     </record>
 
 </odoo>
-
