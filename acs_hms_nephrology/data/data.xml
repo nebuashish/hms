@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="acs_nephrology_department" model="hr.department">
+            <field name="name">Nephrology</field>
+            <field name="patient_department">True</field>
+            <field name="department_type">nephrology</field>
+            <field name="image" type="base64" file="acs_hms_nephrology/static/description/icon.png"/>
+        </record>
+
+        <record id="base.user_root" model="res.users">
+            <field name="department_ids" eval="[(4, ref('acs_hms_nephrology.acs_nephrology_department'))]"/>
+        </record>
+
+        <record id="base.user_admin" model="res.users">
+            <field name="department_ids" eval="[(4, ref('acs_hms_nephrology.acs_nephrology_department'))]"/>
+        </record>
+
+    </data>
+</odoo>

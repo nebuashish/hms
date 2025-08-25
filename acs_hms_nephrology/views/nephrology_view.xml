@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_hms_appointment_form" model="ir.ui.view">
+        <field name="name">hms.appointment.form</field>
+        <field name="model">hms.appointment</field>
+        <field name="inherit_id" ref="acs_hms.view_hms_appointment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='planned_duration']" position="after">
+                <field name="blood_group" invisible="department_type!='nephrology'"/>
+            </xpath>
+            
+            <xpath expr="//field[@name='past_history']" position="attributes">
+                <attribute name="invisible">department_type=='nephrology'</attribute>
+            </xpath>
+
+            <xpath expr="//page[@name='info']/separator[@name='past_history']" position="attributes">
+                <attribute name="invisible">department_type=='nephrology'</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='differential_diagnosis']" position="attributes">
+                <attribute name="invisible">department_type=='nephrology'</attribute>
+            </xpath>
+
+            <xpath expr="//page[@name='advice']/separator[@name='differential_diagnosis']" position="attributes">
+                <attribute name="invisible">department_type=='nephrology'</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='diseases_ids']" position="before">
+                <field name="debugging_treatment" invisible="department_type!='nephrology'"/>
+            </xpath>
+
+            <xpath expr="//field[@name='hr']" position="after">
+                <field name="blood_flow"/>
+                <field name="venous_pressure"/>
+            </xpath>
+
+            <xpath expr="//field[@name='bmi']" position="after">
+                <field name="observation"/>
+            </xpath>
+
+            <xpath expr="//page[@name='info']" position="after">
+                <page name="nephrology" string="Nephrology" invisible="department_type!='nephrology'" groups="acs_hms_nephrology.group_hms_nephrology_user">
+                    <div class="o_row">
+                        <field name="show_etiology" nolabel="1" class="oe_inline"/>
+                        <label for="show_etiology" string="Etiology Of Chronic Renal Failure"/>
+                    </div>
+                    <field name="etiology_of_chronic_renal_failure" nolabel="1" invisible="not show_etiology" placeholder="Etiology Of Chronic Renal Failure..."/>
+                    
+                    <div class="o_row">
+                        <field name="show_way_of_arrival" nolabel="1" class="oe_inline"/>
+                        <label for="show_way_of_arrival" string="Way Of Arrival"/>
+                    </div>
+                    <field name="way_of_arrival" nolabel="1" invisible="not show_way_of_arrival" placeholder="Way Of Arrival..."/>
+
+                    <div class="o_row">
+                        <field name="show_adverse_reactions" nolabel="1" class="oe_inline"/>
+                        <label for="show_adverse_reactions" string="Adverse Reactions"/>
+                    </div>
+                    <field name="adverse_reactions" nolabel="1" invisible="not show_adverse_reactions" placeholder="Adverse Reactions..."/>
+
+                    <div class="o_row">
+                        <field name="show_transplant_waiting_list" nolabel="1" class="oe_inline"/>
+                        <label for="show_transplant_waiting_list" string="Transplant Waiting List"/>
+                    </div>
+                    <field name="transplant_waiting_list" nolabel="1" invisible="not show_transplant_waiting_list" placeholder="Transplant Waiting List..."/>
+
+                    <div class="o_row">
+                        <field name="show_toxic_habits" nolabel="1" class="oe_inline"/>
+                        <label for="show_toxic_habits" string="Toxic Habits"/>
+                    </div>
+                    <field name="toxic_habits" nolabel="1" invisible="not show_toxic_habits" placeholder="Toxic Habits..."/>
+
+                    <div class="o_row">
+                        <field name="show_trauma" nolabel="1" class="oe_inline"/>
+                        <label for="show_trauma" string="Trauma"/>
+                    </div>
+                    <field name="trauma" nolabel="1" invisible="not show_trauma" placeholder="Trauma..."/>
+
+                    <div class="o_row">
+                        <field name="show_transfusions" nolabel="1" class="oe_inline"/>
+                        <label for="show_transfusions" string="Transfusions"/>
+                    </div>
+                    <field name="transfusions" nolabel="1" invisible="not show_transfusions" placeholder="Transfusions..."/>
+
+                    <div class="o_row">
+                        <field name="show_cesarean_operations" nolabel="1" class="oe_inline"/>
+                        <label for="show_cesarean_operations" string="Cesarean Operations"/>
+                    </div>
+                    <field name="cesarean_operations" nolabel="1" invisible="not show_cesarean_operations" placeholder="Cesarean Operations..."/>
+
+                    <div class="o_row">
+                        <field name="show_vaccinations" nolabel="1" class="oe_inline"/>
+                        <label for="show_vaccinations" string="Vaccinations"/>
+                    </div>
+                    <field name="vaccinations" nolabel="1" invisible="not show_vaccinations" placeholder="Vaccinations..."/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_acs_patient_evaluation_form" model="ir.ui.view">
+        <field name="name">acs.patient.evaluation.form</field>
+        <field name="model">acs.patient.evaluation</field>
+        <field name="inherit_id" ref="acs_hms.view_acs_patient_evaluation_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='rr']" position="after">
+                <field name="blood_flow"/>
+                <field name="venous_pressure"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="view_acs_patient_procedure_form" model="ir.ui.view">
+        <field name="name">acs.patient.procedure.form</field>
+        <field name="model">acs.patient.procedure</field>
+        <field name="inherit_id" ref="acs_hms.view_acs_patient_procedure_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='patient_id']" position="after">
+                <field name="blood_group" invisible="department_type!='nephrology'"/>
+            </xpath>
+
+            <xpath expr="//notebook/page[@name='consumed_products']" position="before">
+                <page name="nephrology" string="Nephrology" invisible="department_type!='nephrology'" groups="acs_hms_nephrology.group_hms_nephrology_user">
+                    <group string="Hemodialysis Regimen" invisible="department_type!='nephrology'">
+                        <group>
+                            <field name="type_of_vascular_access"/>
+                            <field name="dialyzer_type"/>
+                            <field name="dialysis_number"/>
+                        </group>
+
+                        <group>
+                            <field name="nephrology_schedule_ids" widget="many2many_tags"/>
+                            <field name="last_ktv"/>
+                            <field name="type_of_dialysate"/>
+                            <field name="dry_weight"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group>
+                            <field name="heparin_others"/>
+                            <field name="bicarbonate"/>
+                            <field name="erythropoietin_units">Units</field>
+                        </group>
+
+                        <group>                            
+                            <field name="potassium"/>
+                            <field name="sodium"/>
+                            <field name="calcium"/>
+                        </group>
+                    </group>
+
+                    <separator string="Blood Culture" invisible="department_type!='nephrology'"/>
+                    <field name="blood_culture" placeholder="Blood Culture..." invisible="department_type!='nephrology'"/>
+                    
+                    <separator string="Actual Treatment" invisible="department_type!='nephrology'"/>
+                    <field name="actual_treatment" placeholder="Actual Treatment..." invisible="department_type!='nephrology'"/>
+                    
+                    <separator string="Heparinization" invisible="department_type!='nephrology'"/>
+                    <field name="heparinization" placeholder="Heparinization..." invisible="department_type!='nephrology'"/>
+                    
+                    <separator string="Blood Flow" invisible="department_type!='nephrology'"/>
+                    <field name="blood_flow" placeholder="Blood Flow..." invisible="department_type!='nephrology'"/>
+                    
+                    <separator string="Dialysis Fluid Flow" invisible="department_type!='nephrology'"/>
+                    <field name="dialysis_fluid_flow" placeholder="Dialysis Fluid Flow..." invisible="department_type!='nephrology'"/>
+                    
+                    <separator string="Interdialysis Increase" invisible="department_type!='nephrology'"/>
+                    <field name="interdialysis_increase" placeholder="Interdialysis Increase..." invisible="department_type!='nephrology'"/>
+                    
+                    <separator string="Interdialysis Medication" invisible="department_type!='nephrology'"/>
+                    <field name="interdialysis_medication" placeholder="Interdialysis Medication..." invisible="department_type!='nephrology'"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <menuitem id="menu_acs_main_nephrology" name="Nephrology" sequence="30" web_icon="acs_hms_nephrology,static/description/icon.png" groups="acs_hms_nephrology.group_hms_nephrology_user"/>
+
+    <menuitem id="menu_acs_patient" name="Patients" parent="menu_acs_main_nephrology" action="action_acs_hms_patient" sequence="10"/>
+
+    <menuitem id="menu_acs_treatment" name="Treatments" parent="menu_acs_main_nephrology" action="action_acs_treatment" sequence="20"/>
+
+    <menuitem id="menu_acs_appointment" name="Appointment" parent="menu_acs_main_nephrology" action="action_appointment" sequence="30"/>
+
+    <menuitem id="menu_acs_patient_procedure" name="Nephrology Procedures" parent="menu_acs_main_nephrology" action="action_acs_nephrology_procedure" sequence="40"/>
+
+    <menuitem id="menu_acs_nephrology_procedures" name="Procedures" parent="menu_acs_main_nephrology" action="action_nephrology_procedure" sequence="40"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_nephrology_config" name="Configuration" parent="menu_acs_main_nephrology" groups="acs_hms_base.group_hms_manager" sequence="100"/>
+
+    <menuitem id="menu_vascular_types" name="Vascular Access Types" sequence="1" action="action_acs_vscular_types" parent="menu_nephrology_config"/>
+
+    <menuitem id="menu_acs_dialyer" name="Dialyzer Types" sequence="2" action="action_acs_dialyer" parent="menu_nephrology_config"/>
+
+    <menuitem id="menu_acs_dialysate" name="Dialysate Types" sequence="3" action="action_acs_dialysate" parent="menu_nephrology_config"/>
+
+    <menuitem id="menu_acs_race" name="Race" sequence="4" action="action_acs_race" parent="menu_nephrology_config"/>
+
+    <menuitem id="menu_acs_schedule" name="Schedule" sequence="5" action="action_acs_nephrology_schedule" parent="menu_nephrology_config"/>
+
+</odoo>

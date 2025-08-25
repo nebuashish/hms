@@ -1,0 +1,237 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <!-- Race -->
+    <record id="acs_hms_race" model="ir.ui.view">
+        <field name="name">Race</field>
+        <field name="model">acs.race</field>
+        <field name="arch" type="xml">
+            <list string="Race">
+                <field name="name"/>
+                <field name="code"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="acs_hms_race_form" model="ir.ui.view">
+        <field name="name">Race</field>
+        <field name="model">acs.race</field>
+        <field name="arch" type="xml">
+            <form string="Race">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="code"/>
+                        </group>
+                        <separator string="Description"/>
+                        <field name="description" placeholder="Description" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_acs_race" model="ir.actions.act_window">
+        <field name="name">Race</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">acs.race</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Record Found
+            </p>
+            <p>
+                Click to add new Race.
+            </p>
+        </field>
+    </record>
+
+    <!-- Dialysate Types -->
+    <record id="acs_hms_dialysate" model="ir.ui.view">
+        <field name="name">Dialysate Types</field>
+        <field name="model">acs.dialysate</field>
+        <field name="arch" type="xml">
+            <list string="Dialysate Types">
+                <field name="name"/>
+                <field name="code"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="acs_hms_dialysate_form" model="ir.ui.view">
+        <field name="name">Dialysate Type</field>
+        <field name="model">acs.dialysate</field>
+        <field name="arch" type="xml">
+            <form string="Race">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="code"/>
+                        </group>
+                        <separator string="Description"/>
+                        <field name="description" placeholder="Description" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_acs_dialysate" model="ir.actions.act_window">
+        <field name="name">Dialysate Types</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">acs.dialysate</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Record Found
+            </p>
+            <p>
+                Click to add new Dialysate types.
+            </p>
+        </field>
+    </record>
+
+    <record id="acs_hms_dialyser" model="ir.ui.view">
+        <field name="name">Dialyzer Types</field>
+        <field name="model">acs.dialyzer</field>
+        <field name="arch" type="xml">
+            <list string="Dialyzer Types">
+                <field name="name"/>
+                <field name="code"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="acs_hms_dialyser_form" model="ir.ui.view">
+        <field name="name">Dialyzer Type</field>
+        <field name="model">acs.dialyzer</field>
+        <field name="arch" type="xml">
+            <form string="Race">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="code"/>
+                        </group>
+                        <separator string="Description"/>
+                        <field name="description" placeholder="Description" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_acs_dialyer" model="ir.actions.act_window">
+        <field name="name">Dialyzer Types</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">acs.dialyzer</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Record Found
+            </p>
+            <p>
+                Click to add new Dialyzer types.
+            </p>
+        </field>
+    </record>
+
+    <!-- Vascular Access Types -->
+    <record id="acs_hms_vascular_access" model="ir.ui.view">
+        <field name="name">Vascular Access Types</field>
+        <field name="model">acs.vascular.access</field>
+        <field name="arch" type="xml">
+            <list string="Dialyzer Types">
+                <field name="name"/>
+                <field name="code"/>
+            </list>
+        </field>
+    </record>
+    
+    <record id="acs_vascular_access_form" model="ir.ui.view">
+        <field name="name">Vascular Access Type</field>
+        <field name="model">acs.vascular.access</field>
+        <field name="arch" type="xml">
+            <form string="Race">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="code"/>
+                        </group>
+                        <separator string="Description"/>
+                        <field name="description" placeholder="Description" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_acs_vscular_types" model="ir.actions.act_window">
+        <field name="name">Vascular Access Types</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">acs.vascular.access</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Record Found
+            </p>
+            <p>
+                Click to add new Vascular Access Types.
+            </p>
+        </field>
+    </record>
+
+    <!-- Nephrology Schedule -->
+    <record id="acs_hms_nephrology_schedule_list" model="ir.ui.view">
+        <field name="name">Schedule</field>
+        <field name="model">acs.nephrology.schedule</field>
+        <field name="arch" type="xml">
+            <list string="Schedule">
+                <field name="name"/>
+                <field name="code"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="acs_hms_nephrology_schedule_form" model="ir.ui.view">
+        <field name="name">Nephrology Schedule</field>
+        <field name="model">acs.nephrology.schedule</field>
+        <field name="arch" type="xml">
+            <form string="Race">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_acs_nephrology_schedule" model="ir.actions.act_window">
+        <field name="name">Nephrology Schedule</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">acs.nephrology.schedule</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Record Found
+            </p>
+            <p>
+                Click to add new Nephrology Schedule.
+            </p>
+        </field>
+    </record>
+
+</odoo>

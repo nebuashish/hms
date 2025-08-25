@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <menuitem id="main_menu_cashier" name="Cashier" sequence="22" groups="acs_hms_cashier.group_acs_cashier" web_icon="acs_hms_cashier,static/description/icon.png"/>
+
+    <menuitem id="menu_acs_hms_appointment" action="action_acs_hms_appointment" name="Appointments" parent="main_menu_cashier" sequence="20"/>
+
+    <menuitem id="menu_acs_hms_invoice" action="action_acs_hms_invoice" name="Patient Invoice" parent="main_menu_cashier" sequence="10"/>
+
+    <menuitem id="menu_acs_hms_surgery" action="action_hms_surgery" name="Surgery" parent="main_menu_cashier" sequence="50"/>
+
+    <menuitem id="menu_patient_procedure" action="action_patient_procedure" name="Patient Procedures" parent="acs_hms_cashier.main_menu_cashier" sequence="60"/>
+
+    <menuitem id="menu_patient_vaccination" action="action_vaccination" name="Vaccination" parent="acs_hms_cashier.main_menu_cashier" sequence="70"/>
+
+    <menuitem id="menu_hospitalization" action="acs_action_form_inpatient_cashier" name="Hospitalization" parent="acs_hms_cashier.main_menu_cashier" sequence="80"/>
+
+</odoo>
