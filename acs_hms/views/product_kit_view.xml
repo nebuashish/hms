@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <record id="view_acs_product_kit_line_tree" model="ir.ui.view">
-        <field name="name">acs.product.kit.line.tree</field>
+    <record id="view_acs_product_kit_line_list" model="ir.ui.view">
+        <field name="name">acs.product.kit.line.list</field>
         <field name="model">acs.product.kit.line</field>
         <field name="arch" type="xml">
             <list string="Kit Components" editable="bottom">
@@ -14,6 +14,7 @@
                 <field name="total_standard_price" sum="Total" optional="hide"/>
                 <field name="unit_price"/>
                 <field name="total_price" sum="Total"/>
+                <field name="acs_invoice_exempt" optional="hide"/>
             </list>
         </field>
     </record>
@@ -42,8 +43,8 @@
         </field>
     </record>
 
-    <record id="view_acs_product_kit_tree" model="ir.ui.view">
-        <field name="name">acs.product.kit.tree</field>
+    <record id="view_acs_product_kit_list" model="ir.ui.view">
+        <field name="name">acs.product.kit.list</field>
         <field name="model">acs.product.kit</field>
         <field name="arch" type="xml">
             <list string="Product Kits">
@@ -69,17 +70,14 @@
                     <separator string="Description"/>
                     <field name="description" placeholder="Description..."/>
                 </sheet>
-		<!--<div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers"/>
-                    <field name="activity_ids" widget="mail_activity"/>
-                    <field name="message_ids" widget="mail_thread"/>
-		</div> -->
+                <chatter/>
             </form>
         </field>
     </record>
 
     <record id="action_acs_product_kit" model="ir.actions.act_window">
         <field name="name">Product Kits</field>
+        <field name="path">almightyhms-product-kit</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">acs.product.kit</field>
         <field name="view_mode">list,form</field>
@@ -108,6 +106,17 @@
                 <page name="acs_kit_components" string="Kit Components" invisible="not is_kit_product">
                     <field name="acs_kit_line_ids"/>
                 </page>
+            </xpath>
+
+            <xpath expr="//field[@name='pregnancy']" position="after">
+                <separator string="Medical Alert" colspan="4"/>
+                <group>
+                    <field name="acs_medical_alert_ids" widget="many2many_tags"/>
+                </group>
+                <separator string="Allergies" colspan="4"/>
+                <group>
+                    <field name="acs_allergy_ids" widget="many2many_tags"/>
+                </group>
             </xpath>
         </field>
     </record>

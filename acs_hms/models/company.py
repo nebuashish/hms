@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 
 
 class ResCompany(models.Model):
-    #_description = "Hospital"  #Do not chnage moduel name to avoid testcase error
+    #_description = "Hospital"  #Do not change module name to avoid testcase error
     _inherit = "res.company"
 
     patient_registration_product_id = fields.Many2one('product.product', 
@@ -33,7 +34,8 @@ class ResCompany(models.Model):
     registration_date = fields.Char(string='Date of Registration')
     appointment_invoice_policy = fields.Selection([('at_end','Invoice in the End'),
         ('anytime','Invoice Anytime'),
-        ('advance','Invoice in Advance')], default='at_end', string="Appointment Invoicing Policy", required=True)
+        ('advance','Invoice in Advance'),
+        ('foc','No Invoice: Free')], default='at_end', string="Appointment Invoicing Policy", required=True)
     acs_check_appo_payment = fields.Boolean(string="Check Appointment Payment Status before Accepting Request")
     appointment_usage_location_id = fields.Many2one('stock.location', 
         string='Usage Location for Consumed Products in Appointment')
@@ -45,7 +47,7 @@ class ResCompany(models.Model):
     procedure_stock_location_id = fields.Many2one('stock.location', 
         string='Stock Location for Consumed Products in Procedure')
 
-    acs_prescription_qrcode = fields.Boolean(string="Print Authetication QrCode on Presctiprion", default=True)
+    acs_prescription_qrcode = fields.Boolean(string="Print Authentication QrCode on Prescription", default=True)
     acs_cancel_old_appointment = fields.Boolean(string='Cancel Old Appointment', default=True)
     acs_auto_appo_confirmation_mail = fields.Boolean(string="Sent Appointment Confirmation Mail")
     acs_appointment_planned_duration = fields.Float(string="Default Appointment Planned Duration", default=0.25)
@@ -54,5 +56,8 @@ class ResCompany(models.Model):
     acs_reminder_hours = fields.Float(string="Reminder Hours", default=2)
 
     acs_flag_days = fields.Integer(string="Warning Flag Days", help="Days to count cancelled appointment", default=365)
-    acs_flag_count_limit = fields.Integer(string="Count Limit for Flag", help="Configure number to show alert flag after couting that many cancelled appoitments", default=10)
+    acs_flag_count_limit = fields.Integer(string="Count Limit for Flag", help="Configure number to show alert flag after couting that many cancelled appointments", default=10)
 
+    badge_image = fields.Image('Badge Background', max_width=1024, max_height=1024)
+    acs_view_patient_progress = fields.Boolean(string="Patient Profile Progress")
+    acs_patient_field_ids = fields.Many2many('ir.model.fields', string='Fields', domain="[('model', '=', 'hms.patient'), ('name', '!=', 'acs_patient_progress')]")

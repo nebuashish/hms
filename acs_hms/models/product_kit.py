@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
@@ -40,6 +41,9 @@ class ACSProductKitLine(models.Model):
     total_price = fields.Float(compute=_get_total_price, string='Total Price')
     total_standard_price = fields.Float(compute=_get_total_price, string='Total Cost Price')
 
+    # MKA: Once the boolean is selected, this line will be excluded from the invoice
+    acs_invoice_exempt = fields.Boolean(string="Exclude from Invoice", default=False)
+
     def write(self, values):
         res = super(ACSProductKitLine, self).write(values)
         self.mapped('product_template_id').acs_update_price_for_kit()
@@ -73,6 +77,11 @@ class ProductTemplate(models.Model):
     kit_amount_total = fields.Float(compute='acs_get_kit_amount_total', string="Kit Total")
     kit_cost_total = fields.Float(compute='acs_get_kit_amount_total', string="Kit Cost Total")
 
+    acs_medical_alert_ids = fields.Many2many('acs.medical.alert', 'acs_product_medical_alert_rel','product_id', 'alert_id',
+        string='Medical Alerts')
+    acs_allergy_ids = fields.Many2many('acs.medical.allergy', 'acs_product_allergies_rel','product_id', 'allergies_id',
+        string='Allergies')
+    
     @api.onchange('is_kit_product')
     def onchange_is_kit_product(self):
         if self.is_kit_product:

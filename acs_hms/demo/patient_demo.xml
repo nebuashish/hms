@@ -5,30 +5,43 @@
         <record id="hms_diseases_0" model="hms.diseases">
             <field name="name">Cholera</field>
             <field name="info">Cholera is a disease caused by bacteria that produce a watery diarrhea that can rapidly lead to dehydration.</field>
+            <field name="category_id" ref="category_bacterial"/>
         </record>
+
         <record id="hms_diseases_1" model="hms.diseases">
             <field name="name">Hair Loss</field>
             <field name="info">Hair loss is a very common condition and affects most people at some time in their lives.</field>
+            <field name="category_id" ref="category_other"/>
         </record>
+
         <record id="hms_diseases_2" model="hms.diseases">
             <field name="name">Sinus Headache</field>
-            <field name="info">Sinuses in the face are air the spaces that develop from the nasal passages and help with air humidification and mucus secretion..</field>
+            <field name="info">Sinuses in the face are air the spaces that develop from the nasal passages and help with air humidification and mucus secretion.</field>
+            <field name="category_id" ref="category_other"/>
         </record>
+
         <record id="hms_diseases_3" model="hms.diseases">
             <field name="name">Heart Attack</field>
             <field name="info">A heart attack results when a blood clot completely obstructs a coronary artery supplying blood to the heart muscle and heart muscle dies.</field>
+            <field name="category_id" ref="category_other"/>
         </record>
+
         <record id="hms_diseases_4" model="hms.diseases">
             <field name="name">Hepatitis</field>
             <field name="info">Many illnesses and conditions can cause inflammation of the liver (hepatitis), but certain viruses cause about half of all hepatitis in people.</field>
+            <field name="category_id" ref="category_viral"/>
         </record>
+
         <record id="hms_diseases_5" model="hms.diseases">
             <field name="name">Heart Disease</field>
             <field name="info">Heart disease refers to various types of conditions that can affect heart function.</field>
+            <field name="category_id" ref="category_other"/>
         </record>
+
         <record id="hms_diseases_6" model="hms.diseases">
             <field name="name">Hernia</field>
             <field name="info">An abdominal hernia occurs when an organ or other piece of tissue protrudes through a weakening in one of the muscle walls that enclose the abdominal cavity.</field>
+            <field name="category_id" ref="category_other"/>
         </record>
 
         <!-- Family Diseases -->

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from . import hms_mixin
 from . import hms_base
+from . import calendar
 from . import hms_consumable_line
 from . import partner
 from . import patient
@@ -13,5 +15,6 @@ from . import ir_sequence
 from . import res_config
 from . import stock_move
 from . import country
+from . import document
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

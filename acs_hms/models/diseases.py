@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError, ValidationError
 
 
 class ACSDiseases(models.Model):
@@ -20,17 +22,16 @@ class ACSDiseases(models.Model):
     gene = fields.Char(string='Gene')
     chromosome = fields.Char(string='Affected Chromosome', help='chromosome number')
     classification = fields.Selection([
-        ('icd9','ICD-9'),
-        ('icd10',    'ICD-10'), 
-        ('vaccine', 'ICD-11')], string="Classification")
+        ('icd9', 'ICD-9'),
+        ('icd10', 'ICD-10'), 
+        ('icd11', 'ICD-11')], string="Classification")
     sequence = fields.Integer(string='Sequence', default=60)
 
     def _compute_display_name(self):
         for rec in self:
+            name = rec.name
             if rec.code:
-                name = rec.name + ' ' + '['+ str(rec.code) + ']'
-            else:
-                name = rec.name
+                name = '['+ str(rec.code) + '] ' + rec.name
             rec.display_name = name
 
 
@@ -44,14 +45,15 @@ class ACSDiseasesCategory(models.Model):
     @api.constrains('parent_id')
     def _check_parent_id(self):
         for rec in self:
-            if not rec._check_recursion():
+            if rec._has_cycle():
                 raise ValidationError(_('You cannot create a recursive hierarchy.'))
 
 
 class ACSPatientDisease(models.Model):
     _name = 'hms.patient.disease'
     _description = "Patient Diseases"
-
+    
+    #ACS; disease_id Field remove in v19 not used
     disease_id = fields.Many2one('hms.diseases', ondelete='set null', string='Disease')
     description = fields.Char(string='Treatment Description')
     diagnosed_date = fields.Date(string='Date of Diagnosis')
@@ -88,7 +90,16 @@ class ACSPatientDisease(models.Model):
         help='Patient age at the moment of the diagnosis. Can be estimative')
     treatment_id = fields.Many2one('hms.treatment', ondelete='cascade', 
         string='Treatment', help="Treatment Id")
+    
+    procedure_ids = fields.Many2many('acs.patient.procedure', 'acs_rel_disease_procedure', 'disease_id', 'procedure_id', string='Patient Procedures', store=True)
 
+    disease_ids = fields.Many2many('hms.diseases', 'acs_rel_patient_disease', 'patient_disease_id', 'disease_id', string='Diseases', store=True)
+    acs_procedures = fields.Text(string="Procedures", compute="_compute_procedures", store=True)
+
+    @api.depends('procedure_ids')
+    def _compute_procedures(self):
+        for rec in self:
+            rec.acs_procedures = ', '.join(rec.procedure_ids.mapped('product_id.name'))
 
 class ACSDiseaseGene(models.Model):
     _name = 'disease.gene'

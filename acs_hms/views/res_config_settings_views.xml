@@ -13,7 +13,7 @@
                         <field name="patient_registration_product_id" class="o_light_label"/>
                     </setting>
                     <setting help="Create Patient Registration Invoicing." id="default_patient_registration_invoice_setting">
-                        <field name="group_patient_registartion_invoicing" class="o_light_label"/>
+                        <field name="group_patient_registration_invoicing" class="o_light_label"/>
                     </setting>
                     <setting help="Set the default Patient Weight measure." id="default_patient_weight_measure_setting">
                         <field name="patient_weight_measure_uom" class="o_light_label"/>
@@ -33,6 +33,10 @@
                     <setting help="Set the default Patient Head Circumference measure." id="default_patient_head_circumference_measure_setting">
                         <field name="patient_head_circum_measure_uom" class="o_light_label"/>
                     </setting>
+                    <setting help="Set Patient Profile Progressbar" id="default_view_patient_profile_progressbar">
+                        <field name="acs_view_patient_progress"/>
+                        <field name="acs_patient_field_ids" widget="many2many_tags" options="{'no_create': True, 'no_create_edit': True}" required="acs_view_patient_progress" invisible="not acs_view_patient_progress"/>
+                    </setting>
                 </block>
 
                 <block title="Patient Procedure" name="patient_procedure_setting_container">
@@ -50,7 +54,7 @@
 
             <xpath expr="//div[@id='prescription_data']" position="before">
                 <block title="Prescription" name="prescription_setting_container">
-                    <setting string="Prescription Authentication" help="Allow user to Autheticate prescription by scanning QrCode from report." id="acs_prescription_qrcode_setting">
+                    <setting string="Prescription Authentication" help="Allow user to Authenticate prescription by scanning QrCode from report." id="acs_prescription_qrcode_setting">
                         <field name="acs_prescription_qrcode"/>
                     </setting>
                 </block>
@@ -72,7 +76,7 @@
                         <field name="consultation_product_id"/><br/>
                         <span class="o_form_label">Auto Follow-up Date</span>
                         <div class="text-muted">
-                            Cofigure days to set Auto followup days on appointment.
+                            Configure days to set Auto followup days on appointment.
                         </div>
                         <div class="text-muted">
                             <field name="auto_followup_days"/>
@@ -94,7 +98,7 @@
                     <setting string="Check Payment Status" help="Do not allow to accept request before completion of payment." id="acs_check_appo_payment_setting" invisible="appointment_invoice_policy!='advance'">
                         <field name="acs_check_appo_payment"/>
                     </setting>
-                    <setting string="Folloup Activity" help="Auto Folloup activity for responsible person for reminder of followup (Before one day of followup Date)." id="acs_followup_activity_type_id_setting">
+                    <setting string="Followup Activity" help="Auto Followup activity for responsible person for reminder of followup (Before one day of followup Date)." id="acs_followup_activity_type_id_setting">
                         <field name="acs_followup_activity_type_id"/>
                     </setting>
                     <setting string="Auto Cancel Old Appointment" help="Auto cancel the draft and confirm appointments created before today." id="acs_cancel_old_appointment_setting">

@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models ,_
 from odoo.exceptions import UserError
-import base64
-import xlrd
-import csv
-import io
+
 import time
 import json
 from datetime import datetime, timedelta
@@ -27,8 +25,8 @@ class ACSPatient(models.Model):
             rec.evaluation_count = len(rec.evaluation_ids)
             rec.patient_procedure_count = len(rec.patient_procedure_ids)
 
-    def _acs_get_attachemnts(self):
-        attachments = super(ACSPatient, self)._acs_get_attachemnts()
+    def _acs_get_attachments(self):
+        attachments = super(ACSPatient, self)._acs_get_attachments()
         attachments += self.appointment_ids.mapped('attachment_ids')
         return attachments
 
@@ -49,16 +47,16 @@ class ACSPatient(models.Model):
             else:
                 rec.last_evaluation_id = False
 
-    @api.depends('grpah_data_filter')
+    @api.depends('graph_data_filter')
     def _patient_evaluation_graph_data(self):
         for rec in self:
             today = fields.Datetime.now()
             domain = [('patient_id','=',rec.id)]
-            if rec.grpah_data_filter=='today':
+            if rec.graph_data_filter=='today':
                 domain += [('date', '>=', today.strftime('%Y-%m-%d 00:00:00')),('date', '<=', today.strftime('%Y-%m-%d 23:59:59'))]
-            if rec.grpah_data_filter=='week':
+            if rec.graph_data_filter=='week':
                 domain += [('date', '>=', (today + relativedelta(weeks=-1,days=1,weekday=0))), ('date', '<=', (fields.Datetime.today() + relativedelta(weekday=6)))]
-            if rec.grpah_data_filter=='month':
+            if rec.graph_data_filter=='month':
                 domain += [('date','<',(today+relativedelta(months=1)).strftime('%Y-%m-01')), ('date','>=',time.strftime('%Y-%m-01'))]
 
             records = self.env['acs.patient.evaluation'].search(domain, order="date")
@@ -129,6 +127,8 @@ class ACSPatient(models.Model):
     appointment_ids = fields.One2many('hms.appointment', 'patient_id', 'Appointments')
     medical_alert_ids = fields.Many2many('acs.medical.alert', 'patient_medical_alert_rel','patient_id', 'alert_id',
         string='Medical Alerts')
+    allergy_ids = fields.Many2many('acs.medical.allergy', 'patient_allergies_rel','patient_id', 'allergies_id',
+        string='Allergies')
     registration_product_id = fields.Many2one('product.product', default=_get_service_id, string="Registration Service")
     invoice_id = fields.Many2one("account.move","Registration Invoice", copy=False)
 
@@ -153,13 +153,13 @@ class ACSPatient(models.Model):
     pain_level = fields.Selection(related="last_evaluation_id.pain_level", string="Pain Level", readonly=True)
     pain = fields.Selection(related="last_evaluation_id.pain", string="Pain", readonly=True)
 
-    grpah_data_filter = fields.Selection([
+    graph_data_filter = fields.Selection([
             ('today','Today'),
             ('week','This Week'),
             ('month','This Month'),
             ('year','This Year'),
             ('all','All'),
-        ], "Grpah Filter Type", default="month")
+        ], "Graph Filter Type", default="month")
     patient_weight_line_graph = fields.Text(compute='_patient_evaluation_graph_data')
     patient_height_line_graph = fields.Text(compute='_patient_evaluation_graph_data')
     patient_temp_line_graph = fields.Text(compute='_patient_evaluation_graph_data')
@@ -181,133 +181,6 @@ class ACSPatient(models.Model):
     show_cancellation_warning_flag = fields.Boolean(compute='acs_check_cancellation_flag', string='Show Cancellation Flag')
     acs_flag_days = fields.Integer(compute='acs_check_cancellation_flag', string='Flag Days')
     acs_cancelled_appointments = fields.Integer(compute='acs_check_cancellation_flag', string='Cancelled Appointments')
-    mrn_no = fields.Char(string='Medical Record Number', help="Unique Medical Record Number for the patient.")
-    upload_excel = fields.Binary(string='Upload Patient Data', help="Upload a CSV file to create multiple patients at once.")
-    partner_age = fields.Char(string='Age')
-
-    def get_or_create_attribute(self, attr_name, values_list):
-        """Find existing attribute or create a new one"""
-        attr = self.env['product.attribute'].search([('name', '=', attr_name)], limit=1)
-        if not attr:
-            attr = self.env['product.attribute'].create({
-                'name': attr_name,
-                'create_variant': 'always'
-            })
-
-        # Ensure all values exist
-        for val_name in values_list:
-            if not attr.value_ids.filtered(lambda v: v.name == val_name):
-                self.env['product.attribute.value'].create({
-                    'name': val_name,
-                    'attribute_id': attr.id,
-                })
-        return attr
-
-
-    def create_product_with_attributes(self, product_name):
-        # Attributes (reusable across all products)
-        category_attr = self.get_or_create_attribute('Category', ['General', 'Government', 'Insurance', 'Healthabhi'])
-        sub_category_attr = self.get_or_create_attribute('Sub Category', ['ICICI'])
-        room_type_attr = self.get_or_create_attribute('Room Type', [
-            'General', 'Semi-Special', 'Deluxe', 'Super Deluxe',
-            'Suite', 'Sharing', 'ICU', 'Dialysis', 'Recovery Room'
-        ])
-
-        # Create product template with attribute lines
-        product_tmpl = self.env['product.template'].create({
-            'name': product_name,
-            'type': 'service',
-            'hospital_product_type': 'surgery',
-            'attribute_line_ids': [
-                (0, 0, {
-                    'attribute_id': category_attr.id,
-                    'value_ids': [(6, 0, category_attr.value_ids.ids)],
-                }),
-                (0, 0, {
-                    'attribute_id': sub_category_attr.id,
-                    'value_ids': [(6, 0, sub_category_attr.value_ids.ids)],
-                }),
-                (0, 0, {
-                    'attribute_id': room_type_attr.id,
-                    'value_ids': [(6, 0, room_type_attr.value_ids.ids)],
-                }),
-            ]
-        })
-
-        print(f"✅ Product '{product_name}' created with variants.")
-        return product_tmpl
-
-    def create_patient_from_csv(self):
-        if self.upload_excel:
-            file_data = base64.decodebytes(self.upload_excel)
-            decoded_file = file_data.decode('utf-8')
-            csv_reader = csv.reader(io.StringIO(decoded_file))
-            next(csv_reader)  # Skip header
-            for row in csv_reader:
-                ##### For adding patient #####
-                #doctor_ids = []
-                #if row[6]: 
-                #    doctor_id = self.env['res.partner'].search([('name', '=', row[6])], limit=1)
-                #    if not doctor_id:
-                #        doctor_id = self.env['res.partner'].create({'name': row[6], 'is_referring_doctor': True})
-                #    doctor_ids.append(doctor_id.id)
-
-                #patient_vals = {
-                #    'mrn_no': row[0] if row[0] else False,
-                #    'code': row[1] if row[1] else False,
-                #    'name': row[2] if row[2] else False,
-                #    'partner_age': row[3] if row[3] else False,
-                #    'gender': 'male' if row[4] == 'M' else 'female' if row[4] == 'F' else 'other',
-                #    'active': True,  
-                #    'ref_doctor_ids': [(6, 0, doctor_ids)]
-                #}
-                #self.env['hms.patient'].create(patient_vals)
-
-                ##### For adding insurance plan #####
-                #include_package_ids = []
-                #include_package = row[2].split(',') if row[2] else []
-                #for i in include_package:
-                #    product = self.env['product.template'].search([('name', '=', i.strip())], limit=1)
-                #    if product:
-                #        include_package_ids.append(product.id)
-
-                #insurance_plan_vals = {
-                #    'ppn_code': row[0] if row[0] else False,
-                #    'name': row[1] if row[1] else False,
-                #    'include_package': [(6, 0, include_package_ids)],
-                #    'active': True,
-                #    'insurance_company_id': 1
-                #}
-                #insurance_plan = self.env['acs.insurance.plan'].create(insurance_plan_vals)
-                #self.create_product_with_attributes(row[0])
-                self.create_surgery_template(row[0])
-
-    def find_general_icici_generalward(self, surgery_name):
-        # Attribute values we want
-        category_val = self.env['product.attribute.value'].search([('name', '=', 'General')], limit=1)
-        sub_category_val = self.env['product.attribute.value'].search([('name', '=', 'ICICI')], limit=1)
-        room_type_val = self.env['product.attribute.value'].search([('name', '=', 'Deluxe')], limit=1)
-
-        if not category_val or not sub_category_val or not room_type_val:
-            return self.env['product.product']  # empty recordset if not found
-
-        # Find product variants with all three attribute values
-        products = self.env['product.product'].search([
-            ('name', '=', surgery_name),
-            ('product_template_attribute_value_ids.product_attribute_value_id', 'in', [category_val.id]),
-            ('product_template_attribute_value_ids.product_attribute_value_id', 'in', [sub_category_val.id]),
-            ('product_template_attribute_value_ids.product_attribute_value_id', 'in', [room_type_val.id]),
-        ], limit=1)
-
-        return products
-
-    def create_surgery_template(self, surgery_name):
-        products = self.find_general_icici_generalward(surgery_name)
-        surgery_template = self.env['hms.surgery.template'].create({
-            'name': surgery_name,
-            'surgery_product_id': products.id
-        })
-        return surgery_template
 
     def action_view_patient_procedures(self):
         action = self.env["ir.actions.actions"]._for_xml_id("acs_hms.action_acs_patient_procedure")
@@ -316,19 +189,19 @@ class ACSPatient(models.Model):
         return action
 
     def today_data(self):
-        self.sudo().grpah_data_filter = 'today'
+        self.sudo().graph_data_filter = 'today'
 
     def week_data(self):
-        self.sudo().grpah_data_filter = 'week'
+        self.sudo().graph_data_filter = 'week'
 
     def month_data(self):
-        self.sudo().grpah_data_filter = 'month'
+        self.sudo().graph_data_filter = 'month'
 
     def year_data(self):
-        self.sudo().grpah_data_filter = 'year'
+        self.sudo().graph_data_filter = 'year'
 
     def all_data(self):
-        self.sudo().grpah_data_filter = 'all'
+        self.sudo().graph_data_filter = 'all'
 
     def show_weight_chart(self):
         action = self.env["ir.actions.actions"]._for_xml_id("acs_hms.action_patient_evaluation_graph_1")
@@ -367,6 +240,25 @@ class ACSPatient(models.Model):
         action['context'] = {'default_patient_id': self.id, 'default_physician_id': self.primary_physician_id.id}
         return action
 
+    acs_patient_progress = fields.Float(string="Patient Profile Progress", compute="compute_patient_progress")
+    show_patient_progress = fields.Boolean(string="Show Patient Progress", compute="compute_view_patient_progress")
+
+    def compute_view_patient_progress(self):
+        for rec in self:
+            company = rec.company_id or self.env.company
+            rec.show_patient_progress = company.sudo().acs_view_patient_progress
+
+    def compute_patient_progress(self):
+        for rec in self:
+            company = rec.company_id or self.env.company
+            acs_patient_progress = 0.0
+            dynamic_fields = company.acs_patient_field_ids.filtered(lambda f: f.model == 'hms.patient').mapped('name')
+            if dynamic_fields:
+                total = len(dynamic_fields)
+                filled = sum(1 for field_name in dynamic_fields if getattr(rec, field_name))
+                acs_patient_progress = (filled / total * 100) if total else 0.0
+            rec.acs_patient_progress = acs_patient_progress
+
 
 class ACSFamilyMember(models.Model):
     _name = 'acs.family.member'
@@ -401,7 +293,7 @@ class ACSFamilyMember(models.Model):
     def write(self, values):
         res = super(ACSFamilyMember, self).write(values)
         if 'patient_id' in values or 'related_patient_id' in values :
-            raise UserError(_("Please Delete Exiting relateion and create new!"))
+            raise UserError(_("Please Delete Exiting relation and create new!"))
 
         if 'relation_id' in values:
             for rec in self:

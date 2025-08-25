@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
@@ -12,11 +13,9 @@ from io import BytesIO
 class ResPartner(models.Model):
     _inherit= "res.partner"
 
-    is_referring_doctor = fields.Boolean(string="Is Refereinng Physician")
+    is_referring_doctor = fields.Boolean(string="Is Referring Physician")
     #ACS Note: Adding assignee as relation with partner for receptionist or Doctor to access only those patients assigned to them
     assignee_ids = fields.Many2many('res.partner','acs_partner_asignee_relation','partner_id','assigned_partner_id','Assignees', help='Assigned partners for receptionist or doctor etc to see the records')
-    category = fields.Selection([('General', 'General'), ('Government', 'Government'), ('Insurance', 'Insurance'), ('Healthabhi', 'Healthabhi')], string='Category', default='General', help="Category of the patient for surgery")
-    sub_category = fields.Selection([('ICICI', 'ICICI')], string='Sub Category', help="Sub Category of the patient for surgery", default='ICICI')
 
 class ResUsers(models.Model):
     _inherit= "res.users"
@@ -24,10 +23,10 @@ class ResUsers(models.Model):
     @api.depends('physician_ids')
     def _compute_physician_count(self):
         for user in self.with_context(active_test=False):
-            user.physician_count = len(user.physician_ids)
+            user.physician_count = len(user.sudo().physician_ids)
 
     def _compute_patient_count(self):
-        Patient = self.env['hms.patient']
+        Patient = self.env['hms.patient'].sudo()
         for user in self.with_context(active_test=False):
             user.patient_count = Patient.search_count([('partner_id','=', user.partner_id.id)])
 
@@ -57,10 +56,13 @@ class ResUsers(models.Model):
 
     def action_create_physician(self):
         self.ensure_one()
-        self.env['hms.physician'].create({
+        portal_user = self.share
+        physician = self.env['hms.physician'].create({
             'user_id': self.id,
             'name': self.name,
         })
+        if portal_user:
+            physician.is_portal_user = True
 
     def action_create_patient(self):
         self.ensure_one()
@@ -76,8 +78,8 @@ class HospitalDepartment(models.Model):
     note = fields.Text('Note')
     patient_department = fields.Boolean("Patient Department", default=True)
     appointment_ids = fields.One2many("hms.appointment", "department_id", "Appointments")
-    department_type = fields.Selection([('general','General')], string="Hospital Department")
-    consultaion_service_id = fields.Many2one('product.product', ondelete='restrict', string='Consultation Service')
+    department_type = fields.Selection([('general','General'),('nurse', 'Nurse')], string="Hospital Department")
+    consultation_service_id = fields.Many2one('product.product', ondelete='restrict', string='Consultation Service')
     followup_service_id = fields.Many2one('product.product', ondelete='restrict', string='Followup Service')
     image = fields.Binary(string='Image')
 
@@ -96,6 +98,14 @@ class ACSEthnicity(models.Model):
 class ACSMedicalAlert(models.Model):
     _name = 'acs.medical.alert'
     _description = "Medical Alert for Patient"
+
+    name = fields.Char(required=True)
+    description = fields.Text('Description')
+    
+    
+class ACSAllergies(models.Model):
+    _name = 'acs.medical.allergy'
+    _description = "Allergies for Patient"
 
     name = fields.Char(required=True)
     description = fields.Text('Description')
@@ -127,7 +137,7 @@ class ACSFamilyRelation(models.Model):
         ('name_uniq', 'unique (name)', 'The Relation must be unique!')
     ]
 
-    def manage_inverser_relation(self):
+    def manage_inverse_relation(self):
         for rec in self:
             if rec.inverse_relation_id and not rec.inverse_relation_id.inverse_relation_id:
                 rec.inverse_relation_id.inverse_relation_id = rec.id
@@ -135,17 +145,22 @@ class ACSFamilyRelation(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         res = super().create(vals_list)
-        for record in res:
-            record.manage_inverser_relation()
+        res.manage_inverse_relation()
         return res
 
     def write(self, values):
         res = super(ACSFamilyRelation, self).write(values)
-        self.manage_inverser_relation()
+        self.manage_inverse_relation()
         return res
 
 
-class product_template(models.Model):
+class ACSPatientEmergencyContact(models.Model):
+    _inherit = "acs.patient.emergency.contact"
+
+    relation_id = fields.Many2one('acs.family.relation', string='Relation')
+
+
+class ProductTemplate(models.Model):
     _inherit = "product.template"
 
     hospital_product_type = fields.Selection(selection_add=[('procedure', 'Procedure'), ('consultation','Consultation')])
@@ -155,8 +170,10 @@ class product_template(models.Model):
     procedure_time = fields.Float("Procedure Time")
     appointment_invoice_policy = fields.Selection([('at_end','Invoice in the End'),
         ('anytime','Invoice Anytime'),
-        ('advance','Invoice in Advance')], string="Appointment Invoicing Policy")
+        ('advance','Invoice in Advance'),
+        ('foc','No Invoice')], string="Appointment Invoicing Policy")
     acs_allow_substitution = fields.Boolean(string='Allow Substitution')
+    short_comment = fields.Char(string='Comment', help='Short comment on the specific drug')
 
 
 class ACSConsumableLine(models.Model):
@@ -164,9 +181,9 @@ class ACSConsumableLine(models.Model):
 
     appointment_id = fields.Many2one('hms.appointment', ondelete="cascade", string='Appointment')
     procedure_id = fields.Many2one('acs.patient.procedure', ondelete="cascade", string="Procedure")
+    procedure_group_id = fields.Many2one('procedure.group.line', ondelete="cascade", string="Procedure Group")
     move_ids = fields.Many2many('stock.move', 'consumable_line_stock_move_rel', 'move_id', 'consumable_id', 'Kit Stock Moves', readonly=True)
-    #ACS: In case of kit moves set move_ids but add move_id also. Else it may lead to comume material process again.
-
+    #ACS: In case of kit moves set move_ids but add move_id also. Else it may lead to consume material process again.
 
 class Physician(models.Model):
     _inherit = 'hms.physician'
@@ -175,5 +192,6 @@ class Physician(models.Model):
     def create(self, vals_list):
         res = super().create(vals_list)
         for record in res:
-            record.groups_id = [(4, self.env.ref('acs_hms.group_hms_jr_doctor').id)]
+            if not record.is_portal_user:
+                record.groups_id = [(4, self.env.ref('acs_hms.group_hms_jr_doctor').id)]
         return res

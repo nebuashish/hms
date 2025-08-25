@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
@@ -8,7 +9,7 @@ import uuid
 class ACSPrescriptionOrder(models.Model):
     _name='prescription.order'
     _description = "Prescription Order"
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'acs.hms.mixin', 'acs.qrcode.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'acs.hms.mixin', 'acs.qrcode.mixin', 'product.catalog.mixin']
     _order = 'id desc'
 
     @api.model
@@ -18,12 +19,12 @@ class ACSPrescriptionOrder(models.Model):
         if ids:
             physician_id = ids[0].id
         return physician_id
-
-
-    @api.depends('medical_alert_ids')
-    def _get_alert_count(self):
+    
+    @api.depends('medical_alert_ids', 'allergy_ids')
+    def acs_get_medical_data_count(self):
         for rec in self:
             rec.alert_count = len(rec.medical_alert_ids)
+            rec.allergy_count = len(rec.allergy_ids)
 
     name = fields.Char(size=256, string='Number', help='Prescription Number of this prescription', readonly=True, copy=False, tracking=1)
     diseases_ids = fields.Many2many('hms.diseases', 'diseases_prescription_rel', 'diseas_id', 'prescription_id', 
@@ -47,7 +48,10 @@ class ACSPrescriptionOrder(models.Model):
     treatment_id = fields.Many2one('hms.treatment', 'Treatment')
     medical_alert_ids = fields.Many2many('acs.medical.alert', 'prescription_medical_alert_rel','prescription_id', 'alert_id',
         string='Medical Alerts', related="patient_id.medical_alert_ids")
-    alert_count = fields.Integer(compute='_get_alert_count', default=0)
+    alert_count = fields.Integer(compute='acs_get_medical_data_count', default=0)
+    allergy_ids = fields.Many2many('acs.medical.allergy', 'prescription_allergies_rel','prescription_id', 'allergies_id',
+        string='Allergies', related='patient_id.allergy_ids')
+    allergy_count = fields.Integer(compute='acs_get_medical_data_count', default=0)
     old_prescription_id = fields.Many2one('prescription.order', 'Old Prescription', copy=False)
     acs_kit_id = fields.Many2one('acs.product.kit', string='Kit')
     acs_kit_qty = fields.Integer("Kit Qty", default=1)
@@ -72,7 +76,7 @@ class ACSPrescriptionOrder(models.Model):
                     'dosage_uom_id': line.dosage_uom_id,
                     'active_component_ids': [(6, 0, [x.id for x in line.product_id.active_component_ids])],
                     'form_id' : line.product_id.form_id.id,
-                    'qty_per_day': line.dose,
+                    'qty_per_day': line.qty_per_day,
                     'days': line.days,
                     'short_comment': line.short_comment,
                     'allow_substitution': line.allow_substitution,
@@ -115,11 +119,10 @@ class ACSPrescriptionOrder(models.Model):
     @api.onchange('pregnancy_warning')
     def onchange_pregnancy_warning(self):
         if self.pregnancy_warning:
-            warning = {}
             message = ''
             for line in self.prescription_line_ids:
                 if line.product_id.pregnancy_warning:
-                    message += _("%s Medicine is not Suggastable for Pregnancy.") % line.product_id.name
+                    message += _("%s Medicine is not Suggestible for Pregnancy.") % line.product_id.name
                     if line.product_id.pregnancy:
                         message += ' ' + line.product_id.pregnancy + '\n'
 
@@ -149,6 +152,7 @@ class ACSPrescriptionOrder(models.Model):
             }))
         self.prescription_line_ids = product_lines
 
+    #here we use prescription lines not consumable lines
     def get_acs_kit_lines(self):
         if not self.acs_kit_id:
             raise UserError("Please Select Kit first.")
@@ -160,6 +164,7 @@ class ACSPrescriptionOrder(models.Model):
                 'product_id': line.product_id.id,
                 'common_dosage_id': line.product_id.common_dosage_id and line.product_id.common_dosage_id.id or False,
                 'dose': line.product_id.dosage,
+                'dosage_uom_id': line.uom_id.id,
                 'active_component_ids': [(6, 0, [x.id for x in line.product_id.active_component_ids])],
                 'form_id' : line.product_id.form_id.id,
                 'qty_per_day': line.product_id.common_dosage_id and line.product_id.common_dosage_id.qty_per_day or 1,
@@ -190,6 +195,25 @@ class ACSPrescriptionOrder(models.Model):
             'target': 'new',
             'context': ctx,
         }
+
+    # Updates the quantity of an existing prescription line or creates a new one from catalog selection, triggering related onchange methods.
+    def _update_order_line_info(self, product_id, quantity, **kwargs):
+        self.ensure_one()
+        line = self.prescription_line_ids.filtered(lambda line: line.product_id.id == product_id)
+        if line:
+            if quantity != 0:
+                line.quantity = quantity
+            else:
+                line.unlink()
+        elif quantity > 0:
+            vals = {
+                'prescription_id': self.id,
+                'product_id': product_id,
+            }
+            line = self.env['prescription.line'].create(vals)
+            line.onchange_product()
+            line.onchange_common_dosage()
+            return line
 
 
 class ACSPrescriptionLine(models.Model):
@@ -232,34 +256,55 @@ class ACSPrescriptionLine(models.Model):
     display_type = fields.Selection([
         ('line_section', "Section"),
         ('line_note', "Note")], help="Technical field for UX purpose.")
+    
+    acs_highlight_pregnancy_line = fields.Boolean(related="product_id.pregnancy_warning", string="Highlight Pregnancy", store=True)
+    acs_highlight_medical_alert = fields.Boolean(string="Highlight for Alerts and Allergy", default=False, store=True)
  
     @api.onchange('product_id')
     def onchange_product(self):
         if self.product_id:
             self.active_component_ids = [(6, 0, [x.id for x in self.product_id.active_component_ids])]
-            self.form_id = self.product_id.form_id and self.product_id.form_id.id or False,
-            self.route_id = self.product_id.route_id and self.product_id.route_id.id or False,
-            self.dosage_uom_id = self.product_id.dosage_uom_id and self.product_id.dosage_uom_id.id or self.product_id.uom_id.id,
+            self.form_id = self.product_id.form_id and self.product_id.form_id.id or False
+            self.route_id = self.product_id.route_id and self.product_id.route_id.id or False
+            self.dosage_uom_id = self.product_id.dosage_uom_id and self.product_id.dosage_uom_id.id or self.product_id.uom_id.id
             self.quantity = 1
             self.dose = self.product_id.dosage or 1
+            self.short_comment = self.product_id.short_comment
             self.allow_substitution = self.product_id.acs_allow_substitution
             self.common_dosage_id = self.product_id.common_dosage_id and self.product_id.common_dosage_id.id or False
             self.name = self.product_id.display_name
 
+            message = ''
+            title = _('Pregnancy/Allergy/Medical Alert Warning')
             if self.prescription_id and self.prescription_id.pregnancy_warning:
-                warning = {}
                 message = ''
                 if self.product_id.pregnancy_warning:
-                    message = _("%s Medicine is not Suggastable for Pregnancy.") % self.product_id.name
+                    message = _("%s Medicine is not Suggestible for Pregnancy. \n") % self.product_id.name
                     if self.product_id.pregnancy:
-                        message += ' ' + self.product_id.pregnancy
-                    warning = {
-                        'title': _('Pregnancy Warning'),
-                        'message': message,
-                    }
+                        message += self.product_id.pregnancy + '\n'
 
-                if warning:
-                    return {'warning': warning}
+            self.acs_highlight_medical_alert = bool(self.product_id.acs_medical_alert_ids or self.product_id.acs_allergy_ids)
+
+            if self.acs_highlight_medical_alert:
+                mapped_medical_alerts = ', '.join(self.product_id.acs_medical_alert_ids.mapped('name'))
+                mapped_allergies = ', '.join(self.product_id.acs_allergy_ids.mapped('name'))
+
+                if self.product_id.acs_medical_alert_ids:
+                    message += _("The medicine '%s' is not recommended for individuals who have %s medical conditions. \n") % (self.product_id.name, mapped_medical_alerts)
+
+                if self.product_id.acs_allergy_ids:
+                    message += _("The medicine '%s' is not recommended for individuals who are allergic to %s. \n") % (self.product_id.name, mapped_allergies)
+
+            if not self.product_id.short_comment:
+                self.short_comment = message
+
+            if message:
+                warning = {
+                    'title': title,
+                    'message': message,
+                }
+                return {'warning': warning}
+                
 
     @api.onchange('common_dosage_id')
     def onchange_common_dosage(self):
@@ -274,5 +319,29 @@ class ACSPrescriptionLine(models.Model):
                 line.manual_quantity = line.quantity
             else:
                 line.manual_quantity = 0.0
+
+    # Triggers the 'action_add_from_catalog' method on the parent record to open the catalog view
+    def action_add_from_catalog(self):
+        model_name = self.env.context.get('model')
+        order = self.env[model_name].browse(self.env.context.get('order_id'))
+        return order.action_add_from_catalog()
+
+    # Returns a dictionary of product line data (quantity, price, type, readOnly flag) for catalog view, based on existing consumable lines.
+    def _get_product_catalog_lines_data(self, parent_record=None):
+        result = {}
+        for line in self:
+            product_id = line.product_id.id
+            read_only = False
+            if parent_record and parent_record._name == 'prescription.order':
+                duplicate_lines = parent_record.prescription_line_ids.filtered(lambda l: l.product_id.id == product_id)
+                if len(duplicate_lines) > 1:
+                    read_only = True
+            result[product_id] = {
+                'quantity': float(line.quantity or 0.0),
+                'price': float(line.product_id.standard_price or 0.0),
+                'readOnly': read_only,
+                'productType': line.product_id.type
+            }
+        return result
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

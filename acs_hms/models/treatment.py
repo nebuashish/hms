@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
@@ -9,6 +10,7 @@ class ACSTreatment(models.Model):
     _name = 'hms.treatment'
     _description = "Treatment"
     _inherit = ['mail.thread', 'mail.activity.mixin', 'acs.hms.mixin', 'acs.document.mixin']
+    _order = "id desc"
 
     @api.depends('medical_alert_ids')
     def _get_alert_count(self):
@@ -27,11 +29,11 @@ class ACSTreatment(models.Model):
             rec.appointment_count = len(rec.appointment_ids)
             rec.patient_procedure_count = len(rec.patient_procedure_ids)
 
-    name = fields.Char(string='Name', readonly=True, index=True, copy=False, tracking=1)
+    name = fields.Char(string='Name', readonly=True, index=True, copy=False, tracking=1,default='New')
     subject = fields.Char(string='Subject', tracking=1)
     patient_id = fields.Many2one('hms.patient', 'Patient', required=True, index=True, tracking=1)
     department_id = fields.Many2one('hr.department', ondelete='restrict', string='Department',
-        domain=[('patient_department', '=', True)], tracking=1)
+        domain=lambda self: self.acs_get_department_domain(), tracking=1)
     image_128 = fields.Binary(related='patient_id.image_128', string='Image', readonly=True)
     date = fields.Datetime(string='Date of Diagnosis', default=fields.Datetime.now)
     healed_date = fields.Date(string='Healed Date')
@@ -92,6 +94,8 @@ class ACSTreatment(models.Model):
     patient_procedure_count = fields.Integer(compute='_rec_count', string='# Patient Procedures')
     procedure_group_id = fields.Many2one('procedure.group', ondelete="set null", string='Procedure Group')
 
+    invoice_exempt = fields.Boolean(string='Invoice Exempt')
+
     @api.model
     def default_get(self, fields):
         res = super(ACSTreatment, self).default_get(fields)
@@ -113,27 +117,38 @@ class ACSTreatment(models.Model):
             self.department_type = self.department_id.department_type
 
     def get_line_data(self, line):
-        base_date = fields.Date.today()
+        base_date = fields.datetime.now()
         return {
+            'treatment_id': self.id,
             'product_id': line.product_id.id,
             'patient_id': self.patient_id.id,
-            'date': fields.datetime.now() + timedelta(days=line.days_to_add),
-            'date_stop': fields.datetime.now() + timedelta(days=line.days_to_add) + timedelta(hours=line.product_id.procedure_time)
+            'date': base_date + timedelta(days=line.days_to_add),
+            'date_stop': base_date + timedelta(days=line.days_to_add) + timedelta(hours=line.product_id.procedure_time),
+            'price_unit': line.product_id.list_price
         }
-
-    @api.onchange('procedure_group_id')
-    def onchange_procedure_group(self):
-        patient_procedure_ids = []
-        if self.procedure_group_id:
-            for line in self.procedure_group_id.line_ids:
-                patient_procedure_ids.append((0,0,self.get_line_data(line)))
-            self.patient_procedure_ids = patient_procedure_ids
+    
+    def get_procedure_group_data(self):
+        Consumable = self.env['hms.consumable.line']
+        for line in self.procedure_group_id.line_ids:
+            procedure = self.patient_procedure_ids.create(self.get_line_data(line))
+            for consumable_line in line.consumable_line_ids:
+                Consumable.create({
+                    'product_id': consumable_line.product_id.id,
+                    'product_uom_id': consumable_line.product_uom_id.id,
+                    'qty': consumable_line.qty,
+                    'procedure_id': procedure.id,
+                    'acs_invoice_exempt': consumable_line.acs_invoice_exempt,
+                    'ignore_stock_move': consumable_line.ignore_stock_move
+                })
 
     @api.model_create_multi
     def create(self, vals_list):
-        for values in vals_list:
-            if values.get('name', 'New Treatment') == 'New Treatment':
-                values['name'] = self.env['ir.sequence'].next_by_code('hms.treatment') or 'New Treatment'
+        for vals in vals_list:
+            if vals.get('name', _("New")) == _("New"):
+                seq_date = None
+                if vals.get('date'):
+                    seq_date = fields.Datetime.context_timestamp(self, fields.Datetime.to_datetime(vals['date']))
+                vals['name'] = self.env['ir.sequence'].with_company(vals.get('company_id')).next_by_code('hms.treatment', sequence_date=seq_date) or _("New")
         return super().create(vals_list)
 
     def unlink(self):
@@ -153,7 +168,7 @@ class ACSTreatment(models.Model):
         patient_disease_id = self.env['hms.patient.disease'].create({
             'patient_id': self.patient_id.id,
             'treatment_id': self.id,
-            'disease_id': self.diagnosis_id.id,
+            'disease_ids': [(6, 0, [self.diagnosis_id.id])] if self.diagnosis_id.id else [],
             'age': self.age,
             'diagnosed_date': self.date,
             'healed_date': self.healed_date,
@@ -206,6 +221,10 @@ class ACSTreatment(models.Model):
             })
 
             for consumable in procedure.consumable_line_ids:
+                # MKA: Skip invoice if consumable is invoice exempt
+                if consumable.acs_invoice_exempt:
+                    continue
+
                 product_data.append({
                     'product_id': consumable.product_id,
                     'quantity': consumable.qty,
@@ -226,7 +245,7 @@ class ACSTreatment(models.Model):
         })
         return action
 
-    def acs_select_treatement_for_appointment(self):
+    def acs_select_treatment_for_appointment(self):
         if self._context.get('acs_current_appointment'):
             #Check if we can get back to appointment in breadcrumb.
             appointment = self.env['hms.appointment'].search([('id','=',self._context.get('acs_current_appointment'))])
@@ -236,6 +255,6 @@ class ACSTreatment(models.Model):
             action['views'] = [(self.env.ref('acs_hms.view_hms_appointment_form').id, 'form')]
             return action
         else:
-            raise UserError(_("Something went wrong! Plese Open Appointment and try again"))
+            raise UserError(_("Something went wrong! Please Open Appointment and try again"))
 
     

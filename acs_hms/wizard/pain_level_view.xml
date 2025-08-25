@@ -8,7 +8,7 @@
             <form string="Pain Level Diagram">
                 <group>
                     <group>
-                        <img src="acs_hms/static/src/img/pain_scale_chart.jpg" alt="Pain Level Diagram" class="pull-left" height="450"/>
+                        <img src="/acs_hms/static/src/img/pain_scale_chart.jpg" alt="Pain Level Diagram" class="pull-left" height="500"/>
                     </group>
                     <group>
                         <div colspan="2">

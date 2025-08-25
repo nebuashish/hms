@@ -2,8 +2,8 @@
 <odoo>
 
     <!-- Specialty -->
-    <record id="view_physician_specialty_tree" model="ir.ui.view">
-        <field name="name">physician.specialty.tree</field>
+    <record id="view_physician_specialty_list" model="ir.ui.view">
+        <field name="name">physician.specialty.list</field>
         <field name="model">physician.specialty</field>
         <field name="arch" type="xml">
             <list string="Medicament Specialty">
@@ -16,7 +16,7 @@
         <field name="name">physician.specialty.form</field>
         <field name="model">physician.specialty</field>
         <field name="arch" type="xml">
-            <form string="Medicament Specialtys">
+            <form string="Medicament Specialty">
                 <sheet>
                     <div class="oe_title">
                         <label for="name" string="Name" class="oe_edit_only"/>
@@ -31,7 +31,7 @@
 
     <record model="ir.actions.act_window" id="action_physician_specialty">
         <field name="name">Specialty</field>
-        <field name="type">ir.actions.act_window</field>
+        <field name="path">almightyhms-physician-specialty</field>
         <field name="res_model">physician.specialty</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
@@ -45,8 +45,8 @@
     </record>
 
     <!-- Physician Degree -->
-    <record id="view_physician_degree_tree" model="ir.ui.view">
-        <field name="name">physician.degree.tree</field>
+    <record id="view_physician_degree_list" model="ir.ui.view">
+        <field name="name">physician.degree.list</field>
         <field name="model">physician.degree</field>
         <field name="arch" type="xml">
             <list string="Physician Degree">
@@ -74,7 +74,7 @@
 
     <record model="ir.actions.act_window" id="action_physician_degree">
         <field name="name">Physician Degree</field>
-        <field name="type">ir.actions.act_window</field>
+        <field name="path">almightyhms-physician-degree</field>
         <field name="res_model">physician.degree</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
@@ -88,8 +88,8 @@
     </record>
 
     <!-- physician -->
-    <record id="view_physician_tree" model="ir.ui.view">
-        <field name="name">physician.tree</field>
+    <record id="view_physician_list" model="ir.ui.view">
+        <field name="name">physician.list</field>
         <field name="model">hms.physician</field>
         <field name="arch" type="xml">
             <list string="Physician">
@@ -99,7 +99,7 @@
                 <field name="mobile"/>
                 <field name="email"/>
                 <field name="company_id" groups="base.group_multi_company"/>
-                <field name="active" invisible="1"/>
+                <field name="active" column_invisible="1"/>
             </list>
         </field>
     </record>
@@ -109,36 +109,29 @@
         <field name="model">hms.physician</field>
         <field name="type">kanban</field>
         <field name="arch" type="xml">
-            <kanban string="Physician">
-                <field name="id"/>
+            <kanban class="o_kanban_card">
                 <field name="name"/>
                 <field name="image_128"/>
-                <field name="specialty_id"/>
                 <field name="degree_ids"/>
-                <field name="code"/>
                 <templates>
-                    <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill">
-                            <t t-set="placeholder" t-value="'/base/static/img/avatar_grey.png'"/>
-                            <div class="o_kanban_image_fill_left d-none d-md-block" t-attf-style="background-image:url('#{kanban_image('hms.physician', 'image_128', record.id.raw_value, placeholder)}')"/>
-                            <div class="oe_kanban_details">
-                                <div class="o_kanban_record_top">
-                                    <strong class="oe_partner_heading"><field name="display_name"/></strong>
-                                    <div class="o_kanban_record_headings" id="dr_heading">
-                                    </div>
-                                </div>
-                                <field name="degree_ids" widget="many2many_tags"/>
-                                <ul id="code_ul">
-                                    <li><b>Code:</b> <field name="code"/></li>
-                                    <li t-if="record.specialty_id.raw_value"><b>Specialty:</b> <field name="specialty_id"/></li>
-                                </ul>
+                    <t t-name="card" class="flex-row">
+                        <aside class="o_kanban_aside_full">
+                            <field name="image_128" class="w-100" widget="image" options="{'img_class': 'object-fit-cover'}"/>
+                        </aside>
+                        <main class="ps-2 ps-md-0">
+                            <div class="mb-1" name="name">
+                                <field name="display_name" class="mb-0 fw-bold fs-5"/>
                             </div>
-                        </div>
+                            <field name="degree_ids" widget="many2many_tags"/>
+                            <div><b>Code:</b> <field name="code"/></div>
+                            <div t-if="record.specialty_id.raw_value"><b>Specialty:</b> <field name="specialty_id"/></div>
+                        </main>
                     </t>
                 </templates>
             </kanban>
         </field>
     </record>
+
 
     <record id="view_physician_form" model="ir.ui.view">
         <field name="name">physician.form</field>
@@ -169,11 +162,11 @@
                         </group>
                         <group>
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
-                            <field name="specialty_id" required="True"/>
+                            <field name="specialty_id"/>
                         </group>
                     </group>
                     <notebook>
-                        <page string="General Information" name="gneral_info">
+                        <page string="General Information" name="general_info">
                             <group>
                                 <field name="parent_id" invisible="1"/>
                                 <group>
@@ -202,13 +195,13 @@
                                 </group>
                             </group>
                         </page>
+                        <page string="Personal Information" groups="acs_hms_base.group_hms_manager">
+                            <separator string="Signature"/>
+                            <field name="signature" widget="signature"/>
+                        </page>
                     </notebook>
                 </sheet>
-		<!-- <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers"/>
-                    <field name="activity_ids" widget="mail_activity"/>
-                    <field name="message_ids" widget="mail_thread"/>
-		</div> -->
+                <chatter/>
             </form>
         </field>
     </record>
@@ -242,6 +235,7 @@
 
     <record id="action_physician" model="ir.actions.act_window">
         <field name="name">Physician</field>
+        <field name="path">almightyhms-physician</field>
         <field name="res_model">hms.physician</field>
         <field name="view_mode">kanban,list,form,search</field>
         <field name="help" type="html">

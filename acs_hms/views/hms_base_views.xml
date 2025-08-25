@@ -13,6 +13,7 @@
             </field>
             <field name="drug_company_id" position="before">
                 <field name="manual_prescription_qty"/>
+                <field name="short_comment"/>
             </field>
             <field name="hospital_product_type" position="after">
                 <field name="procedure_time" invisible="type!='service'" widget="float_time"/>
@@ -21,29 +22,9 @@
         </field>
     </record>
 
-    <!-- User -->
-    <record id="view_res_users_inherit_form" model="ir.ui.view">
-        <field name="name">res.users.inherit</field>
-        <field name="model">res.users</field>
-        <field name="inherit_id" ref="base.view_users_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//page[@name='access_rights']/group" position="after">
-                <group string="Multi Department">
-                    <field string="Allowed Departments" name="department_ids" widget="many2many_tags" options="{'no_create': True}" groups="acs_hms.group_allow_multi_department" domain="[('patient_department', '=', True)]"/>
-                    <field name="physician_count" invisible="1"/>
-                    <field name="patient_count" invisible="1"/>
-                </group>
-            </xpath>
-            <xpath expr="//header" position="inside">
-                <button string="Create Physician" type="object" name="action_create_physician" invisible="not id or share or physician_count>0"/>
-                <button string="Create Patient" type="object" name="action_create_patient" invisible="not id or share or patient_count>0"/>
-            </xpath>
-        </field>
-    </record>
-
    <!-- Department -->
-   <record id="view_hr_department_tree" model="ir.ui.view">
-        <field name="name">hr.department.hms.tree</field>
+   <record id="view_hr_department_list" model="ir.ui.view">
+        <field name="name">hr.department.hms.list</field>
         <field name="model">hr.department</field>
         <field name="arch" type="xml">
             <list string="Department">
@@ -67,7 +48,7 @@
                             <group name="left_data">
                                 <field name='department_type'/>
                                 <field name='followup_service_id'/>
-                                <field name='consultaion_service_id'/>
+                                <field name='consultation_service_id'/>
                             </group>
                             <group name="right_data">
                             </group>
@@ -99,8 +80,8 @@
         </field>
     </record>
 
-    <record id="view_patient_family_disease_tree" model="ir.ui.view">
-        <field name="name">patient.family.disease.tree</field>
+    <record id="view_patient_family_disease_list" model="ir.ui.view">
+        <field name="name">patient.family.disease.list</field>
         <field name="model">hms.patient.family.diseases</field>
         <field name="arch" type="xml">
             <list string="Genetic Family Diseases">
@@ -148,8 +129,8 @@
         </field>
     </record>
 
-    <record id="view_hms_patient_genetic_risk_tree" model="ir.ui.view">
-        <field name="name">hms.patient.genetic.risk.tree</field>
+    <record id="view_hms_patient_genetic_risk_list" model="ir.ui.view">
+        <field name="name">hms.patient.genetic.risk.list</field>
         <field name="model">hms.patient.genetic.risk</field>
         <field name="arch" type="xml">
             <list string="Patient Genetic Risks" editable="bottom">
@@ -159,28 +140,24 @@
     </record>
 
     <!-- Partner -->
-    <!-- NOTE: not added any simple view becuase for commsin payment and all we need many features --> 
+    <!-- NOTE: not added any simple view because for commission payment and all we need many features --> 
     <record id="view_hms_partner_form" model="ir.ui.view">
         <field name="name">Referring Doctors</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
-	<field name="arch" type="xml">
-	    <field name="vat" position="before">
-                <field name="category"/>
-                <field name="sub_category"/>
-            </field>
+        <field name="arch" type="xml">
             <xpath expr="//page" position="after">
                 <page string="Hospital Info" name="hms_info">
                     <group>
                         <group>
                             <field name="acs_patient_id"/>
-			    <field name="assignee_ids" widget="many2many_tags"/>
-		        </group>
+                            <field name="assignee_ids" widget="many2many_tags"/>
+                        </group>
                         <group>
                             <button name="create_patient" string="Create Patient" class="oe_highlight oe_inline" invisible="acs_patient_id" type="object"/>
                         </group>
                     </group>
-                    <separator string="Refering Doctor"/>
+                    <separator string="Referring Doctor"/>
                     <group>
                         <group>
                             <field name="is_referring_doctor"/>
@@ -207,6 +184,7 @@
 
     <record id="action_referring_doctors" model="ir.actions.act_window">
         <field name="name">Referring Doctors</field>
+        <field name="path">almightyhms-referring-doctors</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">res.partner</field>
         <field name="view_mode">kanban,list,form</field>
@@ -222,8 +200,8 @@
     </record>
 
     <!-- Ethnicity view -->
-    <record id="view_acs_ethnicity_tree" model="ir.ui.view">
-        <field name="name">acs.ethnicity.tree</field>
+    <record id="view_acs_ethnicity_list" model="ir.ui.view">
+        <field name="name">acs.ethnicity.list</field>
         <field name="model">acs.ethnicity</field>
         <field name="arch" type="xml">
             <list string="ACS Ethnicity">
@@ -274,6 +252,7 @@
 
     <record model="ir.actions.act_window" id="act_open_acs_ethnicity_view">
         <field name="name">Ethnicity</field>
+        <field name="path">almightyhms-ethnicity</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">acs.ethnicity</field>
         <field name="view_mode">list,form</field>
@@ -291,8 +270,8 @@
     </record>
 
     <!-- Family Relation view -->
-    <record id="view_acs_family_relation_tree" model="ir.ui.view">
-        <field name="name">acs.family.relation.tree</field>
+    <record id="view_acs_family_relation_list" model="ir.ui.view">
+        <field name="name">acs.family.relation.list</field>
         <field name="model">acs.family.relation</field>
         <field name="arch" type="xml">
             <list string="Family Relation" editable="bottom">
@@ -305,6 +284,7 @@
 
     <record id="action_acs_family_relation" model="ir.actions.act_window">
         <field name="name">Family Relation</field>
+        <field name="path">almightyhms-family-relation</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">acs.family.relation</field>
         <field name="view_mode">list</field>

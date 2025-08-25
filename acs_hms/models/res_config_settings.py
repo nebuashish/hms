@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 # Part of AlmightyCS See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class ResConfigSettings(models.TransientModel):
@@ -55,9 +57,9 @@ class ResConfigSettings(models.TransientModel):
         domain=[('usage','=','internal')],
         string='Stock Location for Consumed Products in Procedure', readonly=False)
 
-    group_patient_registartion_invoicing = fields.Boolean("Patient Registration Invoicing", implied_group='acs_hms.group_patient_registartion_invoicing')
+    group_patient_registration_invoicing = fields.Boolean("Patient Registration Invoicing", implied_group='acs_hms.group_patient_registration_invoicing')
     group_treatment_invoicing = fields.Boolean("Treatment Invoicing", implied_group='acs_hms.group_treatment_invoicing')
-    acs_prescription_qrcode = fields.Boolean(related='company_id.acs_prescription_qrcode', string="Print Authetication QrCode on Presctiprion", readonly=False)
+    acs_prescription_qrcode = fields.Boolean(related='company_id.acs_prescription_qrcode', string="Print Authentication QrCode on Prescription", readonly=False)
     auto_followup_days = fields.Float(related='company_id.auto_followup_days', string='Default Followup on (Days)', readonly=False)
     patient_weight_measure_uom = fields.Char(string='Patient Weight unit of measure', config_parameter='acs_hms.acs_patient_weight_uom')
     patient_height_measure_uom = fields.Char(string='Patient Height unit of measure', config_parameter='acs_hms.acs_patient_height_uom')
@@ -72,4 +74,6 @@ class ResConfigSettings(models.TransientModel):
     acs_reminder_day = fields.Float(related='company_id.acs_reminder_day',string="Reminder Days", readonly=False)
     acs_reminder_hours = fields.Float(related='company_id.acs_reminder_hours',string="Reminder Hours", readonly=False)
     acs_flag_days = fields.Integer(related='company_id.acs_flag_days', string="Warning Flag Days", help="Days to count cancelled appointment", readonly=False)
-    acs_flag_count_limit = fields.Integer(related='company_id.acs_flag_count_limit', string="Count Limit for Flag", help="Configure number to show alert flag after couting that many cancelled appoitments", readonly=False)
+    acs_flag_count_limit = fields.Integer(related='company_id.acs_flag_count_limit', string="Count Limit for Flag", help="Configure number to show alert flag after couting that many cancelled appointments", readonly=False)
+    acs_view_patient_progress = fields.Boolean(string="Patient Profile Progress", related='company_id.acs_view_patient_progress', readonly=False)
+    acs_patient_field_ids = fields.Many2many('ir.model.fields', string='Fields', related='company_id.acs_patient_field_ids', readonly=False, domain="[('model', '=', 'hms.patient'), ('name', '!=', 'acs_patient_progress')]")

@@ -27,15 +27,19 @@
                     </block>
 
                     <block title="HMS Mobile App" name="hms_mobile_app_setting_container">
-                        <setting id="on_google_play_setting">
-                            <a class="d-block mx-auto" href="https://play.google.com/store/apps/details?id=com.almightycspatient" target="blank">
-                                <img alt="On Google Play" class="d-block mx-auto img img-fluid" src="/base_setup/static/src/img/google_play.png"/>
-                            </a>
-                        </setting>
-                        <setting id="on_apple_store_setting">
-                            <a class='d-block mx-auto' href="https://apps.apple.com/us/app/almightyhms-patient-portal/id1551078716" target="blank">
-                                <img alt="On Apple Store" class="d-block mx-auto img img-fluid" src="/base_setup/static/src/img/app_store.png"/>
-                            </a>
+                        <setting id="acs_hms_mobile_app">
+                            <div class="d-flex">
+                                <div class="px-4">
+                                    <a class="d-block mx-auto" href="https://play.google.com/store/apps/details?id=com.almightycspatient" target="blank">
+                                        <img alt="On Google Play" class="d-block mx-auto img img-fluid" src="/acs_hms_base/static/src/img/acs_android_qr.png" style="width: auto; height: auto;"/>
+                                    </a>
+                                </div>
+                                <div>
+                                    <a class="d-block mx-auto" href="https://apps.apple.com/us/app/almightyhms-patient-portal/id1551078716" target="blank">
+                                        <img alt="On Apple Store" class="d-block mx-auto img img-fluid" src="/acs_hms_base/static/src/img/acs_ios_qr.png"  style="width: auto; height: auto;"/>
+                                    </a>
+                                </div>
+                            </div>
                         </setting>
                     </block>
                 </app>
@@ -45,7 +49,7 @@
 
     <record id="action_hms_config_settings" model="ir.actions.act_window">
         <field name="name">Settings</field>
-        <field name="type">ir.actions.act_window</field>
+        <field name="path">almightyhms-settings</field>
         <field name="res_model">res.config.settings</field>
         <field name="view_id" ref="res_config_settings_view_form"/>
         <field name="view_mode">form</field>

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models ,_
 from odoo.exceptions import UserError
@@ -8,6 +9,7 @@ class ProcedureGroupLine(models.Model):
     _name = "procedure.group.line"
     _description = "Procedure Group Line"
     _order = 'sequence'
+    _rec_name = 'product_id'
 
     sequence = fields.Integer("Sequence", default=10)
     group_id = fields.Many2one('procedure.group', ondelete='restrict', string='Procedure Group')
@@ -15,6 +17,8 @@ class ProcedureGroupLine(models.Model):
     days_to_add = fields.Integer('Days to add',help="Days to add for next date")
     procedure_time = fields.Float(related='product_id.procedure_time', string='Procedure Time', readonly=True)
     price_unit = fields.Float(related='product_id.list_price', string='Price', readonly=True)
+    consumable_line_ids = fields.One2many('hms.consumable.line', 'procedure_group_id',
+        string='Consumable Lines', copy=False)
 
 
 class ProcedureGroup(models.Model):
@@ -27,7 +31,7 @@ class ProcedureGroup(models.Model):
 
 class AcsPatientProcedure(models.Model):
     _name="acs.patient.procedure"
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'acs.hms.mixin', 'acs.document.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'acs.hms.mixin', 'acs.document.mixin', 'acs.calendar.mixin', 'product.catalog.mixin']
     _description = "Patient Procedure"
     _order = "id desc"
 
@@ -40,12 +44,12 @@ class AcsPatientProcedure(models.Model):
                 duration = (diff.days * 24) + (diff.seconds/3600)
             rec.duration = duration
 
-    def _acs_get_attachemnts(self):
-        attachments = super(AcsPatientProcedure, self)._acs_get_attachemnts()
+    def _acs_get_attachments(self):
+        attachments = super(AcsPatientProcedure, self)._acs_get_attachments()
         attachments += self.appointment_ids.mapped('attachment_ids')
         return attachments
 
-    name = fields.Char(string="Name", tracking=1)
+    name = fields.Char(string="Name", tracking=1,default='New')
     patient_id = fields.Many2one('hms.patient', string='Patient', required=True, tracking=1)
     product_id = fields.Many2one('product.product', string='Procedure', 
         change_default=True, ondelete='restrict', required=True)
@@ -61,16 +65,16 @@ class AcsPatientProcedure(models.Model):
     ], string='Status', default='scheduled', tracking=1)
     company_id = fields.Many2one('res.company', ondelete='restrict',
         string='Hospital', default=lambda self: self.env.company)
-    date = fields.Datetime("Date")
-    date_stop = fields.Datetime("End Date")
+    date = fields.Datetime("Date", tracking=1)
+    date_stop = fields.Datetime("End Date", tracking=1)
     duration = fields.Float('Duration', compute="acs_get_duration", store=True)
 
     diseas_id = fields.Many2one('hms.diseases', 'Disease')
     description = fields.Text(string="Description")
     treatment_id = fields.Many2one('hms.treatment', 'Treatment')
+    appointment_id = fields.Many2one('hms.appointment', 'Appointment')
     appointment_ids = fields.Many2many('hms.appointment', 'acs_appointment_procedure_rel', 'appointment_id', 'procedure_id', 'Appointments')
-    department_id = fields.Many2one('hr.department', ondelete='restrict', 
-        domain=[('patient_department', '=', True)], string='Department', tracking=1)
+    department_id = fields.Many2one('hr.department', ondelete='restrict', domain=lambda self: self.acs_get_department_domain(), string='Department', tracking=1)
     department_type = fields.Selection(related='department_id.department_type', string="Appointment Department", store=True)
 
     consumable_line_ids = fields.One2many('hms.consumable.line', 'procedure_id',
@@ -78,6 +82,9 @@ class AcsPatientProcedure(models.Model):
     acs_kit_id = fields.Many2one('acs.product.kit', string='Kit')
     acs_kit_qty = fields.Integer("Kit Qty", default=1)
     invoice_exempt = fields.Boolean(string='Invoice Exempt')
+    notes = fields.Char("Notes")
+    nurse_id = fields.Many2one('res.users','Nurse', domain=lambda self: [('employee_ids.department_id.department_type', '=', 'nurse')])
+    patient_disease_id = fields.Many2one('hms.patient.disease', string='Patient Disease')
 
     @api.model
     def default_get(self, fields):
@@ -100,14 +107,45 @@ class AcsPatientProcedure(models.Model):
 
     def action_running(self):
         self.state = 'running'
+        if not self.date:
+            self.date = fields.Datetime.now()
+
+        if not self.patient_disease_id:
+            disease_history = self.env['hms.patient.disease'].search([
+                ('patient_id', '=', self.patient_id.id),
+                ('diagnosed_date', '=', self.date),
+                ('procedure_ids', '!=', False)
+            ], limit=1)
+
+            disease_id = self.diseas_id.id if self.diseas_id else False
+
+            if disease_history:
+                disease_history.write({
+                    'physician_id': self.physician_id.id,
+                    'procedure_ids': [(4, self.id)],
+                    'disease_ids': [(4, disease_id)] if disease_id else False,
+                })
+            else:
+                patient_disease_id = self.env['hms.patient.disease'].create({
+                    'patient_id': self.patient_id.id,
+                    'physician_id': self.physician_id.id,
+                    'diagnosed_date': self.date,
+                    'procedure_ids': [(6, 0, [self.id])],
+                    'disease_ids': [(6, 0, [disease_id])] if disease_id else False,
+                })
+                self.patient_disease_id = patient_disease_id.id
 
     def action_schedule(self):
         self.state = 'scheduled'
 
     def action_done(self):
         if self.consumable_line_ids:
-            self.consume_procedure_material()
+            self.acs_consume_material('procedure_id')
         self.state = 'done'
+        if not self.date_stop:
+            self.date_stop = fields.Datetime.now()
+        if not self.nurse_id:
+            self.nurse_id = self.env.user.id
 
     def action_cancel(self):
         self.state = 'cancel'
@@ -117,12 +155,38 @@ class AcsPatientProcedure(models.Model):
             if rec.state not in ['scheduled','cancel']:
                 raise UserError(_('Record can be deleted only in Canceled/Scheduled state.'))
         return super(AcsPatientProcedure, self).unlink()
+    
+    def acs_prepare_calendar_data(self):
+        data = super().acs_prepare_calendar_data()
+        user_id = self.physician_id.user_id
+        partner_ids = [user_id.partner_id.id]        
+        data.update({
+            'user_id': user_id.id,
+            'start': self.date,
+            'stop': self.date_stop,
+            'partner_ids': [(6, 0, partner_ids)],
+        })
+        return data
 
     @api.model_create_multi
     def create(self, vals_list):
-        for values in vals_list:
-            values['name'] = self.env['ir.sequence'].next_by_code('acs.patient.procedure') or 'New Procedure'
-        return super().create(vals_list)
+        for vals in vals_list:
+            if vals.get('name', _("New")) == _("New"):
+                seq_date = None
+                if vals.get('date'):
+                    seq_date = fields.Datetime.context_timestamp(self, fields.Datetime.to_datetime(vals['date']))
+                vals['name'] = self.env['ir.sequence'].with_company(vals.get('company_id')).next_by_code('acs.patient.procedure', sequence_date=seq_date) or _("New")
+        res = super().create(vals_list)
+        for record in res:
+            record.acs_calendar_event('physician_id')
+        return res
+
+    def write(self, values):
+        res = super().write(values)
+        fields_to_check = ['date', 'date_stop' ,'physician_id', 'state']
+        if any(f in values for f in fields_to_check):
+            self.acs_calendar_event('physician_id')
+        return res
 
     def get_procedure_invoice_data(self):
         product_data = [{
@@ -131,17 +195,22 @@ class AcsPatientProcedure(models.Model):
         for rec in self:
             #Pass price if it is updated else pass 0
             #so if 0 is passed it will apply pricelist value properly.
-            procedure_data = {'product_id': rec.product_id}
+            procedure_data = {'product_id': rec.product_id, 'line_type': 'procedure'}
             if rec.price_unit!=rec.product_id.list_price:
                 procedure_data['price_unit'] = rec.price_unit
             product_data.append(procedure_data)
 
             #Line for procedure Consumables
             for consumable in rec.consumable_line_ids:
+                # MKA: Skip invoice if consumable is invoice exempt
+                if consumable.acs_invoice_exempt:
+                    continue
+
                 product_data.append({
                     'product_id': consumable.product_id,
                     'quantity': consumable.qty,
-                    'lot_id': consumable.lot_id and consumable.lot_id.id or False,
+                    'lot_id': consumable.lot_id and consumable.lot_id.id or False, 
+                    'line_type': 'procedure'
                 })
         return product_data
 
@@ -167,29 +236,6 @@ class AcsPatientProcedure(models.Model):
         source_location_id  = self.company_id.procedure_stock_location_id.id
         return source_location_id, dest_location_id
 
-    def consume_procedure_material(self):
-        for rec in self:
-            source_location_id, dest_location_id = rec.acs_get_consume_locations()
-            for line in rec.consumable_line_ids.filtered(lambda s: not s.move_id):
-                if line.product_id.is_kit_product:
-                    move_ids = []
-                    for kit_line in line.product_id.acs_kit_line_ids:
-                        if kit_line.product_id.tracking!='none':
-                            raise UserError("In Consumable lines Kit product with component having lot/serial tracking is not allowed.")
-
-                        move = self.consume_material(source_location_id, dest_location_id,
-                            {'product': kit_line.product_id, 'qty': kit_line.product_qty * line.qty})
-                        move.procedure_id = rec.id
-                        move_ids.append(move.id)
-                    #Set move_id on line also to avoid 
-                    line.move_id = move.id
-                    line.move_ids = [(6,0,move_ids)]
-                else:
-                    move = self.consume_material(source_location_id, dest_location_id,
-                        {'product': line.product_id, 'qty': line.qty, 'lot_id': line.lot_id and line.lot_id.id or False})
-                    move.procedure_id = rec.id
-                    line.move_id = move.id
-
     def view_invoice(self):
         invoices = self.mapped('invoice_id')
         action = self.acs_action_view_invoice(invoices)
@@ -204,20 +250,7 @@ class AcsPatientProcedure(models.Model):
         action['target'] = 'new'
         return action
 
-    def get_acs_kit_lines(self):
-        if not self.acs_kit_id:
-            raise UserError("Please Select Kit first.")
-
-        lines = []
-        for line in self.acs_kit_id.acs_kit_line_ids:
-            lines.append((0,0,{
-                'product_id': line.product_id.id,
-                'product_uom_id': line.product_id.uom_id.id,
-                'qty': line.product_qty * self.acs_kit_qty,
-            }))
-        self.consumable_line_ids = lines
-
-    #method to create get invocie data and set passed invocie id.
+    #method to create get invoice data and set passed invoice id.
     def acs_common_invoice_procedure_data(self, invoice_id=False):
         data = []
         if self.ids:
@@ -226,6 +259,9 @@ class AcsPatientProcedure(models.Model):
                 self.invoice_id = invoice_id.id
         return data
 
+    # This method updates or adds a consumable line for the given product and quantity using a common helper function.
+    def _update_order_line_info(self, product_id, quantity, **kwargs):
+        return self.acs_generic_update_order_line_info(model='hms.consumable.line',product_id=product_id, quantity=quantity, link_field='procedure_id', extra_vals=None)
 
 class StockMove(models.Model):
     _inherit = "stock.move"

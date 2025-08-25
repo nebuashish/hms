@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
@@ -44,12 +45,12 @@ class AcsPatientEvaluation(models.Model):
                     age = str(delta.years) + _(" Year")
             rec.age = age
 
-    name = fields.Char(readonly=True, copy=False)
+    name = fields.Char(readonly=True, copy=False, default='New ')
     state = fields.Selection([
         ('draft', 'Draft'),
         ('done', 'Done'),
         ('cancel', 'Cancelled'),
-    ], string='Status', default='draft', required=True, copy=False)
+    ], string='Status', default='draft', required=True, copy=False, tracking=1)
     date = fields.Datetime(string='Date', default=fields.Datetime.now)
 
     patient_id = fields.Many2one('hms.patient', ondelete='restrict',  string='Patient',
@@ -99,12 +100,12 @@ class AcsPatientEvaluation(models.Model):
         ('pain_10', 'Unspeakable pain. Bedridden and possibly delirious. Very few people will ever experience this level of pain.'),
     ], string="Pain", compute="_get_pain_info", store=True)
 
-    bmi = fields.Float(compute="get_bmi_data", string='Body Mass Index', store=True)
+    bmi = fields.Float(compute="get_bmi_data", string='Body Mass Index', store=True, readonly=True)
     bmi_state = fields.Selection([
         ('low_weight', 'Low Weight'), 
         ('normal', 'Normal'),
         ('over_weight', 'Over Weight'), 
-        ('obesity', 'Obesity')], compute="get_bmi_data", string='BMI State', store=True)
+        ('obesity', 'Obesity')], compute="get_bmi_data", string='BMI State', store=True, readonly=True)
     company_id = fields.Many2one('res.company', ondelete='restrict',
         string='Hospital', default=lambda self: self.env.company)
 
@@ -145,9 +146,12 @@ class AcsPatientEvaluation(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        for values in vals_list:
-            if not values.get('name'):
-                values['name'] = self.env['ir.sequence'].next_by_code('acs.patient.evaluation') or 'New Appointment'
+        for vals in vals_list:
+            if vals.get('name', _("New")) == _("New"):
+                seq_date = None
+                if vals.get('date'):
+                    seq_date = fields.Datetime.context_timestamp(self, fields.Datetime.to_datetime(vals['date']))
+                vals['name'] = self.env['ir.sequence'].with_company(vals.get('company_id')).next_by_code('acs.patient.evaluation', sequence_date=seq_date) or _("New")
         return super().create(vals_list)
 
     def unlink(self):

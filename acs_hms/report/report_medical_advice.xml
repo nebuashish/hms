@@ -1,68 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <template id="report_prescription_table">
-        <table class="table table-sm o_main_table mt16">
-            <thead>
-                <tr>
-                    <th>Sr.No</th>
-                    <th>Medicine</th>
-                    <th>Allow Substitution</th>
-                    <th>Frequency</th>
-                    <th>Dose Qty.</th>
-                    <th>Qty. Per Day</th>
-                    <th>Days</th>
-                    <th>Total Quantity</th>
-                    <th>Comment</th>
-                </tr>
-            </thead>
-            <tbody>
-                <t t-foreach="prescription.prescription_line_ids" t-as="line">
-                    <tr>
-                        <t t-if="not line.display_type">
-                            <td>
-                                <span t-esc="line_index + 1"/>
-                            </td>
-                            <td>
-                                <span t-field="line.sudo().product_id.name"/>
-                            </td>
-                            <td>
-                                <span t-field="line.allow_substitution"/>
-                            </td>
-                            <td>
-                                <span t-if="line.common_dosage_id.name" t-field="line.common_dosage_id.name"/>
-                                <span t-if="not line.common_dosage_id.name" t-field="line.common_dosage_id.abbreviation"/>
-                            </td>
-                            <td>
-                                <span t-field="line.dose"/> <span style="margin-left:5px;" t-field="line.dosage_uom_id"/>
-                            </td>
-                            <td>
-                                <span t-field="line.qty_per_day"/>
-                            </td>
-                            <td>
-                                <span t-field="line.days"/>
-                            </td>
-                            <td>
-                                <span t-field="line.quantity"/>
-                            </td>
-                            <td>
-                                <span t-field="line.short_comment"/>
-                            </td>
-                        </t>
-                        <t t-if="line.display_type == 'line_section'">
-                            <td colspan="99">
-                                <span t-field="line.name"/>
-                            </td>
-                        </t>
-                        <t t-if="line.display_type == 'line_note'">
-                            <td colspan="99">
-                                <span t-field="line.name"/>
-                            </td>
-                        </t>
-                    </tr>
-                </t>
-            </tbody>
-        </table>
-    </template>
 
     <template id="report_acs_medical_advice_document">
         <t t-call="web.external_layout">
@@ -145,9 +82,9 @@
                     <div class="ml32" t-field="doc.radiological_report"/>
                 </div>
 
-                <div t-if="doc.differencial_diagnosis" class="col-12 mt8 mb8" style="page-break-inside: avoid;" id="differencial_diagnosis">
+                <div t-if="doc.differential_diagnosis" class="col-12 mt8 mb8" style="page-break-inside: avoid;" id="differential_diagnosis">
                     <span><u><b>Differential Diagnosis</b></u>:</span><br/>
-                    <div class="ml32" t-field="doc.differencial_diagnosis"/>
+                    <div class="ml32" t-field="doc.differential_diagnosis"/>
                 </div>
 
                 <div t-if="doc.diseases_ids" class="col-12 mt8 mb8" style="page-break-inside: avoid;" id="acs_diseases_ids">
@@ -185,8 +122,8 @@
                     <span>
                         <u><b>Doctor's Stamp/Signature</b></u>
                         <br/>
-                        <t t-if="doc.physician_id and doc.physician_id.signature">
-                            <span t-field="doc.physician_id.signature" t-options="{'widget': 'image', 'class': 'img-rounded', 'style':'max-height: 100px !important'}"/>
+                        <t t-if="doc.physician_id and doc.sudo().physician_id.signature">
+                            <img t-att-src="image_data_uri(doc.sudo().physician_id.signature)" alt="Sign" style="max-height: 100px !important;"/>
                         </t>
                     </span>
                 </div>

@@ -18,25 +18,17 @@
         <field name="inherit_id" ref="base.view_res_partner_filter"/>
         <field name="arch" type="xml">
             <filter name="type_person" position="before">
-                <filter string="Today's Birthday" name="today_birthday" domain="[('birthday','like',(context_today()).strftime('%%m-%%d'))]"/>
+                <filter string="Today's Birthday" name="today_birthday" domain="[('birthday','like',(context_today()).strftime('-%%m-%%d'))]"/>
             </filter>
-        </field>
-    </record>
-
-    <record id="view_res_partner_filter" model="ir.ui.view">
-        <field name="name">res.partner.filter</field>
-        <field name="model">res.partner</field>
-        <field name="inherit_id" ref="base.view_res_partner_filter"/>
-        <field name="arch" type="xml">
             <filter name="customer" position="before">
                 <filter string="Is Patient" name="is_patient" domain="[('is_patient','=',True)]"/>
             </filter>
         </field>
     </record>
 
-    <!-- <Patient Tag> -->
-    <record id="view_patient_tag_tree" model="ir.ui.view">
-        <field name="name">hms.patient.tag.tree</field>
+    <!-- Patient Tag -->
+    <record id="view_patient_tag_list" model="ir.ui.view">
+        <field name="name">hms.patient.tag.list</field>
         <field name="model">hms.patient.tag</field>
         <field name="arch" type="xml">
             <list string="Patient Tag" editable="bottom" sample="1">
@@ -80,9 +72,9 @@
 
     <record model="ir.actions.act_window" id="act_open_patient_tag">
         <field name="name">Patient Tag</field>
-        <field name="type">ir.actions.act_window</field>
+        <field name="path">almightyhms-patient-tag</field>
         <field name="res_model">hms.patient.tag</field>
-        <field name="view_id" ref="view_patient_tag_tree"/>
+        <field name="view_id" ref="view_patient_tag_list"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No Record Found
@@ -94,8 +86,8 @@
     </record>
 
     <!-- Therapeutic Effect -->
-    <record id="view_therapeutic_effect_tree" model="ir.ui.view">
-        <field name="name">hms.therapeutic.effect.tree</field>
+    <record id="view_therapeutic_effect_list" model="ir.ui.view">
+        <field name="name">hms.therapeutic.effect.list</field>
         <field name="model">hms.therapeutic.effect</field>
         <field name="arch" type="xml">
             <list string="Therapeutic Effect">
@@ -137,7 +129,7 @@
 
     <record model="ir.actions.act_window" id="act_open_therapeutic_effect">
         <field name="name">Therapeutic Effect</field>
-        <field name="type">ir.actions.act_window</field>
+        <field name="path">almightyhms-therapeutic-effect</field>
         <field name="res_model">hms.therapeutic.effect</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -149,9 +141,66 @@
         </field>
     </record>
 
+    <!-- Source -->
+    <record id="view_acs_source_list" model="ir.ui.view">
+        <field name="name">acs.source.list</field>
+        <field name="model">acs.source</field>
+        <field name="arch" type="xml">
+            <list string="Source" editable="bottom" sample="1">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="description"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_acs_source_form" model="ir.ui.view">
+        <field name="name">acs.source.form</field>
+        <field name="model">acs.source</field>
+        <field name="arch" type="xml">
+            <form string="Source">
+                <sheet>
+                     <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_acs_source_search" model="ir.ui.view">
+        <field name="name">acs.source.search</field>
+        <field name="model">acs.source</field>
+        <field name="arch" type="xml">
+            <search string="Source">
+                <field name="name"/>
+                <field name="description"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_acs_source" model="ir.actions.act_window">
+        <field name="name">Source</field>
+        <field name="path">almightyhms-source</field>
+        <field name="res_model">acs.source</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Record Found
+            </p>
+            <p>
+                Click to add a Source.
+            </p>
+        </field>
+    </record>
+
     <!-- Consumable Lines -->
     <record id="view_hms_consumable_line_form" model="ir.ui.view">
-        <field name="name">hhms.consumable.line.form</field>
+        <field name="name">hms.consumable.line.form</field>
         <field name="model">hms.consumable.line</field>
         <field name="arch" type="xml">
             <form string="consumable Lines">
@@ -171,7 +220,7 @@
                             <field name="lot_id"/>
                             <field name="move_id"/>
                             <field name="physician_id"/>
-                            <field name="department_id"/>
+                            <field name="department_id" options="{'no_open': True, 'no_create': True}"/>
                             <field name="patient_id"/>
                             <field name="invoice_id"/>
                         </group>
@@ -183,8 +232,8 @@
     </record>
 
     <!-- Religion view -->
-    <record id="view_acs_religion_tree" model="ir.ui.view">
-        <field name="name">acs.religion.tree</field>
+    <record id="view_acs_religion_list" model="ir.ui.view">
+        <field name="name">acs.religion.list</field>
         <field name="model">acs.religion</field>
         <field name="arch" type="xml">
             <list string="Religion">
@@ -229,7 +278,7 @@
 
     <record model="ir.actions.act_window" id="act_acs_religion_view">
         <field name="name">Religion</field>
-        <field name="type">ir.actions.act_window</field>
+        <field name="path">almightyhms-religion</field>
         <field name="res_model">acs.religion</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_acs_religion_search"/>

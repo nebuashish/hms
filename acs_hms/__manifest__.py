@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 #╔══════════════════════════════════════════════════════════════════════╗
 #║                                                                      ║
 #║                  ╔═══╦╗       ╔╗  ╔╗     ╔═══╦═══╗                   ║
@@ -70,7 +71,7 @@
         servicios de salud administración de la salud administración de la salud departamento de salud
          gestión hospitalaria sistema de información gestión hospitalaria odoo hms odoo
     """,
-    'version': '1.0.4',
+    'version': '1.0.24',
     'category': 'Medical',
     'author': 'Almighty Consulting Solutions Pvt. Ltd.',
     'support': 'info@almightycs.com',
@@ -83,8 +84,8 @@
         'security/ir.model.access.csv',
 
         'report/patient_cardreport.xml',
-        'report/report_medical_advice.xml',
         'report/report_prescription.xml',
+        'report/report_medical_advice.xml',
         'report/appointment_report.xml',
         'report/evaluation_report.xml',
         'report/treatment_report.xml',
@@ -113,12 +114,14 @@
         'views/procedure_view.xml',
         'views/resource_cal.xml',
         'views/medical_alert.xml',
+        'views/allergy_view.xml',
         'views/account_view.xml',
         'views/product_kit_view.xml',
         'views/template.xml',
         'views/res_config_settings_views.xml',
         'views/digest_view.xml',
         'views/res_users.xml',
+        'views/company_view.xml',
         'views/menu_item.xml',
     ],
     'assets': {
@@ -130,10 +133,12 @@
         ]
     },
     'demo': [
+        'demo/diseases_category_demo.xml',
         'demo/doctor_demo.xml',
         'demo/patient_demo.xml',
         'demo/appointment_demo.xml',
         'demo/medicament_demo.xml',
+        'demo/treatment_demo.xml',
     ],
     'images': [
         'static/description/hms_almightycs_cover.gif',

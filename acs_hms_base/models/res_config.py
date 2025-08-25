@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 # Part of AlmightyCS See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, SUPERUSER_ID, _
@@ -12,9 +13,9 @@ class ResCompany(models.Model):
 
     birthday_mail_template_id = fields.Many2one('mail.template', 'Birthday Wishes Template',
         help="This will set the default mail template for birthday wishes.")
-    unique_gov_code = fields.Boolean('Unique Government Identity for Patient', help='Set this True if the Givernment Identity in patients should be unique.')
+    unique_gov_code = fields.Boolean('Unique Government Identity for Patient', help='Set this True if the Government Identity in patients should be unique.')
 
-    #Call this method directly in case of dependcy issue like acs_certification (call in acs_hms_certification)
+    #Call this method directly in case of dependency issue like acs_certification (call in acs_hms_certification)
     def acs_create_sequence(self, name, code, prefix, padding=3):
         self.env['ir.sequence'].sudo().create({
             'name': self.name + " : " + name,
@@ -71,25 +72,27 @@ class ResCompany(models.Model):
     def acs_update_access_data(self):
         user = self.env.user
         company = user.sudo().company_id
-        ir_config_model = self.env["ir.config_parameter"].sudo()
-        secret = ir_config_model.get_param("database.secret")
-        url = ir_config_model.get_param("web.base.url")
+        ir_config_model = self.env["ir.config_parameter"].sudo()        
         Module = self.env['ir.module.module'].sudo()
         data = {
             "installed_modules": Module.search([('state','=','installed')]).mapped('name'), 
-            "db_secret": secret, 
+            "db_secret": ir_config_model.get_param("database.secret"), 
+            "db_uuid": ir_config_model.get_param("database.uuid"),
             "company_name": company.name,
             "email": company.email,
+            "country": company.country_id and company.country_id.name or '',
             "mobile": company.mobile,
-            "url": url,
+            "url": ir_config_model.get_param("web.base.url"),
             'users': self.env['res.users'].sudo().search_count([('share','=',False)]),
             'physicians': self.env['hms.physician'].sudo().search_count([]),
             'patients': self.env['hms.patient'].sudo().search_count([]),
         }
 
         try:
+            data['db_name'] = self.env.cr.dbname
             version_info = common.exp_version()
-            data['version'] = version_info.get('server_serie')    
+            data['version'] = version_info.get('server_serie')
+            data['server_version'] = version_info.get('server_version')
         except:
             pass
 
@@ -147,4 +150,4 @@ class ResConfigSettings(models.TransientModel):
         help="This will set the default mail template for birthday wishes.", readonly=False)
     unique_gov_code = fields.Boolean('Unique Government Identity for Patient',
          related='company_id.unique_gov_code', readonly=False,
-         help='Set this True if the Givernment Identity in patients should be unique.')
+         help='Set this True if the Government Identity in patients should be unique.')

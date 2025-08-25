@@ -12,22 +12,25 @@
             <field name="lang">{{ object.patient_id.lang }}</field>
             <field name="auto_delete" eval="True"/>
             <field name="body_html" type="html">
-<div style="margin:auto;background: #FFFFFF;color:#777777">
+<div>
     <t t-set="appointment_date" t-value="format_datetime(dt=object.date, tz=object.physician_id.tz or 'UTC', lang_code=object.physician_id.lang)"/>
     <p>Hello <t t-out="object.patient_id.name"/>,</p>
-    <p>Your Appointment Have been Scheduled with following details.</p>
-    <ul> 
-        <li>
-            <p>Subject: <t t-out="object.purpose_id.name"/></p>
+    <p>Your Appointment has been scheduled with following details.</p>
+    <ul>
+        <li t-if="object.purpose_id">
+            Subject: <t t-out="object.purpose_id.name"/>
         </li>
         <li>
-            <p>Reference Number: <t t-out="object.name"/></p>
+            Reference Number: <t t-out="object.name"/>
         </li>
         <li>
-            <p>Physician Name: <t t-out="object.physician_id.name"/></p>
+            Physician Name: <t t-out="object.physician_id.name"/>
         </li>
         <li>
-            <p>Date &amp; Time: <t t-out="appointment_date or ''"/> (Timezone: <t t-out="object.physician_id.tz or 'UTC'"/>)</p>
+            Date &amp; Time: <t t-out="appointment_date or ''"/> (Timezone: <t t-out="object.physician_id.tz or 'UTC'"/>)
+        </li>
+        <li t-if="object.acs_access_url">
+            Please confirm your appointment at this link: <a t-attf-href="{{ object.acs_access_url }}"><t t-out="object.acs_access_url"/></a>
         </li>
     </ul>
     <p>Please feel free to call anytime for further information or any query.</p>
@@ -35,6 +38,42 @@
     <p>Best regards.</p><br/>
 </div>
                 
+            </field>
+        </record>
+
+        <record id="acs_reminder_appointment_email" model="mail.template">
+            <field name="name">Appointment Reminder</field>
+            <field name="email_from">{{ user.email_formatted }}</field>
+            <field name="email_to">{{ object.patient_id.email }}</field>
+            <field name="subject">{{ object.patient_id.name }} Your Appointment Have been Scheduled</field>
+            <field name="model_id" ref="acs_hms.model_hms_appointment"/>
+            <field name="lang">{{ object.patient_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div>
+                    <t t-set="appointment_date" t-value="format_datetime(dt=object.date, tz=object.physician_id.tz or 'UTC', lang_code=object.physician_id.lang)"/>
+                    <p>Hello <t t-out="object.patient_id.name"/>,</p>
+                    <p>Your Appointment has been scheduled with following details.</p>
+                    <ul>
+                        <li t-if="object.purpose_id">
+                            Subject: <t t-out="object.purpose_id.name"/>
+                        </li>
+                        <li>
+                            Reference Number: <t t-out="object.name"/>
+                        </li>
+                        <li>
+                            Physician Name: <t t-out="object.physician_id.name"/>
+                        </li>
+                        <li>
+                            Date &amp; Time: <t t-out="appointment_date or ''"/> (Timezone: <t t-out="object.physician_id.tz or 'UTC'"/>)
+                        </li>
+                        <li t-if="object.acs_access_url">
+                            Please confirm your appointment at this link: <a t-attf-href="{{ object.acs_access_url }}"><t t-out="object.acs_access_url"/></a>
+                        </li>
+                    </ul>
+                    <p>Please feel free to call anytime for further information or any query.</p>
+                    <p>Best regards.</p><br/>
+                </div>
             </field>
         </record>
 
@@ -48,21 +87,21 @@
             <field name="lang">{{ object.patient_id.lang }}</field>
             <field name="auto_delete" eval="True"/>
             <field name="body_html" type="html">
-<div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
+<div>
     <p>Hello <t t-out="object.patient_id.name"/>,</p>
     <p>Your Prescription details. For more details please refer attached PDF report.</p>
     <ul>
         <li>
-            <p>Reference Number: <t t-out="object.name"/></p>
+            Reference Number: <t t-out="object.name"/>
         </li>
         <li t-if="object.appointment_id">
-            <p>Appointment ID: <t t-out="object.appointment_id.name"/></p>
+            Appointment ID: <t t-out="object.appointment_id.name"/>
         </li>
         <li t-if="object.physician_id">
-            <p>Physician Name: <t t-out="object.physician_id.name"/></p>
+            Physician Name: <t t-out="object.physician_id.name"/>
         </li>
         <li>
-            <p>Prescription Date: <t t-out="object.prescription_date"/></p>
+            Prescription Date: <t t-out="object.prescription_date"/>
         </li>
     </ul>
     <p>Please feel free to call anytime for further information or any query.</p>
@@ -70,6 +109,22 @@
     <p>Best regards.</p><br/>
 </div>
   
+            </field>
+        </record>
+
+
+        <record id="email_template_appointment_cancel" model="mail.template">
+            <field name="name">Appointment Cancellation Notification</field>
+            <field name="model_id" ref="acs_hms.model_hms_appointment"/>
+            <field name="email_from">{{ user.email_formatted }}</field>
+            <field name="email_to">{{ object.patient_id.email }}</field>
+            <field name="subject">{{ object.patient_id.name }} Appointment Cancellation</field>
+            <field name="lang">{{ object.patient_id.lang }}</field>
+            <field name="body_html" type="html">
+                <p>Dear <t t-out="object.patient_id.name"/>,</p>
+                <p>Your appointment scheduled on <t t-out="object.appointment_date"/> has been canceled.</p>
+                <p><b>Reason:</b> <t t-out="object.cancel_reason"/>.</p>
+                <p>Thank you.</p>
             </field>
         </record>
         

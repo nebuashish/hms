@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Drug Flevour -->
-    <record id="view_medicament_flavour_tree" model="ir.ui.view">
-        <field name="name">medicament.flavour.tree</field>
+    <!-- Drug Flavour -->
+    <record id="view_medicament_flavour_list" model="ir.ui.view">
+        <field name="name">medicament.flavour.list</field>
         <field name="model">medicament.flavour</field>
         <field name="arch" type="xml">
             <list string="Medicament Flavour">
@@ -31,7 +31,7 @@
 
     <record model="ir.actions.act_window" id="action_medicament_flavour">
         <field name="name">Flavour</field>
-        <field name="type">ir.actions.act_window</field>
+        <field name="path">almightyhms-medicament-flavour</field>
         <field name="res_model">medicament.flavour</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
@@ -45,8 +45,8 @@
     </record>
 
     <!-- Drug Form -->
-    <record id="view_drug_form_tree" model="ir.ui.view">
-        <field name="name">drug.form.tree</field>
+    <record id="view_drug_form_list" model="ir.ui.view">
+        <field name="name">drug.form.list</field>
         <field name="model">drug.form</field>
         <field name="arch" type="xml">
             <list string="Drug Form">
@@ -92,9 +92,9 @@
         </field>
     </record>
 
-    <record model="ir.actions.act_window" id="act_open_drug_form_view">
+    <record id="act_open_drug_form_view" model="ir.actions.act_window">
         <field name="name">Drug Form</field>
-        <field name="type">ir.actions.act_window</field>
+        <field name="path">almightyhms-drug-form</field>
         <field name="res_model">drug.form</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
@@ -143,8 +143,8 @@
         </field>
     </record>
 
-    <record id="view_active_comp_tree" model="ir.ui.view">
-        <field name="name">active.comp.tree</field>
+    <record id="view_active_comp_list" model="ir.ui.view">
+        <field name="name">active.comp.list</field>
         <field name="model">active.comp</field>
         <field name="arch" type="xml">
             <list string="Active Component">
@@ -157,7 +157,7 @@
     
     <record model="ir.actions.act_window" id="act_open_active_comp">
         <field name="name">Active Component</field>
-        <field name="type">ir.actions.act_window</field>
+        <field name="path">almightyhms-active-component</field>
         <field name="res_model">active.comp</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
@@ -185,8 +185,8 @@
         </field>
     </record>
 
-    <record id="view_drug_company_tree" model="ir.ui.view">
-        <field name="name">drug.company.tree</field>
+    <record id="view_drug_company_list" model="ir.ui.view">
+        <field name="name">drug.company.list</field>
         <field name="model">drug.company</field>
         <field name="arch" type="xml">
             <list string="Drug Company">
@@ -219,7 +219,7 @@
     
     <record model="ir.actions.act_window" id="act_open_drug_company_form_view">
         <field name="name">Drug Company</field>
-        <field name="type">ir.actions.act_window</field>
+        <field name="path">almightyhms-drug-company</field>
         <field name="res_model">drug.company</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
@@ -230,8 +230,8 @@
     </record>
 
     <!-- Drug Route -->
-    <record id="view_drug_route_tree" model="ir.ui.view">
-        <field name="name">drug.route.tree</field>
+    <record id="view_drug_route_list" model="ir.ui.view">
+        <field name="name">drug.route.list</field>
         <field name="model">drug.route</field>
         <field name="arch" type="xml">
             <list string="Drug Route">
@@ -279,7 +279,7 @@
 
     <record model="ir.actions.act_window" id="action_medicament_route">
         <field name="name">Route</field>
-        <field name="type">ir.actions.act_window</field>
+        <field name="path">almightyhms-drug-route</field>
         <field name="res_model">drug.route</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">

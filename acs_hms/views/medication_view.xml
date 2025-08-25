@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <record id="view_hms_patient_medication_tree" model="ir.ui.view">
-        <field name="name">hms.patient.medication.tree</field>
+    <record id="view_hms_patient_medication_list" model="ir.ui.view">
+        <field name="name">hms.patient.medication.list</field>
         <field name="model">hms.patient.medication</field>
         <field name="arch" type="xml">
             <list string="Patient Medication">

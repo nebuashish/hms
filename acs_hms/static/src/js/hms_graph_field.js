@@ -1,4 +1,4 @@
-/** @odoo-module **/
+/** @almightycs-module **/
  
 import { loadJS } from "@web/core/assets";
 import { registry } from "@web/core/registry";
@@ -15,10 +15,9 @@ export class AlmightyHmsGraphField extends Component {
         xlabel: String,
         ylabel: String,
     };
-
+ 
     setup() {
         this.chart = null;
-        this.cookies = useService("cookie");
         this.canvasRef = useRef("canvas");
         this.data = JSON.parse(this.props.record.data[this.props.name]);
 

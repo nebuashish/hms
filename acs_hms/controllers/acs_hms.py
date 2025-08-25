@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import http, fields, _
 from odoo.http import request
-from odoo import fields as odoo_fields, http, tools, _, SUPERUSER_ID
+
 
 class ACSHms(http.Controller):
 

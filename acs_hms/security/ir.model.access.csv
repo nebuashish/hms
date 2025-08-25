@@ -1,4 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_acs_product_kit_line_base_user,acs.product.kit.line,model_acs_product_kit_line,base.group_user,1,0,0,0
+
 access_hms_hms_appointment_purpose_user,Appointment Purpose,model_appointment_purpose,acs_hms_base.group_hms_user,1,0,0,0
 access_hms_hms_patient_disease_user,Systematic Examination,model_hms_patient_disease,acs_hms_base.group_hms_user,1,0,0,0
 access_hms_hms_appointment_user,Appointment,model_hms_appointment,acs_hms_base.group_hms_user,1,0,1,0
@@ -17,6 +19,7 @@ access_hms_medicament_group_line_user,Medicament Group Line ,model_medicament_gr
 access_hms_medicament_group_user,ACS Medicament Group,model_medicament_group,acs_hms_base.group_hms_user,1,0,0,0
 access_hms_treatment_user,ACS Treatment,acs_hms.model_hms_treatment,acs_hms_base.group_hms_user,1,0,0,0
 access_medical_alert_user,ACS Medical Alerts,model_acs_medical_alert,acs_hms_base.group_hms_user,1,0,0,0
+access_acs_medical_allergy_user,ACS Allergies,model_acs_medical_allergy,base.group_user,1,0,0,0
 access_hms_appointment_cabin_user,App Cabin User,model_appointment_cabin,acs_hms_base.group_hms_user,1,0,0,0
 access_acs_family_relation_user,Family Relation,model_acs_family_relation,acs_hms_base.group_hms_user,1,0,0,0
 access_acs_cancel_reason_user,access_acs_cancel_reason_user,model_acs_cancel_reason,acs_hms_base.group_hms_user,1,0,0,0
@@ -37,13 +40,14 @@ access_hms_acs_family_member_receptionist,ACS Family Member,model_acs_family_mem
 access_hms_app_consumable_rec,Consumable Line Rec,acs_hms_base.model_hms_consumable_line,acs_hms.group_hms_receptionist,1,1,1,0
 access_hms_acs_ethnicity_receptionist,ACS Ethnicity,model_acs_ethnicity,acs_hms.group_hms_receptionist,1,1,1,0
 access_hms_res_partner_receptionist,Partner Receptionist,base.model_res_partner,acs_hms.group_hms_receptionist,1,1,1,0
-access_hms_treatment_receptionist,ACS Treatment,acs_hms.model_hms_treatment,acs_hms.group_hms_receptionist,1,1,1,0
 access_medical_alert_rec,ACS Medical Alerts Rec,model_acs_medical_alert,acs_hms.group_hms_receptionist,1,1,1,1
+access_acs_medical_allergy_rec,ACS Allergies Rec,model_acs_medical_allergy,acs_hms.group_hms_receptionist,1,1,1,1
 access_acs_cancel_reason_receptionist,access_acs_cancel_reason_receptionist,model_acs_cancel_reason,acs_hms.group_hms_receptionist,1,1,1,0
 access_acs_cancel_reason_wiz_receptionist,access_acs_cancel_reason_wiz_receptionist,model_acs_cancel_reason_wiz,acs_hms.group_hms_receptionist,1,1,1,1
 acs_hms.access_acs_reschedule_appointments,access_acs_reschedule_appointments,acs_hms.model_acs_reschedule_appointments,acs_hms.group_hms_receptionist,1,1,1,1
 access_acs_patient_evaluation_receptionist,access_acs_patient_evaluation,model_acs_patient_evaluation,acs_hms.group_hms_receptionist,1,1,1,1
 access_acs_patient_procedure_receptionist,access_acs_patient_procedure,model_acs_patient_procedure,acs_hms.group_hms_receptionist,1,1,1,1
+access_acs_patient_emergency_contact_receptionist,Emergency Contact Receptionist,acs_hms_base.model_acs_patient_emergency_contact,acs_hms.group_hms_receptionist,1,1,1,0
 
 access_hms_medicament_flavour_nurse,ACS Medicament Flavour,acs_hms_base.model_medicament_flavour,acs_hms.group_hms_nurse,1,1,1,0
 access_hms_hms_diseases_nurse,ACS Diseases,model_hms_diseases,acs_hms.group_hms_nurse,1,1,1,0
@@ -66,10 +70,12 @@ access_hms_medicament_group_line_nurse,Medicament Group Line ,model_medicament_g
 access_hms_medicament_group_nurse,ACS Medicament Group,model_medicament_group,acs_hms.group_hms_nurse,1,1,1,0
 access_hms_hms_patient_nurse,ACS Patient Nurse,acs_hms_base.model_hms_patient,acs_hms.group_hms_nurse,1,1,1,0
 access_medical_alert_nurse,ACS Medical Alerts Nurse,model_acs_medical_alert,acs_hms.group_hms_nurse,1,1,1,1
+access_acs_medical_allergy_nurse,ACS Allergies Nurse,model_acs_medical_allergy,acs_hms.group_hms_nurse,1,1,1,1
 access_acs_patient_evaluation_nurse,access_acs_patient_evaluation_nurse,model_acs_patient_evaluation,acs_hms.group_hms_nurse,1,1,1,0
 access_acs_product_kit_nurse,acs.product.kit,model_acs_product_kit,acs_hms.group_hms_nurse,1,1,1,1
 access_acs_product_kit_line_nurse,acs.product.kit.line,model_acs_product_kit_line,acs_hms.group_hms_nurse,1,1,1,1
 
+access_hms_treatment_jr_dr,Treatment Jr. Dr.,acs_hms.model_hms_treatment,acs_hms.group_hms_jr_doctor,1,1,1,0
 access_hms_app_consumable_jr_dr,Consumable Line Dr,acs_hms_base.model_hms_consumable_line,acs_hms.group_hms_jr_doctor,1,1,1,1
 access_hms_acs_family_member_jr_doctor,ACS Family Member,model_acs_family_member,acs_hms.group_hms_jr_doctor,1,1,1,0
 access_hms_hms_prescription_line_jr_doctor,Prescription Line,model_prescription_line,acs_hms.group_hms_jr_doctor,1,1,1,1
@@ -101,7 +107,6 @@ access_hms_hms_appointment_purpose_manager,Appointment Purpose,model_appointment
 access_hms_appointment_cabin_manager,App Cabin Manager,model_appointment_cabin,acs_hms_base.group_hms_manager,1,1,1,1
 access_hms_acs_physician_hms_manager,Physician,acs_hms_base.model_hms_physician,acs_hms_base.group_hms_manager,1,1,0,0
 access_hms_user_stock_move,StockMove,stock.model_stock_move,acs_hms_base.group_hms_user,1,0,0,0
-access_hms_acs_physician_erp_manager,physician,acs_hms_base.model_hms_physician,base.group_erp_manager,1,1,1,1
 access_acs_family_relation_manager,Family Relation,model_acs_family_relation,acs_hms_base.group_hms_user,1,1,1,1
 access_hms_group_acs_hms_appointment_user,Appointment User,model_hms_appointment,acs_hms_base.group_hms_user,1,1,1,0
 access_acs_cancel_reason_manager,access_acs_cancel_reason_manager,model_acs_cancel_reason,acs_hms_base.group_hms_manager,1,1,1,1

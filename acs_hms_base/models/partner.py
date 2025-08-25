@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 from dateutil.relativedelta import relativedelta
@@ -29,13 +30,14 @@ class ResPartner(models.Model):
             rec.today_is_birthday = today_is_birthday
 
     name = fields.Char(tracking=True)
-    code = fields.Char(string='Identification Code', default='/',
+    code = fields.Char(string='Code', default='New',
         help='Identifier provided by the Health Center.', copy=False, tracking=True)
     gender = fields.Selection([
         ('male', 'Male'), 
         ('female', 'Female'), 
         ('other', 'Other')], string='Gender', default='male', tracking=True)
     birthday = fields.Date(string='Date of Birth', tracking=True)
+
     date_of_death = fields.Date(string='Date of Death')
     age = fields.Char(string='Age', compute='_get_age')
     today_is_birthday = fields.Boolean(string='Birthday Today', compute='_get_age')
@@ -50,6 +52,23 @@ class ResPartner(models.Model):
         string='Is Patient', help="Check if customer is linked with patient.")
     acs_amount_due = fields.Monetary(compute='_compute_acs_amount_due',currency_field='currency_id')
     acs_patient_id = fields.Many2one('hms.patient', compute='_is_patient', string='Patient', readonly=True)
+    acs_contact_address_complete = fields.Char(compute='get_acs_compute_complete_address', string='ACS Contact Address')
+
+    @api.depends('street', 'zip', 'city', 'country_id')
+    def get_acs_compute_complete_address(self):
+        for record in self:
+            contact_address_complete = ''
+            if record.street:
+                contact_address_complete += record.street + ', '
+            if record.zip:
+                contact_address_complete += record.zip + ' '
+            if record.city:
+                contact_address_complete += record.city + ', '
+            if record.state_id:
+                contact_address_complete += record.state_id.name + ', '
+            if record.country_id:
+                contact_address_complete += record.country_id.name
+            record.acs_contact_address_complete = contact_address_complete.strip().strip(',')
 
     def _compute_acs_amount_due(self):
         MoveLine = self.env['account.move.line']
@@ -68,7 +87,7 @@ class ResPartner(models.Model):
     def _is_patient(self):
         Patient = self.env['hms.patient'].sudo()
         for rec in self:
-            patient = Patient.search([('partner_id', '=', rec.id)], limit=1)
+            patient = Patient.sudo().search([('partner_id', '=', rec.id)], limit=1)
             rec.acs_patient_id = patient.id if patient else False
             rec.is_patient = True if patient else False
 

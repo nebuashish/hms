@@ -14,6 +14,9 @@ access_hms_res_users_user,Res Users,base.model_res_users,acs_hms_base.group_hms_
 access_hms_res_partner_user,Partner User,base.model_res_partner,acs_hms_base.group_hms_user,1,0,0,0
 access_hms_app_consumable_user,Consumable Line,model_hms_consumable_line,acs_hms_base.group_hms_user,1,0,0,0
 access_hms_acs_religion_user,ACS Religion,model_acs_religion,acs_hms_base.group_hms_user,1,0,0,0
+access_hms_acs_document_user,ACS Document,model_acs_document_type,acs_hms_base.group_hms_user,1,0,0,0
+access_acs_patient_emergency_contact,Emergency Contact,model_acs_patient_emergency_contact,acs_hms_base.group_hms_user,1,0,0,0
+access_acs_source,Source,model_acs_source,acs_hms_base.group_hms_user,1,0,0,0
 
 access_hms_patient_manager,Patient,model_hms_patient,acs_hms_base.group_hms_manager,1,1,1,1
 access_hms_physician_specialty_manager,Physician Specialty,model_physician_specialty,acs_hms_base.group_hms_manager,1,1,1,1
@@ -31,6 +34,9 @@ access_hms_user_stock_move,StockMove,stock.model_stock_move,acs_hms_base.group_h
 access_hms_acs_physician_erp_manager,physician,model_hms_physician,base.group_erp_manager,1,1,1,1
 access_hms_app_consumable_mana,Consumable Line Manager,model_hms_consumable_line,acs_hms_base.group_hms_manager,1,1,1,1
 access_hms_acs_religion_manager,ACS Religion,model_acs_religion,acs_hms_base.group_hms_manager,1,1,1,1
+access_hms_acs_document_manager,ACS Document,model_acs_document_type,acs_hms_base.group_hms_manager,1,1,1,1
+access_acs_patient_emergency_contact_manager,Emergency Contact Manager,model_acs_patient_emergency_contact,acs_hms_base.group_hms_manager,1,1,1,1
+access_acs_source_manager,Source Manager,model_acs_source,acs_hms_base.group_hms_manager,1,1,1,1
 
 access_product_product_hms_service_user,product.product Service Manager,product.model_product_product,acs_hms_base.group_manage_services,1,1,1,1
 access_product_template_hms_service_user,product.template Service Manager,product.model_product_template,acs_hms_base.group_manage_services,1,1,1,1

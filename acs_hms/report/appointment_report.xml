@@ -15,24 +15,36 @@
             <tbody>
                 <t t-foreach="lines" t-as="line">
                     <tr>
-                        <td>
-                            <span t-esc="line_index + 1"/>
-                        </td>
-                        <td>
-                            <span t-field="line.sudo().product_id.name"/>
-                        </td>
-                        <td>
-                            <span t-field="line.qty"/>
-                        </td>
-                        <td>
-                            <span t-field="line.lot_id.name"/>
-                        </td>
-                        <td>
-                            <span t-field="line.price_unit"/>
-                        </td>
-                        <td>
-                            <span t-field="line.subtotal"/>
-                        </td>
+                        <t t-if="line.display_type=='product'">
+                            <td>
+                                <span t-esc="line_index + 1"/>
+                            </td>
+                            <td>
+                                <span t-field="line.sudo().product_id.name"/>
+                            </td>
+                            <td>
+                                <span t-field="line.qty"/>
+                            </td>
+                            <td>
+                                <span t-field="line.lot_id.name"/>
+                            </td>
+                            <td>
+                                <span t-field="line.price_unit"/>
+                            </td>
+                            <td>
+                                <span t-field="line.subtotal"/>
+                            </td>
+                        </t>                    
+                        <t t-if="line.display_type == 'line_section'">
+                            <td colspan="99">
+                                <span t-field="line.name"/>
+                            </td>
+                        </t>
+                        <t t-if="line.display_type == 'line_note'">
+                            <td colspan="99">
+                                <span t-field="line.name"/>
+                            </td>
+                        </t>
                     </tr>
                 </t>
             </tbody>

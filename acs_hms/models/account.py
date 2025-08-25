@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import api,fields,models,_
 
@@ -11,4 +12,3 @@ class AccountMove(models.Model):
     appointment_id = fields.Many2one('hms.appointment', string='Appointment')
     procedure_id = fields.Many2one('acs.patient.procedure', string='Patient Procedure')
     hospital_invoice_type = fields.Selection(selection_add=[('appointment', 'Appointment'), ('treatment','Treatment'), ('procedure','Procedure')])
-    category = fields.Char("Category")

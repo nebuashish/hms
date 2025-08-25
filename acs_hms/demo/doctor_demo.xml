@@ -99,7 +99,7 @@
             <field name="login">laxmi.patil@almightycs-almightyhms.com</field>
             <field name="active">True</field>
             <field name="code">001</field>
-            <field name="consultaion_service_id" ref="hms_consultation_service_0"/>
+            <field name="consultation_service_id" ref="hms_consultation_service_0"/>
             <field name="is_primary_surgeon">True</field>
             <field name="medical_license">215182589621</field>
             <field name="department_ids"  eval="[(4, ref('department_cardiology'))]"/>
@@ -118,12 +118,12 @@
 
         <record id="hms_physician_1" model="hms.physician">
             <field name="image_1920" type="base64" file="acs_hms/static/src/img/doc_img_1.jpg"/>
-            <field name="name">Dr. Devishree Shetty</field>
+            <field name="name">Dr. Shiv</field>
             <field name="degree_ids" eval="[(4, ref('physician_degree_mbbs')),(4, ref('physician_degree_md'))]"></field>
-            <field name="login">devi.shetty@almightycs-almightyhms.com</field>
+            <field name="login">shiv.shetty@almightycs-almightyhms.com</field>
             <field name="active">True</field>
             <field name="code">002</field>
-            <field name="consultaion_service_id" ref="hms_consultation_service_0"/>
+            <field name="consultation_service_id" ref="hms_consultation_service_0"/>
             <field name="is_primary_surgeon">False</field>
             <field name="medical_license">315182589621</field>
             <field name="department_ids"  eval="[(4, ref('department_ent'))]"/>
@@ -136,18 +136,18 @@
             <field name="country_id" ref="base.in"/>
             <field name="phone">7929231234</field>
             <field name="mobile">9429231234</field>
-            <field name="email">devi.shetty@almightycs-almightyhms.com</field>
+            <field name="email">shiv.shetty@almightycs-almightyhms.com</field>
             <field name="signature" type="base64" file="acs_hms/static/src/img/doc_sign_1.png" />
         </record>
 
         <record id="hms_physician_2" model="hms.physician">
             <field name="image_1920" type="base64" file="acs_hms/static/src/img/doc_img_2.jpg"/>
-            <field name="name">Dr. Himashu Shah</field>
+            <field name="name">Dr. Himanshu Shah</field>
             <field name="degree_ids" eval="[(4, ref('physician_degree_mbbs')),(4, ref('physician_degree_md'))]"></field>
             <field name="login">himanshu@almightycs-almightyhms.com</field>
             <field name="active">True</field>
             <field name="code">003</field>
-            <field name="consultaion_service_id" ref="hms_consultation_service_0"/>
+            <field name="consultation_service_id" ref="hms_consultation_service_0"/>
             <field name="is_primary_surgeon">True</field>
             <field name="medical_license">515182589621</field>
             <field name="department_ids" eval="[(4, ref('department_general'))]" />
@@ -171,7 +171,7 @@
             <field name="login">khwahish@almightycs-almightyhms.com</field>
             <field name="active">True</field>
             <field name="code">004</field>
-            <field name="consultaion_service_id" ref="hms_consultation_service_0"/>
+            <field name="consultation_service_id" ref="hms_consultation_service_0"/>
             <field name="is_primary_surgeon">True</field>
             <field name="medical_license">900245788505</field>
             <field name="specialty_id" ref="physician_specialty_4" />
@@ -195,7 +195,7 @@
             <field name="login">zoya@almightycs-almightyhms.com</field>
             <field name="active">True</field>
             <field name="code">005</field>
-            <field name="consultaion_service_id" ref="hms_consultation_service_0"/>
+            <field name="consultation_service_id" ref="hms_consultation_service_0"/>
             <field name="is_primary_surgeon">True</field>
             <field name="medical_license">548755400052</field>
             <field name="department_ids" eval="[(4, ref('department_ent'))]" />
@@ -219,7 +219,7 @@
             <field name="login">wilson@almightycs-almightyhms.com</field>
             <field name="active">True</field>
             <field name="code">006</field>
-            <field name="consultaion_service_id" ref="hms_consultation_service_0"/>
+            <field name="consultation_service_id" ref="hms_consultation_service_0"/>
             <field name="is_primary_surgeon">True</field>
             <field name="medical_license">721245778045</field>
             <field name="department_ids" eval="[(4, ref('department_general'))]"/>

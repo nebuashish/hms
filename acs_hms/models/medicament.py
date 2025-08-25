@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 
@@ -6,10 +7,10 @@ class MedicamentGroupLine(models.Model):
     _name = "medicament.group.line"
     _description = "Medicament Group Line"
 
-    @api.depends('dose','days')
+    @api.depends('dose','days','qty_per_day')
     def _get_total_qty(self):
         for rec in self:
-            rec.quantity = rec.days * rec.dose
+            rec.quantity = rec.days * rec.qty_per_day * rec.dose
 
     group_id = fields.Many2one('medicament.group', ondelete='restrict', string='Medicament Group')
     product_id = fields.Many2one('product.product', ondelete='restrict', string='Medicine Name', required=True)
@@ -31,7 +32,8 @@ class MedicamentGroupLine(models.Model):
         if self.product_id:
             self.common_dosage_id = self.product_id.common_dosage_id.id
             self.dosage_uom_id = self.product_id.dosage_uom_id.id
-            self.quantity = self.dose * self.days
+            self.quantity = self.days * self.qty_per_day * self.dose
+            self.short_comment = self.product_id.short_comment
 
     @api.onchange('common_dosage_id')
     def onchange_common_dosage(self):
@@ -54,15 +56,19 @@ class ACSMedicamentGroup(models.Model):
 class ACSMedicationDosage(models.Model):
     _name = 'medicament.dosage'
     _description = "Medicament Dosage"
-    _rec_name = 'abbreviation'
 
-    name = fields.Char(translate=True)
-    abbreviation = fields.Char(string='Frequency',help='Dosage abbreviation, such as tid in the US or tds in the UK')
+    name = fields.Char(translate=True, required=True)
+    abbreviation = fields.Char(string='Abbreviation',help='Dosage abbreviation, such as tid in the US or tds in the UK')
     qty_per_day = fields.Float(string='Total Qty Per Day', default=1.0)
     days = fields.Float("Days",default=1.0)
     code = fields.Char(size=8, string='Code',help='Dosage Code,for example: SNOMED 229798009 = 3 times per day')
 
     _sql_constraints = [('name_uniq', 'UNIQUE(name)', 'Name must be unique!')]
+
+    def _compute_display_name(self):
+        for rec in self:
+            name = rec.abbreviation or rec.name
+            rec.display_name = name
 
 
 class ACSPatientMedication(models.Model):

@@ -5,11 +5,8 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
-            <field name="partner_id" position="after">
-		    <field name="patient_id" invisible="move_type not in ['out_invoice', 'out_refund']" readonly="state!='draft'"/>
-		 
-                <field name="category"/>
-                <field name="sub_category"/>
+            <field name="partner_shipping_id" position="after">
+                <field name="patient_id" invisible="move_type not in ['out_invoice', 'out_refund']" readonly="state!='draft'"/>
             </field>
             <notebook position="inside">
                 <page name="hospital_info" string="Hospital Info" invisible="move_type not in ['out_invoice', 'out_refund']" readonly="state!='draft'">
@@ -32,6 +29,17 @@
             <filter name="invoice_date" position="after">
                 <filter name="today" string="Today's Invoices" domain="[('invoice_date','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0))), ('invoice_date','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59)))]"/>
             </filter>
+        </field>
+    </record>
+
+    <record id="view_invoice_tree" model="ir.ui.view"> 
+        <field name="name">account.move.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <field name="invoice_date" position="before">
+                <field name="patient_id" invisible="move_type not in ['out_invoice', 'out_refund']" optional="show"/>
+            </field>
         </field>
     </record>
 

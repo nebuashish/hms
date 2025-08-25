@@ -6,10 +6,14 @@
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_form_view"/>
         <field name="arch" type="xml">
-            <field name="type" position="after">
+            <field name="product_tooltip" position="after">
                 <field name="hospital_product_type" required="1"/>
             </field>
-            <xpath expr="//notebook/page[@name='general_information']" position="before">
+            <label for="list_price" position="before">
+                <field name="acs_fixed_price" invisible="hospital_product_type!='time_service'"/>
+                <field name="acs_min_qty" invisible="hospital_product_type!='time_service'"/>
+            </label>
+            <xpath expr="//notebook/page[@name='general_information']" position="after">
                 <page string="Medicament Details" name="acs_medicament_data" invisible="hospital_product_type!='medicament'">
                     <group name="acs_medicament_info">
                         <group>
@@ -63,7 +67,7 @@
 
     <record id="product_template_action_medicines" model="ir.actions.act_window">
         <field name="name">Medicines</field>
-        <field name="type">ir.actions.act_window</field>
+        <field name="path">almightyhms-medicines</field>
         <field name="res_model">product.template</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="view_id" ref="product.product_template_kanban_view"/>
@@ -72,7 +76,7 @@
 
     <record id="product_template_action_services" model="ir.actions.act_window">
         <field name="name">Services</field>
-        <field name="type">ir.actions.act_window</field>
+        <field name="path">almightyhms-services</field>
         <field name="res_model">product.template</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="view_id" ref="product.product_template_kanban_view"/>

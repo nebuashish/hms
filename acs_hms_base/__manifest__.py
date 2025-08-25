@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
+# Privacy Notice: We collect data for subscription and analytics, and
+# product improvement. https://www.almightycs.com/privacy-policy
 #╔══════════════════════════════════════════════════════════════════════╗
 #║                                                                      ║
 #║                  ╔═══╦╗       ╔╗  ╔╗     ╔═══╦═══╗                   ║
@@ -70,13 +73,13 @@
         servicios de salud administración de la salud administración de la salud departamento de salud
          gestión hospitalaria sistema de información gestión hospitalaria odoo hms odoo
     """,
-    'version': '1.0.5',
+    'version': '1.2.27',
     'category': 'Medical',
     'author': 'Almighty Consulting Solutions Pvt. Ltd.',
     'support': 'info@almightycs.com',
     'website': 'https://www.almightycs.com',
     'license': 'OPL-1',
-    'depends': ['account', 'stock', 'hr', 'product_expiry'],
+    'depends': ['account', 'stock', 'hr', 'product_expiry', 'calendar'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
@@ -98,6 +101,7 @@
         'views/res_config_settings.xml',
         'views/stock_view.xml',
         'views/res_country_view.xml',
+        'views/document_view.xml',
         'views/menu_item.xml',
     ],
     'demo': [
@@ -105,15 +109,19 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'acs_hms_base/static/src/scss/report.scss'
-        ],
-        "web.assets_common": [
-            "acs_hms_base/static/src/js/acs.js",
+            'acs_hms_base/static/src/js/acs.js',
+            'acs_hms_base/static/src/scss/report.scss',
             'acs_hms_base/static/src/scss/acs.scss',
         ],
+        'web.assets_frontend': [
+            'acs_hms_base/static/src/scss/acs.scss',
+        ]
     },
     'images': [
         'static/description/hms_almightycs_cover.jpg',
+    ],
+    "cloc_exclude": [
+        "doc/**/*"
     ],
     'installable': True,
     'application': True,
@@ -121,14 +129,4 @@
     'price': 36,
     'currency': 'USD',
 }
-
-#   Disclaimer: We Collect following information for analytics and improving our product/services.
-#   Number of Users, Patients, Dr, Appointments, Prescriptions, Laboratory, Radiology, 
-#       Surgery, Hospitalization and other medical records (Only Count)
-#   Company Name, List of installed modules, DB key, email, mobile and url (to match customer data to update details.)
-#   Only if related modules are installed those data will be fetched.
-#   We do not sale this information or pulish customer details anywhere without having approval from customer
-#   This same detail get used for our monthly subscription users also.
-#   Privay Policy: https://www.almightycs.com/privacy-policy
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

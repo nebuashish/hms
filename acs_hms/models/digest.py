@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models, _
 from odoo.exceptions import AccessError
@@ -64,7 +65,7 @@ class Digest(models.Model):
 
     def _compute_kpis_actions(self, company, user):
         res = super(Digest, self)._compute_kpis_actions(company, user)
-        res['kpi_acs_appointment_total'] = 'acs_hms.action_appointment&menu_id=%s' % self.env.ref('acs_hms.action_main_menu_appointmnet_opd').id
+        res['kpi_acs_appointment_total'] = 'acs_hms.action_appointment&menu_id=%s' % self.env.ref('acs_hms.main_menu_appointment').id
         res['kpi_acs_treatment_total'] = 'acs_hms.acs_action_form_hospital_treatment&menu_id=%s' % self.env.ref('acs_hms.main_menu_treatment').id
         res['kpi_acs_procedure_total'] = 'acs_hms.action_acs_patient_procedure&menu_id=%s' % self.env.ref('acs_hms.menu_acs_patient_procedure_treatment').id
         res['kpi_acs_evaluation_total'] = 'acs_hms.action_acs_patient_evaluation'

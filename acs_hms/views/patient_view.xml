@@ -27,16 +27,40 @@
         <field name="model">hms.patient</field>
         <field name="inherit_id" ref="acs_hms_base.patient_kanban_view"/>
         <field name="arch" type="xml">
-            <field name="id" position="after">
-                <field name="show_cancellation_warning_flag"/>
-                <field name="acs_cancelled_appointments"/>
-                <field name="acs_flag_days"/>
-            </field>
-            <xpath expr="//div[hasclass('oe_kanban_details')]/ul" position="after">
+            <field name="acs_tag_ids" position="after">
                 <div t-if="record.show_cancellation_warning_flag.raw_value" class="badge rounded-pill text-bg-danger">
                     <span class="fa fa-exclamation-triangle" title="Cancellation"/>
                     <field name="acs_cancelled_appointments" nolabel="1"/> Appointment Cancellation in last <field name="acs_flag_days" nolabel="1"/> days
+                    <field name="show_cancellation_warning_flag" invisible="1"/>
                 </div>
+            </field>
+            <div name="name" position="replace">
+                <div>
+                    <div class="mb-1" name="name" style="width: 70%;">
+                        <field name="display_name" class="mb-0 fw-bold fs-5"/>
+                    </div>
+                    <div class="position-absolute top-0 end-0 text-center" style="width: 75px; height: 40px;">
+                        <field name="acs_patient_progress" widget="percentpie" invisible="not show_patient_progress" class="w-100 h-100"/>
+                    </div>
+                </div>
+            </div>
+            <xpath expr="//footer/div" position="inside">
+                <a t-if="record.appointment_count.raw_value" class="btn btn-sm btn-link smaller" groups="acs_hms.group_hms_receptionist" name="action_appointment" role="button" type="object">
+                    <i class="fa fa-user-md me-1" aria-label="Appointments" role="img" title="Appointments"/>
+                    <field name="appointment_count"/>
+                </a>
+                <a t-if="record.prescription_count.raw_value" class="btn btn-sm btn-link smaller" groups="acs_hms.group_hms_receptionist" name="action_prescription" role="button" type="object">
+                    <i class="fa fa-wpforms me-1" aria-label="Prescriptions" role="img" title="Prescriptions"/>
+                    <field name="prescription_count"/>
+                </a>
+                <a t-if="record.patient_procedure_count.raw_value" class="btn btn-sm btn-link smaller" groups="acs_hms.group_hms_receptionist" name="action_view_patient_procedures" role="button" type="object">
+                    <i class="fa fa-list-alt  me-1" aria-label="Procedures" role="img" title="Procedures"/>
+                    <field name="patient_procedure_count"/>
+                </a>
+                <a t-if="record.evaluation_count.raw_value" class="btn btn-sm btn-link smaller" groups="acs_hms.group_hms_receptionist" name="action_evaluation" role="button" type="object">
+                    <i class="fa fa-stethoscope me-1" aria-label="Evaluations" role="img" title="Evaluations"/>
+                    <field name="evaluation_count"/>
+                </a>
             </xpath>
         </field>
     </record>
@@ -47,7 +71,7 @@
         <field name="inherit_id" ref="acs_hms_base.view_patient_form"/>
         <field name="arch" type="xml">
             <header position="inside">
-                <button name="create_invoice" string="Create Invoice" type="object" class="oe_highlight" invisible="invoice_id" groups="acs_hms.group_patient_registartion_invoicing"/>
+                <button name="create_invoice" string="Create Invoice" type="object" class="oe_highlight" invisible="invoice_id" groups="acs_hms.group_patient_registration_invoicing"/>
                 <field name="invoice_id" invisible="1"/>
             </header>
 
@@ -59,36 +83,34 @@
                 </div>
             </widget>
 
-            <div name="button_box" position="inside">
-                <button name="action_treatment" type="object" class="oe_stat_button" groups="acs_hms.group_hms_receptionist" icon="fa-user-md">
-                    <field string="Treatments" name="treatment_count" widget="statinfo"/>
-                </button>
+            <button name="action_view_attachments" position="attributes">
+                <attribute name="groups">acs_hms.group_hms_receptionist</attribute>
+            </button>
+
+            <button name='view_invoices' position="after">
                 <button name="action_appointment" type="object" class="oe_stat_button" groups="acs_hms.group_hms_receptionist" icon="fa-stethoscope">
                     <field string="Appointments" name="appointment_count" widget="statinfo"/>
-                </button>
-                <button name="action_evaluation" type="object" class="oe_stat_button" groups="acs_hms.group_hms_receptionist" icon="fa-stethoscope">
-                    <field string="Evaluations" name="evaluation_count" widget="statinfo"/>
                 </button>
                 <button name="action_prescription" groups="acs_hms.group_hms_jr_doctor" type="object" class="oe_stat_button" icon="fa-wpforms">
                     <field string="Prescriptions" name="prescription_count" widget="statinfo"/>
                 </button>
-                <button name="action_view_patient_procedures" class="oe_stat_button" icon="fa-medkit" type="object">
+                <button name="action_evaluation" type="object" class="oe_stat_button" groups="acs_hms.group_hms_receptionist" icon="fa-stethoscope">
+                    <field string="Evaluations" name="evaluation_count" widget="statinfo"/>
+                </button>
+                <button name="action_view_patient_procedures" groups="acs_hms.group_hms_receptionist" class="oe_stat_button" icon="fa-medkit" type="object">
                     <field string="Patient Procedures" name="patient_procedure_count" widget="statinfo"/>
                 </button>
-            </div>
+                <button name="action_treatment" type="object" class="oe_stat_button" groups="acs_hms.group_hms_receptionist" icon="fa-user-md">
+                    <field string="Treatments" name="treatment_count" widget="statinfo"/>
+                </button>
+            </button>
+            
+            <xpath expr="//div[hasclass('oe_title')]/div" position="inside">
+                <field name="acs_patient_progress" widget="percentpie" invisible="not show_patient_progress"/>
+            </xpath>
 
-	    <field name="age" position="attributes">
-                <attribute name="invisible">birthday == False</attribute>
-	    </field>
-	    <field name="title" position="after">
-                <field name="category"/>
-                <field name="sub_category"/>
-            </field>
-	    <field name="age" position="after">
-		    
-		    <field name="department_ids" widget="many2many_tags" groups="acs_hms.group_allow_multi_department" options="{'no_open': True, 'no_create': True}" context="{'tree_view_ref': 'acs_hms.view_hr_department_tree'}" domain="[('patient_department','=',True)]"/>
-		    <field name="partner_age" invisible="birthday != False"/>
-		    <field name="mrn_no"/>
+            <field name="age" position="after">
+                <field name="department_ids" widget="many2many_tags" groups="acs_hms.group_allow_multi_department" options="{'no_open': True, 'no_create': True}" context="{'list_view_ref': 'acs_hms.view_hr_department_list'}" domain="[('patient_department','=',True)]"/>
             </field>
 
             <field name="caste" position="after">
@@ -100,11 +122,11 @@
             <group name="ref_doc_details" position="inside">
                 <field name="ref_doctor_ids" widget="many2many_tags"/>
                 <field name="assignee_ids" widget="many2many_tags"/>
-                <field name="registration_product_id" groups="acs_hms.group_patient_registartion_invoicing"/>
+                <field name="registration_product_id" groups="acs_hms.group_patient_registration_invoicing"/>
             </group>
 
             <page name="hospital_info" position="after">
-                <page name="clinical_ass" string="Clinical Assesment" groups="acs_hms.group_hms_nurse">
+                <page name="clinical_ass" string="Clinical Assessment" groups="acs_hms.group_hms_nurse">
                     <div>NOTE: Details are shown based on last Completed Patient Evaluation. <t invisible="not last_evaluation_id">Last Evaluation: <field name="last_evaluation_id" nolabel="1" class="oe_link"/></t> <button class="oe_inline oe_stat_button btn-link" type="object" name="show_weight_chart" title="Show Evaluation Charts" icon="fa-area-chart"  string="Show Evaluation Charts" widget="statinfo"/></div>
 
                     <group>
@@ -169,6 +191,10 @@
                     <group>
                         <field name="medical_alert_ids" widget="many2many_tags"/>
                     </group>
+                    <separator string="Allergies" colspan="4"/>
+                    <group>
+                        <field name="allergy_ids" widget="many2many_tags"/>
+                    </group>
                     <separator string="Past Medical History" colspan="4"/>
                     <field name="medical_history"/>
                     <separator string="Diseases History" colspan="4"/>
@@ -178,15 +204,20 @@
                     <separator string="Genetic Risk" />
                     <field name="genetic_risks_ids"/>
                 </page>
-                <page string="Family" name="family_note">
-                    <field name="family_member_ids">
-                        <list editable="bottom">
-                            <field name="related_patient_id"/>
-                            <field name="relation_id" required="1"/>
-                        </list>
-                    </field>
-                </page>
+                
             </page>
+            <page name="emergency_contacts_family" position="inside">
+                <separator string="Family"/>
+                <field name="family_member_ids">
+                    <list editable="bottom">
+                        <field name="related_patient_id"/>
+                        <field name="relation_id" required="1"/>
+                    </list>
+                </field>
+            </page>
+            <xpath expr="//field[@name='emergency_contact_ids']//field[@name='relationship']" position="replace">
+                <field name="relation_id" required="1"/>
+            </xpath>
          </field>
     </record>
 
@@ -198,7 +229,7 @@
         <field name="priority">100</field>
         <field name="arch" type="xml"> 
             <kanban create="false" class="o_kanban_dashboard o_acs_hms_kanban">
-                <field name="grpah_data_filter"/>
+                <field name="graph_data_filter"/>
                 <field name="patient_weight_line_graph"/>
                 <field name="patient_height_line_graph"/>
                 <field name="patient_temp_line_graph"/>
@@ -209,15 +240,15 @@
                 <field name="patient_spo2_line_graph"/>
 
                 <templates> 
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div id="acs_hms_dashboard" class="">
                             <div class="row">
-                                <span t-esc="grpah_data_filter"/>
+                                <span t-esc="graph_data_filter"/>
                                 <div class="btn-group col-4 mt8 mb8" role="group" aria-label="Filters">
-                                    <button t-attf-class="btn #{record.grpah_data_filter.raw_value=='today' ? 'btn-primary' : 'btn-secondary'}" type="object" name="today_data">Today</button>
-                                    <button t-attf-class="btn #{record.grpah_data_filter.raw_value=='week' ? 'btn-primary' : 'btn-secondary'}" type="object" name="week_data">This Week</button>
-                                    <button t-attf-class="btn #{record.grpah_data_filter.raw_value=='month' ? 'btn-primary' : 'btn-secondary'}" type="object" name="month_data">This Month</button>
-                                    <button t-attf-class="btn #{record.grpah_data_filter.raw_value=='all' ? 'btn-primary' : 'btn-secondary'}" type="object" name="all_data">Till Now</button>
+                                    <button t-attf-class="btn #{record.graph_data_filter.raw_value=='today' ? 'btn-primary' : 'btn-secondary'}" type="object" name="today_data">Today</button>
+                                    <button t-attf-class="btn #{record.graph_data_filter.raw_value=='week' ? 'btn-primary' : 'btn-secondary'}" type="object" name="week_data">This Week</button>
+                                    <button t-attf-class="btn #{record.graph_data_filter.raw_value=='month' ? 'btn-primary' : 'btn-secondary'}" type="object" name="month_data">This Month</button>
+                                    <button t-attf-class="btn #{record.graph_data_filter.raw_value=='all' ? 'btn-primary' : 'btn-secondary'}" type="object" name="all_data">Till Now</button>
 
                                 </div>
                             </div>
@@ -256,7 +287,7 @@
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div t-attf-class="card acs-card card-">
                                         <div class="card-heading">
-                                            <i class="fa fa-area-chart" aria-label="Info" title="Weight Chart"></i> Temprature
+                                            <i class="fa fa-area-chart" aria-label="Info" title="Weight Chart"></i> Temperature
                                         </div>
                                         <div class="card-body o_acs_AcsDashboardGraph">
                                             <t t-name="TempratureChart">
@@ -365,7 +396,8 @@
     </record>
 
     <record id="action_patient_evaluation_graph_1" model="ir.actions.act_window">
-        <field name="name">Patient Evalution Graph</field>
+        <field name="name">Patient Evaluation Graph</field>
+        <field name="path">almightyhms-evaluation-graph</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">hms.patient</field>
         <field name="view_mode">kanban</field>

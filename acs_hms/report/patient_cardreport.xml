@@ -3,27 +3,28 @@
 
     <template id="patient_cardreport_document">
         <t t-call="web.external_layout">
-            <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})"/>
+            <t t-set="doc" t-value="doc.with_context({'lang': doc.partner_id.lang})"/>
             <div class="page">
-                <table style="border:1px solid;width:200px;height:150px;">
+                <table class="o_event_badge_ticket_wrapper" 
+                    t-attf-style="background-image: url('data:image/png;base64,#{doc.company_id.badge_image}'); background-size: cover; background-repeat: no-repeat; background-position: center; width: 250px; height: 180px;">
                     <tbody>
                         <tr>
-                            <td>
+                            <td style="padding: 5px;">
                                 <center>
-                                    <div t-if="doc.code" t-field="doc.code" class="barcode" t-options="{'widget': 'barcode', 'symbology': 'Code128', 'width': 180, 'height': 50, 'img_align': 'center'}"/>
+                                    <div t-if="doc.code" t-field="doc.code" class="barcode" 
+                                        t-options="{'widget': 'barcode', 'symbology': 'Code128', 'width': 180, 'height': 50, 'img_align': 'center'}"/>
                                 </center>
                             </td>
                         </tr>
                         <tr>
-                            <td>
+                            <td style="padding:5px;">
                                 <div class="col-11">
                                     <center>
-                                        <span t-field="doc.image_128"
-                                            t-options="{'widget': 'image', 'class': 'img-rounded'}"/>
+                                        <span t-field="doc.image_128" t-options="{'widget': 'image', 'class': 'img-rounded', 'width': 100, 'height': 100}"/>
                                     </center>
                                 </div>
-                                <div class="col-11 mt16 mb16">
-                                    <strong>ID</strong> : <span t-field="doc.code" /><br/>
+                                <div class="col-11 mt16 mb16" style="padding-top:10px;">
+                                    <strong>ID</strong> : <span t-field="doc.code"/><br/>
                                     <strong>Name</strong> : <span t-field="doc.name"/><br/>
                                     <strong>Birth Date</strong> : <span t-field="doc.birthday"/><br/>
                                     <strong>Age</strong> : <span t-field="doc.age"/><br/>

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 
@@ -11,7 +12,7 @@ class ProductProduct(models.Model):
         if not partner:
             partner = self.env.user.sudo().partner_id
 
-        #check if pricelist is passeed in context or partner has any applied pricelist.
+        #check if pricelist is passed in context or partner has any applied pricelist.
         pricelist_id = False
         acs_pricelist_id = self.env.context.get('acs_pricelist_id')
         if acs_pricelist_id:
@@ -27,32 +28,33 @@ class ProductProduct(models.Model):
                 uom = self.env['uom.uom'].browse(uom_id)
             price = pricelist._get_product_price(self, quantity, uom=uom)
         else:
-            price = self.lst_price
+            price = self.list_price
         return price
 
     def _acs_get_partner_price(self, quantity=1, uom_id=False, partner=False):
         pricelist_id = self.acs_get_pricelist(partner)
         #if any pricelist pass price based on pricelist else default price.
-        if pricelist_id and pricelist_id.discount_policy!='without_discount':
+        if pricelist_id:
             price = self.acs_get_pricelist_price(pricelist_id, quantity, uom_id)
         else:
-            price = self.lst_price
+            price = self.list_price
         return price
 
+    #odoov18: not geeting used. Remove it after confirmation.
     #Only One level pricelist price is computed.
-    def _acs_get_partner_price_discount(self, quantity=1, uom_id=False, partner=False):
-        discount = 0
-        base_price = self.lst_price
-        pricelist_id = self.acs_get_pricelist(partner)
-        #if any pricelist pass price based on pricelist else default price.
-        if pricelist_id and pricelist_id.discount_policy=='without_discount':
-            pricelist_price = self.acs_get_pricelist_price(pricelist_id, quantity, uom_id)
-            comp_discount = (base_price - pricelist_price) / base_price * 100
-            if (comp_discount > 0 and base_price > 0) or (comp_discount < 0 and base_price < 0):
-                # only show negative discounts if price is negative
-                # otherwise it's a surcharge which shouldn't be shown to the customer
-                discount = comp_discount
-        return discount
+    # def _acs_get_partner_price_discount(self, quantity=1, uom_id=False, partner=False):
+    #     discount = 0
+    #     base_price = self.list_price
+    #     pricelist_id = self.acs_get_pricelist(partner)
+    #     #if any pricelist pass price based on pricelist else default price.
+    #     if pricelist_id:
+    #         pricelist_price = self.acs_get_pricelist_price(pricelist_id, quantity, uom_id)
+    #         comp_discount = (base_price - pricelist_price) / base_price * 100
+    #         if (comp_discount > 0 and base_price > 0) or (comp_discount < 0 and base_price < 0):
+    #             # only show negative discounts if price is negative
+    #             # otherwise it's a surcharge which shouldn't be shown to the customer
+    #             discount = comp_discount
+    #     return discount
 
 
 class product_template(models.Model):
@@ -63,6 +65,7 @@ class product_template(models.Model):
     drug_company_id = fields.Many2one('drug.company', ondelete='cascade', string='Drug Company', help='Company producing this drug')
     hospital_product_type = fields.Selection([
         ('medicament','Medicament'),
+        ('time_service', 'Time Based Service'),
         ('fdrinks', 'Food & Drinks'),
         ('os', 'Other Service'),
         ('not_medical', 'Not Medical'),], string="Hospital Product Type", default='medicament')
@@ -72,7 +75,7 @@ class product_template(models.Model):
         help='The drug represents risk to pregnancy')
     lactation_warning = fields.Boolean('Lactation Warning',
         help='The drug represents risk in lactation period')
-    pregnancy = fields.Text(string='Pregnancy and Lactancy',
+    pregnancy = fields.Text(string='Pregnancy and Lactation',
         help='Warnings for Pregnant Women')
 
     notes = fields.Text(string='Extra Info')
@@ -85,6 +88,8 @@ class product_template(models.Model):
         string='Route', help='')
     form_id = fields.Many2one('drug.form', ondelete='cascade', 
         string='Form',help='Drug form, such as tablet or gel')
+    acs_fixed_price = fields.Float("Fixed Price")
+    acs_min_qty = fields.Integer('Min Quantity')
 
 
 class StockProductionLot(models.Model):
@@ -92,7 +97,7 @@ class StockProductionLot(models.Model):
 
     product_qty = fields.Float(search="_search_product_qty")
 
-    #canbe used for filtering lots in selection on procedures and consumed products
+    #can be used for filtering lots in selection on procedures and consumed products
     def _search_product_qty(self, operator, value):
         valid_record = []
         product_id = self._context.get('acs_product_id',False)

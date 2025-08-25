@@ -10,6 +10,14 @@
                     <field name="cancel_reason_id"/>
                     <field name="cancel_reason"/>
                 </group>
+                <group>
+                    <group>
+                        <field name="is_send_mail"/>
+                    </group>
+                    <group>
+                        <field name="template_id" invisible="not is_send_mail" required="is_send_mail"/>
+                    </group>
+                </group>
                 <footer>
                     <button name="cancel_appointment" string="Cancel Appointment" type="object" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel" />

@@ -21,7 +21,7 @@
                     </group>
                     <group>
                         <field name="allow_substitution"/>
-                        <field name="route_id" invisible="1" />
+                        <field name="route_id"/>
                         <field name="treatment_id"/>
                     </group>
                     <group>
@@ -59,8 +59,8 @@
     </record>
 
     <!-- Prescription -->
-    <record id="view_hms_prescription_order_tree" model="ir.ui.view">
-        <field name="name">prescription.order.tree</field>
+    <record id="view_hms_prescription_order_list" model="ir.ui.view">
+        <field name="name">prescription.order.list</field>
         <field name="model">prescription.order</field>
         <field name="arch" type="xml">
             <list string="ACS Prescription Order" decoration-info="state=='prescription'" decoration-muted="state=='canceled'">
@@ -86,8 +86,13 @@
                     <button name="button_reset" invisible="state!='prescription'" string="Reset to Draft" type="object" groups="acs_hms.group_hms_jr_doctor"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,prescription"/>
                 </header>
-                <div class="alert alert-error text-center" role="alert" style="margin-bottom:0px; background-color:#f8b9b9;" invisible="alert_count==0">
-                    <field name="medical_alert_ids" nolabel="1" widget="many2many_tags"/>
+                <div class="alert alert-warning text-center" role="alert" invisible="alert_count==0 and allergy_count==0">
+                    <t invisible="alert_count==0">
+                        Medical Alert: <field name="medical_alert_ids" nolabel="1" widget="many2many_tags"/>
+                    </t>
+                    <t invisible="allergy_count==0">
+                        Allergies: <field name="allergy_ids" nolabel="1" widget="many2many_tags"/>
+                    </t>
                 </div>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -109,6 +114,7 @@
                             <field name="diseases_ids" widget="many2many_tags" readonly="state!='draft'"/>
                             <field name="prescription_date" readonly="state!='draft'"/>
                             <field name="alert_count" invisible="1"/>
+                            <field name="allergy_count" invisible="1"/>
                             <field name="pregnancy_warning" readonly="state!='draft'"/>
                         </group>
                     </group>
@@ -131,34 +137,38 @@
                                     </div>
                                 </group>
                             </group>
-                            <field name="prescription_line_ids" nolabel="1" colspan="4" context="{'default_appointment_id': appointment_id}" widget="section_and_note_one2many" readonly="state!='draft'">
-                                <list string="Prescription Line" editable="bottom">
+                            <field name="prescription_line_ids" nolabel="1" colspan="4" context="{'default_appointment_id': appointment_id}" widget="product_label_section_and_note_field_o2m" readonly="state!='draft'">
+                                <list string="Prescription Line" editable="bottom" decoration-warning="acs_highlight_pregnancy_line" decoration-danger="acs_highlight_medical_alert">
                                     <control>
                                         <create name="add_line_control" string="Add a line"/>
                                         <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
                                         <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note'}"/>
+                                        <button name="action_add_from_catalog" type="object" string="Catalog" class="px-4 btn-link" context="{'model': 'prescription.order', 'order_id': parent.id}"/>
                                     </control>
                                     <field name="sequence" widget="handle"/>
-                                    <field name="product_id" string="Medicine Name"/>
-                                    <field name="name" required="1" widget="section_and_note" optional="hide"/>
+                                    <field name="product_id" string="Medicine" widget="product_label_section_and_note_field"/>
+                                    <field name="name" required="1" widget="section_and_note_text" optional="show"/>
                                     <field name="active_component_ids" widget="many2many_tags" optional="hide"/>
                                     <field name="allow_substitution" optional="hide"/>
+                                    <field name="route_id" optional="hide"/>
                                     <field name="common_dosage_id"/>
                                     <field name="dose" required="not display_type" string="Qty Dose"/>
                                     <field name="dosage_uom_id" optional="hide" groups="uom.group_uom"/>
                                     <field name="qty_per_day" required="not display_type" optional="hide"/>
                                     <field name="days" required="not display_type"/>
-                                    <field name="quantity" required="not display_type" readonly="not manual_prescription_qty" string="Total Qty" force_save="1"/>
+                                    <field name="quantity" required="not display_type" readonly="not manual_prescription_qty" string="Total Qty" force_save="1" optional="show"/>
                                     <field name="qty_available" readonly="1" optional="hide"/>
                                     <field name="short_comment"/>
                                     <!-- Others fields -->
-                                    <field name="id" force_save="1" column_invisible="True"/>
-                                    <field name="display_type" force_save="1" column_invisible="True"/>
-                                    <field name="product_uom_category_id" column_invisible="True"/>
+                                    <field name="id" force_save="1" column_invisible="1"/>
+                                    <field name="display_type" force_save="1" column_invisible="1"/>
+                                    <field name="product_uom_category_id" column_invisible="1"/>
                                     <field name="prnt" column_invisible="1"/>
                                     <field name="manual_prescription_qty" column_invisible="1"/>
                                     <field name="manual_quantity" column_invisible="1"/>
                                     <field name="treatment_id" column_invisible="1"/>
+                                    <field name="acs_highlight_pregnancy_line" column_invisible="1"/>
+                                    <field name="acs_highlight_medical_alert" column_invisible="1"/>
                                 </list>
                             </field>
                         </page>
@@ -178,11 +188,7 @@
                         <field name="notes" colspan="4"/>
                     </group>
                 </sheet>
-		<!--                <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers"/>
-                    <field name="activity_ids" widget="mail_activity"/>
-                    <field name="message_ids" widget="mail_thread"/>
-		</div> -->
+                <chatter/>
             </form>
         </field>
     </record>
@@ -199,7 +205,7 @@
                 <field name="physician_id"/>
                 <field name="treatment_id"/>
                 <field name="company_id"/>
-                <filter name="Pregancy Warning" string="Pregancy Warning" domain="[('pregnancy_warning','=',1)]"/>
+                <filter name="Pregnancy Warning" string="Pregnancy Warning" domain="[('pregnancy_warning','=',1)]"/>
                 <newline/>
                 <group expand="0" string="Group By...">
                     <filter string="Patient" name="patient_id_groupby" domain="[]" context="{'group_by':'patient_id'}"/>
@@ -222,32 +228,34 @@
             <kanban  class="oe_background_grey">
                 <field name="name"/>
                 <templates>
-                    <t t-name="kanban-box">
-                        <div class="oe_kanban_content">
-                            <div class="oe_kanban_vignette oe_semantic_html_override">
-                                <div class="oe_kanban_details">
-                                    <h3>
-                                        <a type="open">
-                                            <field name="name"/>
-                                        </a>
-                                    </h3>
-                                    <ul>
-                                        <li t-if="record.prescription_date.raw_value">
-                                            <b>Date:</b>
-                                            <field name="prescription_date"/>
-                                        </li>
-                                        <li t-if="record.patient_id.raw_value">
-                                            <b>Patient:</b>
-                                            <field name="patient_id"/>
-                                        </li>
-                                        <li t-if="record.physician_id.raw_value">
-                                            <b>Physician:</b>
-                                            <field name="physician_id"/>
-                                        </li>
-                                    </ul>
+                    <t t-name="card" class="flex-row">
+                        <main class="ps-2">
+                            <div class="oe_kanban_content">
+                                <div class="oe_kanban_vignette oe_semantic_html_override">
+                                    <div class="oe_kanban_details">
+                                        <h3 class="fw-bold">
+                                            <a type="open">
+                                                <field name="name"/>
+                                            </a>
+                                        </h3>
+                                        <ul class="list-unstyled">
+                                            <li t-if="record.prescription_date.raw_value">
+                                                <b>Date:</b> <field name="prescription_date"/>
+                                            </li>
+                                            <span class="float-end">
+                                                <field class="float-end" name="state" widget="label_selection" options="{'classes': {'draft': 'default', 'prescription': 'success'}}"/>
+                                            </span>
+                                            <li t-if="record.patient_id.raw_value">
+                                                <b>Patient:</b> <field name="patient_id"/>
+                                            </li>
+                                            <li t-if="record.physician_id.raw_value">
+                                                <b>Physician:</b> <field name="physician_id"/>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </main>
                     </t>
                 </templates>
             </kanban>
@@ -280,18 +288,19 @@
 
     <record model="ir.actions.act_window" id="act_open_hms_prescription_order_view">
         <field name="name">Prescription Order</field>
+        <field name="path">almightyhms-prescription-order</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">prescription.order</field>
         <field name="view_mode">list,kanban,form,calendar,pivot</field>
         <field name="search_view_id" ref="view_hms_prescription_order_search"/>
-        <field name="view_id" ref="view_hms_prescription_order_tree"/>
+        <field name="view_id" ref="view_hms_prescription_order_list"/>
         <field name="context">{'search_default_today': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No Record Found
             </p>
             <p>
-                Click to add Prescrition.
+                Click to add Prescription.
             </p>
         </field>
     </record>

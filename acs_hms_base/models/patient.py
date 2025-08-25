@@ -1,18 +1,33 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models ,_
 from odoo.exceptions import UserError,ValidationError
 from datetime import datetime
 
+class FormatGOVCodeLabelMixin(models.AbstractModel):
+    _name = "format.gov.code.label.mixin"
+    _description = "Country Specific Gov Code Label"
+    
+    @api.model
+    def _get_view(self, view_id=None, view_type='form', **options):
+        arch, view = super()._get_view(view_id, view_type, **options)
+        if gov_code_label := self.env.company.country_id.gov_code_label:
+            for node in arch.iterfind(".//field[@name='gov_code']"):
+                node.set("string", gov_code_label)
+            # In some module gov_code field is replaced and so above string change is not working
+            for node in arch.iterfind(".//label[@for='gov_code']"):
+                node.set("string", gov_code_label)
+        return arch, view
 
 class ACSPatient(models.Model):
     _name = 'hms.patient'
     _description = 'Patient'
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'acs.hms.mixin', 'acs.document.mixin']
+    _inherit = ['mail.thread', 'format.gov.code.label.mixin', 'mail.activity.mixin', 'acs.hms.mixin', 'acs.document.mixin']
     _inherits = {
         'res.partner': 'partner_id',
     }
-    _rec_names_search = ['name', 'code']
+    _rec_names_search = ['name', 'code', 'gov_code']
 
     def _rec_count(self):
         Invoice = self.env['account.move']
@@ -23,6 +38,7 @@ class ACSPatient(models.Model):
         string='Related Partner', help='Partner-related data of the Patient')
     gov_code = fields.Char(string='Government Identity', copy=False, tracking=True)
     gov_code_label = fields.Char(compute="acs_get_gov_code_label", string="Government Identity Label")
+    document_type_id = fields.Many2one('acs.document.type', string="Document Type")
     marital_status = fields.Selection([
         ('single', 'Single'), 
         ('married', 'Married'),
@@ -48,8 +64,21 @@ class ACSPatient(models.Model):
     caste = fields.Char("Tribe")
     nationality_id = fields.Many2one("res.country", string="Nationality")
     passport = fields.Char("Passport Number")
+    acs_source_id = fields.Many2one('acs.source', string="Source")
     active = fields.Boolean(string="Active", default=True)
-    location_url = fields.Text()
+    location_url = fields.Text(string="Location URL")
+    age_to_birthday = fields.Integer(string="Age to Birthday")
+    emergency_contact_ids = fields.One2many('acs.patient.emergency.contact', 'patient_id', string='Emergency Contacts')
+
+    @api.onchange('age_to_birthday')
+    def onchange_age_to_birthday(self):
+        if self.age_to_birthday:
+            if self.age_to_birthday >= 0 and self.age_to_birthday <= 200:
+                today = fields.Date.today()
+                birth_year = today.year - self.age_to_birthday
+                self.birthday = today.replace(year=birth_year, month=1, day=1)
+            else:
+                raise UserError('Please enter a valid age between 0 and 200.')
 
     def acs_get_gov_code_label(self):
         for rec in self:
@@ -57,7 +86,7 @@ class ACSPatient(models.Model):
 
     def check_gov_code(self, gov_code):
         patient = self.search([('gov_code','=',gov_code)],limit=1)
-        if patient:
+        if patient and not self.env.context.get('acs_avoid_gov_code_check',False):
             raise ValidationError(_('Patient already exists with Government Identity: %s.') % (gov_code))
 
     @api.model_create_multi
@@ -113,7 +142,6 @@ class ACSPatient(models.Model):
     def _onchange_mobile_warning(self):
         if not self.mobile:
             return
-        mobile = self.mobile
         message = ''
         domain = [('mobile','=',self.mobile)]
         if self._origin and self._origin.id:
@@ -125,7 +153,7 @@ class ACSPatient(models.Model):
             message += _('\n\n Are you sure you want to create a new Patient?')
             return {
                 'warning': {
-                    'title': _("Warning for Mobile Dupication"),
+                    'title': _("Warning for Mobile Duplication"),
                     'message': message,
                 }
             }
@@ -138,5 +166,15 @@ class ACSPatient(models.Model):
             for node in arch.xpath("//field[@name='gov_code']"):
                 node.attrib["string"] = company.country_id.gov_code_label
         return arch, view
+    
+    @api.onchange('phone', 'country_id', 'company_id')
+    def _onchange_phone_validation(self):
+        if self.phone:
+            self.phone = self._phone_format(fname='phone', force_format='INTERNATIONAL') or self.phone
+
+    @api.onchange('mobile', 'country_id', 'company_id')
+    def _onchange_mobile_validation(self):
+        if self.mobile:
+            self.mobile = self._phone_format(fname='mobile', force_format='INTERNATIONAL') or self.mobile
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

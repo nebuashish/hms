@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     
-    <record id="view_medical_alert_tree" model="ir.ui.view">
-        <field name="name">acs.medical.alert.tree</field>
+    <record id="view_medical_alert_list" model="ir.ui.view">
+        <field name="name">acs.medical.alert.list</field>
         <field name="model">acs.medical.alert</field>
         <field name="arch" type="xml">
             <list string="Medical Alert">
@@ -42,6 +42,7 @@
 
     <record model="ir.actions.act_window" id="act_open_medical_alerts">
         <field name="name">Medical Alerts</field>
+        <field name="path">almightyhms-medical-alert</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">acs.medical.alert</field>
         <field name="view_mode">list,form</field>

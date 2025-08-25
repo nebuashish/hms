@@ -4,39 +4,16 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 15.0+e\n"
+"Project-Id-Version: Odoo Server 17.0-20240126\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-14 06:05+0000\n"
-"PO-Revision-Date: 2022-03-14 06:05+0000\n"
+"POT-Creation-Date: 2024-03-08 15:09+0000\n"
+"PO-Revision-Date: 2024-03-08 15:09+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/appointment.py:0
-#: code:addons/acs_hms/models/evaluation.py:0
-#, python-format
-msgid " Days"
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/appointment.py:0
-#: code:addons/acs_hms/models/evaluation.py:0
-#, python-format
-msgid " Month "
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/appointment.py:0
-#: code:addons/acs_hms/models/appointment.py:0
-#: code:addons/acs_hms/models/evaluation.py:0
-#: code:addons/acs_hms/models/evaluation.py:0
-#, python-format
-msgid " Year"
-msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_hms_physician__appointment_count
@@ -61,6 +38,11 @@ msgid "# Patient Procedures"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_physician__patient_count
+msgid "# Patients"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_hms_patient__prescription_count
 #: model:ir.model.fields,field_description:acs_hms.field_hms_physician__prescription_count
 msgid "# Prescriptions"
@@ -73,7 +55,11 @@ msgid "# Treatments"
 msgstr ""
 
 #. module: acs_hms
-#: model:ir.model.fields,field_description:acs_hms.field_hms_physician__patient_count
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__invoice_count
+msgid "#Invoices"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_res_users__patient_count
 msgid "#Patient"
 msgstr ""
@@ -82,13 +68,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_hms_physician__physician_count
 #: model:ir.model.fields,field_description:acs_hms.field_res_users__physician_count
 msgid "#Physician"
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/prescription.py:0
-#: code:addons/acs_hms/models/prescription.py:0
-#, python-format
-msgid "%s Medicine is not Suggastable for Pregnancy."
 msgstr ""
 
 #. module: acs_hms
@@ -112,8 +91,23 @@ msgid "(object.name or 'Evaluation').replace('/','_')+'_Evalution'"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.actions.report,print_report_name:acs_hms.action_report_hms_medicines_label
+msgid "(object.name or 'Medicine Label').replace('/','_')"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.actions.report,print_report_name:acs_hms.report_hms_prescription_id
 msgid "(object.name or 'Prescription').replace('/','_')"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.actions.report,print_report_name:acs_hms.action_procedures_report
+msgid "(object.name or 'Procedures').replace('/','_')"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.actions.report,print_report_name:acs_hms.action_treatment_report
+msgid "(object.name or 'Treatment').replace('/','_')"
 msgstr ""
 
 #. module: acs_hms
@@ -194,29 +188,57 @@ msgid ""
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid ""
+"<br/>\n"
+"                        <span class=\"o_form_label\">Auto Follow-up Date</span>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid ""
+"<br/>\n"
+"                        <span class=\"o_form_label\">Follow-up Days</span>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_hms_medicines_label_document
+msgid ""
+"<br/>\n"
+"                    Dose :-"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_hms_medicines_label_document
+msgid ""
+"<br/>\n"
+"                    Frequency :-"
+msgstr ""
+
+#. module: acs_hms
 #: model:mail.template,body_html:acs_hms.acs_appointment_email
 msgid ""
 "<div style=\"margin:auto;background: #FFFFFF;color:#777777\">\n"
-"    <t t-set=\"appointment_date\" t-value=\"format_datetime(dt=object.date, tz=object.physician_id.tz or 'UTC', lang_code=object.physician_id.lang)\"/>\n"
-"    <p>Hello <t t-out=\"object.patient_id.name\"/>,</p>\n"
+"    <t t-set=\"appointment_date\" t-value=\"format_datetime(dt=object.date, tz=object.physician_id.tz or 'UTC', lang_code=object.physician_id.lang)\"></t>\n"
+"    <p>Hello <t t-out=\"object.patient_id.name\"></t>,</p>\n"
 "    <p>Your Appointment Have been Scheduled with following details.</p>\n"
 "    <ul> \n"
 "        <li>\n"
-"            <p>Subject: <t t-out=\"object.purpose_id.name\"/></p><br/>\n"
+"            <p>Subject: <t t-out=\"object.purpose_id.name\"></t></p>\n"
 "        </li>\n"
 "        <li>\n"
-"            <p>Reference Number: <t t-out=\"object.name\"/></p><br/>\n"
+"            <p>Reference Number: <t t-out=\"object.name\"></t></p>\n"
 "        </li>\n"
 "        <li>\n"
-"            <p>Physician Name: <t t-out=\"object.physician_id.name\"/></p><br/>\n"
+"            <p>Physician Name: <t t-out=\"object.physician_id.name\"></t></p>\n"
 "        </li>\n"
 "        <li>\n"
-"            <p>Date &amp; Time: <t t-out=\"appointment_date or ''\"/> (Timezone: <t t-out=\"object.physician_id.tz or 'UTC'\"/>)</p><br/>\n"
+"            <p>Date &amp; Time: <t t-out=\"appointment_date or ''\"></t> (Timezone: <t t-out=\"object.physician_id.tz or 'UTC'\"></t>)</p>\n"
 "        </li>\n"
 "    </ul>\n"
 "    <p>Please feel free to call anytime for further information or any query.</p>\n"
 "\n"
-"    <p>Best regards.</p><br/>\n"
+"    <p>Best regards.</p><br>\n"
 "</div>\n"
 "                \n"
 "            "
@@ -226,25 +248,25 @@ msgstr ""
 #: model:mail.template,body_html:acs_hms.acs_prescription_email
 msgid ""
 "<div style=\"padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777\">\n"
-"    <p>Hello <t t-out=\"object.patient_id.name\"/>,</p>\n"
+"    <p>Hello <t t-out=\"object.patient_id.name\"></t>,</p>\n"
 "    <p>Your Prescription details. For more details please refer attached PDF report.</p>\n"
 "    <ul>\n"
 "        <li>\n"
-"            <p>Reference Number: <t t-out=\"object.name\"/></p><br/>\n"
+"            <p>Reference Number: <t t-out=\"object.name\"></t></p>\n"
 "        </li>\n"
 "        <li t-if=\"object.appointment_id\">\n"
-"            <p>Appointment ID: <t t-out=\"object.appointment_id.name\"/></p><br/>\n"
+"            <p>Appointment ID: <t t-out=\"object.appointment_id.name\"></t></p>\n"
 "        </li>\n"
 "        <li t-if=\"object.physician_id\">\n"
-"            <p>Physician Name: <t t-out=\"object.physician_id.name\"/></p><br/>\n"
+"            <p>Physician Name: <t t-out=\"object.physician_id.name\"></t></p>\n"
 "        </li>\n"
 "        <li>\n"
-"            <p>Prescription Date: <t t-out=\"object.prescription_date\"/></p><br/>\n"
+"            <p>Prescription Date: <t t-out=\"object.prescription_date\"></t></p>\n"
 "        </li>\n"
 "    </ul>\n"
 "    <p>Please feel free to call anytime for further information or any query.</p>\n"
 "\n"
-"    <p>Best regards.</p><br/>\n"
+"    <p>Best regards.</p><br>\n"
 "</div>\n"
 "  \n"
 "            "
@@ -260,8 +282,8 @@ msgstr ""
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.patient_evalution_kanban_view
 msgid ""
-"<i class=\"fa fa-area-chart\" aria-label=\"Info\" title=\"Hear Rate "
-"Chart\"/> Hear Rate Chart"
+"<i class=\"fa fa-area-chart\" aria-label=\"Info\" title=\"Heart Rate "
+"Chart\"/> Heart Rate Chart"
 msgstr ""
 
 #. module: acs_hms
@@ -310,6 +332,7 @@ msgid ""
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
 msgid ""
 "<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"Arrow icon\" "
@@ -338,90 +361,16 @@ msgid ""
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.patient_kanban_view
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_patient_form
+msgid "<span class=\"fa fa-exclamation-triangle\" title=\"Cancellation\"/>"
+msgstr ""
+
+#. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.report_hms_prescription_document
 msgid ""
-"<span class=\"float-right\" style=\"font-size: 10px;\"><b>Scan to "
+"<span class=\"float-end\" style=\"font-size: 10px;\"><b>Scan to "
 "Authenticate.</b></span><br/>"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Auto Follow-up Date</span>"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Check Payment Status</span>"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Consultation Service</span>"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Follow-up Days</span>"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Follow-up Service</span>"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Followup Activity</span>"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Invoice Policy</span>"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Patient Height Measure</span>"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Patient RBS Measure</span>"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Patient Registration Service</span>"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Patient SpO2 Measure</span>"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Patient Temp Measure</span>"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Patient Weight Measure</span>"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Stock Location</span>"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Stock Usage Location</span>"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">Treatment Registration Service</span>"
 msgstr ""
 
 #. module: acs_hms
@@ -475,8 +424,28 @@ msgid "<span>Appointment: </span>"
 msgstr ""
 
 #. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_form
-msgid "<span>bpm</span>"
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "<span>Cancelled Appointments</span>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "<span>Days</span>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "<span>Hours</span>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+msgid "<span>Patient Procedures: </span>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_treatment_document
+msgid "<span>Treatments: </span>"
 msgstr ""
 
 #. module: acs_hms
@@ -501,6 +470,26 @@ msgid "<strong>Age</strong>"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+msgid "<strong>Appointments :-</strong>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_appointment_document
+msgid "<strong>Consumed Products/Services</strong>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+msgid "<strong>Consumed Products</strong>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_treatment_document
+msgid "<strong>Date of Diagnosis :-</strong>"
+msgstr ""
+
+#. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_evaluation_document
 msgid "<strong>Date: </strong>"
 msgstr ""
@@ -511,13 +500,45 @@ msgid "<strong>Date</strong>"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_treatment_document
+msgid "<strong>Department :-</strong>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_treatment_document
+msgid "<strong>Diagnosis :-</strong>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+msgid "<strong>Disease :-</strong>"
+msgstr ""
+
+#. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.report_hms_prescription_document
 msgid "<strong>Doctor</strong>"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+msgid "<strong>Duration :-</strong>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_treatment_document
+msgid "<strong>End Date :-</strong>"
+msgstr ""
+
+#. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.patient_cardreport_document
 msgid "<strong>ID</strong> :"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+msgid "<strong>Invoice :-</strong>"
 msgstr ""
 
 #. module: acs_hms
@@ -528,6 +549,11 @@ msgstr ""
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_evaluation_document
 msgid "<strong>Patient Evaluation</strong>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_treatment_document
+msgid "<strong>Patient Procedures</strong>"
 msgstr ""
 
 #. module: acs_hms
@@ -542,8 +568,25 @@ msgid "<strong>Patient</strong>"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_treatment_document
+msgid "<strong>Patint :-</strong>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_treatment_document
+msgid "<strong>Physician :-</strong>"
+msgstr ""
+
+#. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_evaluation_document
 msgid "<strong>Physician: </strong>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_treatment_document
+msgid "<strong>Prescribed Medicine</strong>"
 msgstr ""
 
 #. module: acs_hms
@@ -552,8 +595,28 @@ msgid "<strong>Prescribed Medicines</strong>"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+msgid "<strong>Price :-</strong>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+msgid "<strong>Procedure :-</strong>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+msgid "<strong>Start Date :-</strong>"
+msgstr ""
+
+#. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_appointment_document
 msgid "<strong>Subject:</strong>"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+msgid "<strong>Treatment :-</strong>"
 msgstr ""
 
 #. module: acs_hms
@@ -607,8 +670,31 @@ msgid "Abbreviation"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_physician__acs_appointment_duration
+#: model:ir.model.fields,field_description:acs_hms.field_res_users__acs_appointment_duration
+msgid "Acs Appointment Duration"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__acs_department_id
+msgid "Acs Department"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_physician__acs_medical_license
+#: model:ir.model.fields,field_description:acs_hms.field_res_users__acs_medical_license
+msgid "Acs Medical License,"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__acs_show_in_wc
 msgid "Acs Show In Wc"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_physician__acs_signature
+#: model:ir.model.fields,field_description:acs_hms.field_res_users__acs_signature
+msgid "Acs Signature"
 msgstr ""
 
 #. module: acs_hms
@@ -686,14 +772,32 @@ msgid "Add Kit Products"
 msgstr ""
 
 #. module: acs_hms
-#: model:ir.model.fields,field_description:acs_hms.field_hms_patient_medication__adverse_reaction
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_patient_medication_search
-msgid "Adverse Reactions"
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_order_form
+msgid "Add a line"
 msgstr ""
 
 #. module: acs_hms
-#: model:drug.company,name:acs_hms.drug_company_0
-msgid "Aelicure"
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_order_form
+msgid "Add a note"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_order_form
+msgid "Add a section"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,help:acs_hms.field_product_product__is_kit_product
+#: model:ir.model.fields,help:acs_hms.field_product_template__is_kit_product
+msgid ""
+"Adding this product will lead to component consumption when added in medical"
+" flow"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_patient_medication__adverse_reaction
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_patient_medication_search
+msgid "Adverse Reactions"
 msgstr ""
 
 #. module: acs_hms
@@ -728,6 +832,26 @@ msgid "All"
 msgstr ""
 
 #. module: acs_hms
+#: model:res.groups,name:acs_hms.group_hms_all_appointments
+msgid "All Appointments"
+msgstr ""
+
+#. module: acs_hms
+#: model:res.groups,name:acs_hms.group_hms_all_patients
+msgid "All Patients"
+msgstr ""
+
+#. module: acs_hms
+#: model:res.groups,name:acs_hms.group_hms_all_prescription
+msgid "All Prescriptions"
+msgstr ""
+
+#. module: acs_hms
+#: model:res.groups,name:acs_hms.group_hms_all_treatments
+msgid "All Treatments"
+msgstr ""
+
+#. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_treatment_search
 msgid "Allergic"
 msgstr ""
@@ -746,8 +870,15 @@ msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_line__allow_substitution
+#: model:ir.model.fields,field_description:acs_hms.field_product_product__acs_allow_substitution
+#: model:ir.model.fields,field_description:acs_hms.field_product_template__acs_allow_substitution
 #: model_terms:ir.ui.view,arch_db:acs_hms.report_prescription_table
 msgid "Allow Substitution"
+msgstr ""
+
+#. module: acs_hms
+#: model:res.groups,name:acs_hms.group_hms_allow_update_done_appointment
+msgid "Allow Updating Done Appointment"
 msgstr ""
 
 #. module: acs_hms
@@ -785,8 +916,15 @@ msgid "Amount of medication (eg, 250 mg) per dose"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_form
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
+msgid "Apply/Remove"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.actions.act_window,name:acs_hms.action_appointment
 #: model:ir.actions.report,name:acs_hms.action_appointment_report
+#: model:ir.model,name:acs_hms.model_hms_appointment
 #: model:ir.model.fields,field_description:acs_hms.field_account_bank_statement_line__appointment_id
 #: model:ir.model.fields,field_description:acs_hms.field_account_move__appointment_id
 #: model:ir.model.fields,field_description:acs_hms.field_account_payment__appointment_id
@@ -800,7 +938,6 @@ msgstr ""
 #: model:ir.ui.menu,name:acs_hms.menu_appointment
 #: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_appointment_document
 #: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_tree
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_order_search
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_physician_form
 msgid "Appointment"
@@ -823,8 +960,19 @@ msgid "Appointment Cabin"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.patient_kanban_view
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_patient_form
+msgid "Appointment Cancellation in last"
+msgstr ""
+
+#. module: acs_hms
 #: model:mail.template,name:acs_hms.acs_appointment_email
 msgid "Appointment Creation"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__appointment_date
+msgid "Appointment Date"
 msgstr ""
 
 #. module: acs_hms
@@ -839,18 +987,14 @@ msgid "Appointment Details"
 msgstr ""
 
 #. module: acs_hms
-#: code:addons/acs_hms/models/appointment.py:0
-#, python-format
-msgid "Appointment Followup"
-msgstr ""
-
-#. module: acs_hms
-#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__name
-msgid "Appointment Id"
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_users_form_simple_modif
+msgid "Appointment Duration"
 msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__appointment_invoice_policy
+#: model:ir.model.fields,field_description:acs_hms.field_product_product__appointment_invoice_policy
+#: model:ir.model.fields,field_description:acs_hms.field_product_template__appointment_invoice_policy
 #: model:ir.model.fields,field_description:acs_hms.field_res_company__appointment_invoice_policy
 #: model:ir.model.fields,field_description:acs_hms.field_res_config_settings__appointment_invoice_policy
 msgid "Appointment Invoicing Policy"
@@ -888,6 +1032,40 @@ msgid "Appointments"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_reschedule_appointments_form
+msgid ""
+"Are you sure that you want to reschedule all selected appointments? it will "
+"add given hours to current scheduled time, means if current time is 1 PM and"
+" you add 2 hours it will be 3 PM after Rescheduling."
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__nurse_id
+msgid "Assigned Nurse"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_physician_form
+msgid "Assigned Patients"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,help:acs_hms.field_hms_patient__assignee_ids
+#: model:ir.model.fields,help:acs_hms.field_hms_physician__assignee_ids
+#: model:ir.model.fields,help:acs_hms.field_res_partner__assignee_ids
+#: model:ir.model.fields,help:acs_hms.field_res_users__assignee_ids
+msgid "Assigned partners for receptionist or doctor etc to see the records"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_patient__assignee_ids
+#: model:ir.model.fields,field_description:acs_hms.field_hms_physician__assignee_ids
+#: model:ir.model.fields,field_description:acs_hms.field_res_partner__assignee_ids
+#: model:ir.model.fields,field_description:acs_hms.field_res_users__assignee_ids
+msgid "Assignees"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__message_attachment_count
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__message_attachment_count
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit__message_attachment_count
@@ -898,6 +1076,7 @@ msgid "Attachment Count"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__attachment_ids
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__attachment_ids
 #: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__attachment_ids
 msgid "Attachments"
@@ -910,6 +1089,11 @@ msgstr ""
 
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Auto Cancel Old Appointment"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
 msgid ""
 "Auto Folloup activity for responsible person for reminder of followup "
 "(Before one day of followup Date)."
@@ -918,6 +1102,16 @@ msgstr ""
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_res_company__auto_followup_days
 msgid "Auto Followup on (Days)"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Auto Send Appointment Confirmation Mail"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Auto cancel the draft and confirm appointments created before today."
 msgstr ""
 
 #. module: acs_hms
@@ -944,6 +1138,11 @@ msgid "BP:"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_res_company__birthday_mail_template_id
+msgid "Birthday Wishes Template"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__bmi
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__bmi
 #: model:ir.model.fields,field_description:acs_hms.field_hms_patient__bmi
@@ -961,45 +1160,58 @@ msgid "Brother"
 msgstr ""
 
 #. module: acs_hms
-#: model:drug.form,name:acs_hms.drug_form_0
-msgid "CAPSULE"
-msgstr ""
-
-#. module: acs_hms
-#: model:drug.form,name:acs_hms.drug_form_1
-msgid "CREAM"
-msgstr ""
-
-#. module: acs_hms
-#: model:drug.company,name:acs_hms.drug_company_4
-msgid "Cadila"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_cancel_reason
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_cancel_reason_wiz
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_popup_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_form
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_reschedule_appointments_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hospital_hms_treatment_form
 msgid "Cancel"
 msgstr ""
 
 #. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_cancel_reason
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_cancel_reason_wiz
 msgid "Cancel Appointment"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_res_company__acs_cancel_old_appointment
+#: model:ir.model.fields,field_description:acs_hms.field_res_config_settings__acs_cancel_old_appointment
+msgid "Cancel Old Appointment"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.actions.act_window,name:acs_hms.action_acs_cancel_reason
+#: model:ir.actions.act_window,name:acs_hms.action_acs_cancel_reason_wiz
+#: model:ir.model,name:acs_hms.model_acs_cancel_reason
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__cancel_reason
+#: model:ir.ui.menu,name:acs_hms.menu_acs_cancel_reason
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_cancel_reason_tree
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
 msgid "Cancel Reason"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.actions.server,name:acs_hms.cron_cancel_draft_appointments_ir_actions_server
+msgid "Cancel old appointments"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields.selection,name:acs_hms.selection__acs_patient_procedure__state__cancel
 msgid "Canceled"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Cancellation Flag"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model,name:acs_hms.model_acs_cancel_reason_wiz
+#: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason_wiz__cancel_reason_id
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__cancel_reason_id
+msgid "Cancellation Reason"
 msgstr ""
 
 #. module: acs_hms
@@ -1016,12 +1228,14 @@ msgid "Cancelled"
 msgstr ""
 
 #. module: acs_hms
-#: model:physician.specialty,name:acs_hms.physician_specialty_0
-msgid "Cardiologist"
+#: model:ir.model.fields,field_description:acs_hms.field_hms_patient__acs_cancelled_appointments
+msgid "Cancelled Appointments"
 msgstr ""
 
 #. module: acs_hms
-#: model:ir.model.fields,field_description:acs_hms.field_hms_diseases__category
+#: model:ir.model.fields,field_description:acs_hms.field_hms_diseases__category_id
+#: model:ir.model.fields,field_description:acs_hms.field_medicament_group_line__product_uom_category_id
+#: model:ir.model.fields,field_description:acs_hms.field_prescription_line__product_uom_category_id
 #: model:ir.model.fields,field_description:acs_hms.field_resource_calendar__category
 msgid "Category"
 msgstr ""
@@ -1033,19 +1247,19 @@ msgid "Category Name"
 msgstr ""
 
 #. module: acs_hms
-#: model:ir.model.fields,field_description:acs_hms.field_hms_patient__cod
+#: model:ir.model.fields,field_description:acs_hms.field_hms_patient__cod_id
 msgid "Cause of Death"
-msgstr ""
-
-#. module: acs_hms
-#: model:appointment.purpose,name:acs_hms.appointment_purpose_certificate
-msgid "Certificate"
 msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_res_company__acs_check_appo_payment
 #: model:ir.model.fields,field_description:acs_hms.field_res_config_settings__acs_check_appo_payment
 msgid "Check Appointment Payment Status before Accepting Request"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Check Payment Status"
 msgstr ""
 
 #. module: acs_hms
@@ -1081,19 +1295,9 @@ msgid "Chief Complaints..."
 msgstr ""
 
 #. module: acs_hms
-#: model:hms.diseases,name:acs_hms.hms_diseases_0
-msgid "Cholera"
-msgstr ""
-
-#. module: acs_hms
 #: model:ir.model.fields.selection,name:acs_hms.selection__hms_patient_disease__status__chronic
 #: model:ir.model.fields.selection,name:acs_hms.selection__hms_treatment__disease_status__chronic
 msgid "Chronic"
-msgstr ""
-
-#. module: acs_hms
-#: model:drug.company,name:acs_hms.drug_company_3
-msgid "Cipla"
 msgstr ""
 
 #. module: acs_hms
@@ -1113,6 +1317,11 @@ msgid "Click to add Medicaments Group."
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.actions.act_window,help:acs_hms.action_medicament_dosage
+msgid "Click to add Medication Dosage."
+msgstr ""
+
+#. module: acs_hms
 #: model_terms:ir.actions.act_window,help:acs_hms.act_open_hms_prescription_order_view
 msgid "Click to add Prescrition."
 msgstr ""
@@ -1120,6 +1329,11 @@ msgstr ""
 #. module: acs_hms
 #: model_terms:ir.actions.act_window,help:acs_hms.action_acs_product_kit
 msgid "Click to add Product Kit."
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.actions.act_window,help:acs_hms.action_acs_cancel_reason
+msgid "Click to add a Cancel Reason."
 msgstr ""
 
 #. module: acs_hms
@@ -1188,6 +1402,11 @@ msgid "Click to add an Appointment."
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.actions.act_window,help:acs_hms.action_procedure_group
+msgid "Click to add new Procedure Group."
+msgstr ""
+
+#. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_patient_form
 msgid "Clinical Assesment"
@@ -1217,8 +1436,19 @@ msgid "Comment"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model,name:acs_hms.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_order_search
 msgid "Company"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_physician__physician_id
+#: model:ir.model.fields,field_description:acs_hms.field_res_users__physician_id
+msgid "Company Physician"
 msgstr ""
 
 #. module: acs_hms
@@ -1233,10 +1463,24 @@ msgid "Computed patient age at the moment of the evaluation"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model,name:acs_hms.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.ui.menu,name:acs_hms.menu_appointment_cofig
 #: model:ir.ui.menu,name:acs_hms.menu_hms_cofig
 #: model:ir.ui.menu,name:acs_hms.menu_pres_cofig
+#: model:ir.ui.menu,name:acs_hms.menu_treatment_cofig
 msgid "Configuration"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,help:acs_hms.field_res_company__acs_flag_count_limit
+#: model:ir.model.fields,help:acs_hms.field_res_config_settings__acs_flag_count_limit
+msgid ""
+"Configure number to show alert flag after couting that many cancelled "
+"appoitments"
 msgstr ""
 
 #. module: acs_hms
@@ -1248,7 +1492,6 @@ msgid "Confirm"
 msgstr ""
 
 #. module: acs_hms
-#: model:appointment.purpose,name:acs_hms.appointment_purpose_consultation
 #: model:ir.model.fields.selection,name:acs_hms.selection__hms_appointment__consultation_type__consultation
 #: model:ir.model.fields.selection,name:acs_hms.selection__product_template__hospital_product_type__consultation
 msgid "Consultation"
@@ -1285,8 +1528,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__product_id
 #: model:ir.model.fields,field_description:acs_hms.field_hms_physician__consultaion_service_id
 #: model:ir.model.fields,field_description:acs_hms.field_hr_department__consultaion_service_id
-#: model:product.product,name:acs_hms.hms_consultation_service_0
 #: model:product.template,name:acs_hms.hms_consultation_service_0_product_template
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
 msgid "Consultation Service"
 msgstr ""
 
@@ -1317,6 +1560,11 @@ msgid "Consumable Line"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__consumable_line_count
+msgid "Consumable Line Count"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__consumable_invoice_id
 msgid "Consumables Invoice"
 msgstr ""
@@ -1329,6 +1577,30 @@ msgstr ""
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
 msgid "Consumed Products/Services"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model,name:acs_hms.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,help:acs_hms.field_medicament_group_line__product_uom_category_id
+#: model:ir.model.fields,help:acs_hms.field_prescription_line__product_uom_category_id
+msgid ""
+"Conversion between Units of Measure can only occur if they belong to the "
+"same category. The conversion will be made based on the ratios."
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit_line__standard_price
+msgid "Cost Price"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_res_company__acs_flag_count_limit
+#: model:ir.model.fields,field_description:acs_hms.field_res_config_settings__acs_flag_count_limit
+msgid "Count Limit for Flag"
 msgstr ""
 
 #. module: acs_hms
@@ -1378,7 +1650,7 @@ msgstr ""
 
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
-msgid "Create Patient Registration Invoicing"
+msgid "Create Patient Registration Invoicing."
 msgstr ""
 
 #. module: acs_hms
@@ -1393,6 +1665,7 @@ msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason__create_uid
+#: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason_wiz__create_uid
 #: model:ir.model.fields,field_description:acs_hms.field_acs_ethnicity__create_uid
 #: model:ir.model.fields,field_description:acs_hms.field_acs_family_member__create_uid
 #: model:ir.model.fields,field_description:acs_hms.field_acs_family_relation__create_uid
@@ -1402,6 +1675,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__create_uid
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit__create_uid
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit_line__create_uid
+#: model:ir.model.fields,field_description:acs_hms.field_acs_reschedule_appointments__create_uid
 #: model:ir.model.fields,field_description:acs_hms.field_appointment_cabin__create_uid
 #: model:ir.model.fields,field_description:acs_hms.field_appointment_purpose__create_uid
 #: model:ir.model.fields,field_description:acs_hms.field_disease_gene__create_uid
@@ -1418,11 +1692,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_medicament_group_line__create_uid
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_line__create_uid
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_order__create_uid
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group__create_uid
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group_line__create_uid
 msgid "Created by"
 msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason__create_date
+#: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason_wiz__create_date
 #: model:ir.model.fields,field_description:acs_hms.field_acs_ethnicity__create_date
 #: model:ir.model.fields,field_description:acs_hms.field_acs_family_member__create_date
 #: model:ir.model.fields,field_description:acs_hms.field_acs_family_relation__create_date
@@ -1432,6 +1709,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__create_date
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit__create_date
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit_line__create_date
+#: model:ir.model.fields,field_description:acs_hms.field_acs_reschedule_appointments__create_date
 #: model:ir.model.fields,field_description:acs_hms.field_appointment_cabin__create_date
 #: model:ir.model.fields,field_description:acs_hms.field_appointment_purpose__create_date
 #: model:ir.model.fields,field_description:acs_hms.field_disease_gene__create_date
@@ -1448,6 +1726,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_medicament_group_line__create_date
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_line__create_date
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_order__create_date
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group__create_date
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group_line__create_date
 msgid "Created on"
 msgstr ""
 
@@ -1471,6 +1751,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__date
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__date
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_search
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_search
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_search
@@ -1514,6 +1795,28 @@ msgid "Days"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group_line__days_to_add
+msgid "Days to add"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,help:acs_hms.field_procedure_group_line__days_to_add
+msgid "Days to add for next date"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,help:acs_hms.field_res_company__acs_flag_days
+#: model:ir.model.fields,help:acs_hms.field_res_config_settings__acs_flag_days
+msgid "Days to count cancelled appointment"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_res_company__acs_appointment_planned_duration
+#: model:ir.model.fields,field_description:acs_hms.field_res_config_settings__acs_appointment_planned_duration
+msgid "Default Appointment Planned Duration"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_hms_physician__appointment_duration
 msgid "Default Consultation Duration"
 msgstr ""
@@ -1524,17 +1827,24 @@ msgid "Default Followup on (Days)"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Default planned duration for appointments"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,help:acs_hms.field_acs_product_kit_line__uom_id
 msgid "Default unit of measure used for all stock operations."
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model,name:acs_hms.model_hr_department
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__department_id
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__department_id
 #: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__department_id
 #: model:ir.model.fields,field_description:acs_hms.field_resource_calendar__department_id
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_search
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_treatment_search
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hr_department_tree
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_schedule_search
 msgid "Department"
 msgstr ""
@@ -1574,7 +1884,6 @@ msgstr ""
 
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_form
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_popup_form
 msgid "Details"
 msgstr ""
 
@@ -1613,6 +1922,11 @@ msgid "Differential Diagnosis..."
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model,name:acs_hms.model_digest_digest
+msgid "Digest"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_hms_patient_medication__discontinued
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_patient_medication_search
 msgid "Discontinued"
@@ -1625,7 +1939,7 @@ msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__diseas_id
-#: model:ir.model.fields,field_description:acs_hms.field_hms_patient_disease__disease
+#: model:ir.model.fields,field_description:acs_hms.field_hms_patient_disease__disease_id
 #: model:ir.model.fields,field_description:acs_hms.field_hms_patient_family_diseases__diseases_ids
 msgid "Disease"
 msgstr ""
@@ -1692,6 +2006,7 @@ msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason__display_name
+#: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason_wiz__display_name
 #: model:ir.model.fields,field_description:acs_hms.field_acs_ethnicity__display_name
 #: model:ir.model.fields,field_description:acs_hms.field_acs_family_member__display_name
 #: model:ir.model.fields,field_description:acs_hms.field_acs_family_relation__display_name
@@ -1701,6 +2016,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__display_name
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit__display_name
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit_line__display_name
+#: model:ir.model.fields,field_description:acs_hms.field_acs_reschedule_appointments__display_name
 #: model:ir.model.fields,field_description:acs_hms.field_appointment_cabin__display_name
 #: model:ir.model.fields,field_description:acs_hms.field_appointment_purpose__display_name
 #: model:ir.model.fields,field_description:acs_hms.field_disease_gene__display_name
@@ -1717,7 +2033,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_medicament_group_line__display_name
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_line__display_name
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_order__display_name
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group__display_name
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group_line__display_name
 msgid "Display Name"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_prescription_line__display_type
+msgid "Display Type"
 msgstr ""
 
 #. module: acs_hms
@@ -1726,27 +2049,11 @@ msgid "Do not allow to accept request before completion of payment."
 msgstr ""
 
 #. module: acs_hms
-#: code:addons/acs_hms/models/digest.py:0
-#: code:addons/acs_hms/models/digest.py:0
-#: code:addons/acs_hms/models/digest.py:0
-#: code:addons/acs_hms/models/digest.py:0
-#: code:addons/acs_hms/models/digest.py:0
-#, python-format
-msgid "Do not have access, skip this data for user's digest email"
-msgstr ""
-
-#. module: acs_hms
 #: model:ir.model.fields.selection,name:acs_hms.selection__resource_calendar__category__doctor
 #: model:res.groups,name:acs_hms.group_hms_doctor
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_patient_disease_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_treatment_search
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_hospital_hms_treatment_form
 msgid "Doctor"
-msgstr ""
-
-#. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_search
-msgid "Doctor's Appointments"
 msgstr ""
 
 #. module: acs_hms
@@ -1755,10 +2062,11 @@ msgid "Doctor's Schedule"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__attach_count
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__attach_count
 #: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__attach_count
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_hospital_hms_treatment_form
 msgid "Documents"
 msgstr ""
 
@@ -1783,7 +2091,6 @@ msgstr ""
 #: model:ir.model.fields.selection,name:acs_hms.selection__acs_patient_procedure__state__done
 #: model:ir.model.fields.selection,name:acs_hms.selection__hms_appointment__state__done
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_form
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_popup_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hospital_hms_treatment_form
 msgid "Done"
@@ -1826,7 +2133,6 @@ msgstr ""
 #: model:ir.model.fields.selection,name:acs_hms.selection__hms_treatment__state__draft
 #: model:ir.model.fields.selection,name:acs_hms.selection__prescription_order__state__draft
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_form
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_popup_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hospital_hms_treatment_form
 msgid "Draft"
@@ -1848,21 +2154,14 @@ msgid "Drug form, such as tablet or gel"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__duration
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__planned_duration
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_treatment_document
 msgid "Duration"
 msgstr ""
 
 #. module: acs_hms
-#: model:drug.form,name:acs_hms.drug_form_2
-msgid "EMULSION"
-msgstr ""
-
-#. module: acs_hms
-#: model:drug.form,name:acs_hms.drug_form_3
-msgid "ENEMA"
-msgstr ""
-
-#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__date_stop
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__date_end
 #: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__end_date
 msgid "End Date"
@@ -1886,6 +2185,7 @@ msgstr ""
 #. module: acs_hms
 #: model:ir.actions.act_window,name:acs_hms.act_open_acs_ethnicity_view
 #: model:ir.model,name:acs_hms.model_acs_ethnicity
+#: model:ir.ui.menu,name:acs_hms.menu_ethnicity
 msgid "Ethnicity"
 msgstr ""
 
@@ -1987,6 +2287,16 @@ msgid ""
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_patient__acs_flag_days
+msgid "Flag Days"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Folloup Activity"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields.selection,name:acs_hms.selection__hms_appointment__consultation_type__followup
 msgid "Follow Up"
 msgstr ""
@@ -2009,8 +2319,8 @@ msgid "Follow-up Invoice Product"
 msgstr ""
 
 #. module: acs_hms
-#: model:product.product,name:acs_hms.hms_followup_service_0
 #: model:product.template,name:acs_hms.hms_followup_service_0_product_template
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
 msgid "Follow-up Service"
 msgstr ""
 
@@ -2094,11 +2404,6 @@ msgid "Frequency"
 msgstr ""
 
 #. module: acs_hms
-#: model:drug.form,name:acs_hms.drug_form_4
-msgid "GEL"
-msgstr ""
-
-#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_hms_diseases__gene
 msgid "Gene"
 msgstr ""
@@ -2153,11 +2458,6 @@ msgid "Get Lines"
 msgstr ""
 
 #. module: acs_hms
-#: model:drug.company,name:acs_hms.drug_company_5
-msgid "Glenmark"
-msgstr ""
-
-#. module: acs_hms
 #: model:ir.model.fields.selection,name:acs_hms.selection__hms_patient_family_diseases__relative__grandfather
 msgid "Grandfather"
 msgstr ""
@@ -2187,7 +2487,13 @@ msgstr ""
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit__name
 #: model:ir.model.fields,field_description:acs_hms.field_medicament_group__name
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group__name
 msgid "Group Name"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group__line_ids
+msgid "Group lines"
 msgstr ""
 
 #. module: acs_hms
@@ -2215,16 +2521,6 @@ msgid "HR:"
 msgstr ""
 
 #. module: acs_hms
-#: model:hms.diseases,name:acs_hms.hms_diseases_1
-msgid "Hair Loss"
-msgstr ""
-
-#. module: acs_hms
-#: model:medicament.dosage,name:acs_hms.medication_dosage_3
-msgid "Half in morning , Half at noon and Half in evening."
-msgstr ""
-
-#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__has_message
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__has_message
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit__has_message
@@ -2232,6 +2528,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__has_message
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_order__has_message
 msgid "Has Message"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__head_circum
+msgid "Head Circumference"
 msgstr ""
 
 #. module: acs_hms
@@ -2253,16 +2554,6 @@ msgid "Healing Date"
 msgstr ""
 
 #. module: acs_hms
-#: model:hms.diseases,name:acs_hms.hms_diseases_3
-msgid "Heart Attack"
-msgstr ""
-
-#. module: acs_hms
-#: model:hms.diseases,name:acs_hms.hms_diseases_5
-msgid "Heart Disease"
-msgstr ""
-
-#. module: acs_hms
 #: model:ir.model.fields,help:acs_hms.field_acs_patient_evaluation__hr
 #: model:ir.model.fields,help:acs_hms.field_hms_appointment__hr
 #: model:ir.model.fields,help:acs_hms.field_hms_patient__hr
@@ -2271,12 +2562,14 @@ msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__height
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__height
 #: model:ir.model.fields,field_description:acs_hms.field_hms_patient__height
 msgid "Height"
 msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,help:acs_hms.field_acs_patient_evaluation__height
+#: model:ir.model.fields,help:acs_hms.field_hms_appointment__height
 #: model:ir.model.fields,help:acs_hms.field_hms_patient__height
 msgid "Height in cm"
 msgstr ""
@@ -2284,16 +2577,6 @@ msgstr ""
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_evaluation_document
 msgid "Height:"
-msgstr ""
-
-#. module: acs_hms
-#: model:hms.diseases,name:acs_hms.hms_diseases_4
-msgid "Hepatitis"
-msgstr ""
-
-#. module: acs_hms
-#: model:hms.diseases,name:acs_hms.hms_diseases_6
-msgid "Hernia"
 msgstr ""
 
 #. module: acs_hms
@@ -2320,6 +2603,11 @@ msgid "Hospital"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hr_department__department_type
+msgid "Hospital Department"
+msgstr ""
+
+#. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_partner_form
 msgid "Hospital Info"
 msgstr ""
@@ -2327,6 +2615,24 @@ msgstr ""
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_department_form
 msgid "Hospital Information"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_account_bank_statement_line__hospital_invoice_type
+#: model:ir.model.fields,field_description:acs_hms.field_account_move__hospital_invoice_type
+#: model:ir.model.fields,field_description:acs_hms.field_account_payment__hospital_invoice_type
+msgid "Hospital Invoice Type"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_product_product__hospital_product_type
+#: model:ir.model.fields,field_description:acs_hms.field_product_template__hospital_product_type
+msgid "Hospital Product Type"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_physician__hr_presence_state
+msgid "Hr Presence State"
 msgstr ""
 
 #. module: acs_hms
@@ -2361,6 +2667,7 @@ msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason__id
+#: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason_wiz__id
 #: model:ir.model.fields,field_description:acs_hms.field_acs_ethnicity__id
 #: model:ir.model.fields,field_description:acs_hms.field_acs_family_member__id
 #: model:ir.model.fields,field_description:acs_hms.field_acs_family_relation__id
@@ -2370,6 +2677,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__id
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit__id
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit_line__id
+#: model:ir.model.fields,field_description:acs_hms.field_acs_reschedule_appointments__id
 #: model:ir.model.fields,field_description:acs_hms.field_appointment_cabin__id
 #: model:ir.model.fields,field_description:acs_hms.field_appointment_purpose__id
 #: model:ir.model.fields,field_description:acs_hms.field_disease_gene__id
@@ -2386,12 +2694,9 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_medicament_group_line__id
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_line__id
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_order__id
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group__id
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group_line__id
 msgid "ID"
-msgstr ""
-
-#. module: acs_hms
-#: model:drug.form,name:acs_hms.drug_form_5
-msgid "INJECTION"
 msgstr ""
 
 #. module: acs_hms
@@ -2416,17 +2721,11 @@ msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,help:acs_hms.field_acs_patient_evaluation__message_needaction
-#: model:ir.model.fields,help:acs_hms.field_acs_patient_evaluation__message_unread
 #: model:ir.model.fields,help:acs_hms.field_acs_patient_procedure__message_needaction
-#: model:ir.model.fields,help:acs_hms.field_acs_patient_procedure__message_unread
 #: model:ir.model.fields,help:acs_hms.field_acs_product_kit__message_needaction
-#: model:ir.model.fields,help:acs_hms.field_acs_product_kit__message_unread
 #: model:ir.model.fields,help:acs_hms.field_hms_appointment__message_needaction
-#: model:ir.model.fields,help:acs_hms.field_hms_appointment__message_unread
 #: model:ir.model.fields,help:acs_hms.field_hms_treatment__message_needaction
-#: model:ir.model.fields,help:acs_hms.field_hms_treatment__message_unread
 #: model:ir.model.fields,help:acs_hms.field_prescription_order__message_needaction
-#: model:ir.model.fields,help:acs_hms.field_prescription_order__message_unread
 msgid "If checked, new messages require your attention."
 msgstr ""
 
@@ -2455,6 +2754,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__image_128
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__image_128
 #: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__image_128
+#: model:ir.model.fields,field_description:acs_hms.field_hr_department__image
 msgid "Image"
 msgstr ""
 
@@ -2511,36 +2811,42 @@ msgid "Invoice"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields.selection,name:acs_hms.selection__hms_appointment__appointment_invoice_policy__anytime
+#: model:ir.model.fields.selection,name:acs_hms.selection__product_template__appointment_invoice_policy__anytime
 #: model:ir.model.fields.selection,name:acs_hms.selection__res_company__appointment_invoice_policy__anytime
 msgid "Invoice Anytime"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__invoice_exempt
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__invoice_exempt
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_tree
 msgid "Invoice Exempt"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Invoice Policy"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields.selection,name:acs_hms.selection__hms_appointment__appointment_invoice_policy__advance
+#: model:ir.model.fields.selection,name:acs_hms.selection__product_template__appointment_invoice_policy__advance
 #: model:ir.model.fields.selection,name:acs_hms.selection__res_company__appointment_invoice_policy__advance
 msgid "Invoice in Advance"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields.selection,name:acs_hms.selection__hms_appointment__appointment_invoice_policy__at_end
+#: model:ir.model.fields.selection,name:acs_hms.selection__product_template__appointment_invoice_policy__at_end
 #: model:ir.model.fields.selection,name:acs_hms.selection__res_company__appointment_invoice_policy__at_end
 msgid "Invoice in the End"
 msgstr ""
 
 #. module: acs_hms
-#: code:addons/acs_hms/models/appointment.py:0
-#, python-format
-msgid "Invoice is not Paid yet."
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/appointment.py:0
-#, python-format
-msgid "Invoice is not created yet"
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__invoice_ids
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
+msgid "Invoices"
 msgstr ""
 
 #. module: acs_hms
@@ -2554,11 +2860,26 @@ msgid "Is Follower"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.product_template_search_view
+msgid "Is Kit Product"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_hms_patient__is_referring_doctor
 #: model:ir.model.fields,field_description:acs_hms.field_hms_physician__is_referring_doctor
 #: model:ir.model.fields,field_description:acs_hms.field_res_partner__is_referring_doctor
 #: model:ir.model.fields,field_description:acs_hms.field_res_users__is_referring_doctor
 msgid "Is Refereinng Physician"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__is_video_call
+msgid "Is Video Call"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model,name:acs_hms.model_account_move
+msgid "Journal Entry"
 msgstr ""
 
 #. module: acs_hms
@@ -2575,14 +2896,42 @@ msgid "Kit"
 msgstr ""
 
 #. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_product_kit_form
-msgid "Kit Products"
+#: model:ir.model.fields,field_description:acs_hms.field_product_product__acs_kit_line_ids
+#: model:ir.model.fields,field_description:acs_hms.field_product_template__acs_kit_line_ids
+#: model_terms:ir.ui.view,arch_db:acs_hms.product_template_form_view_kit_inherit
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_product_kit_line_tree
+msgid "Kit Components"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_product_product__kit_cost_total
+#: model:ir.model.fields,field_description:acs_hms.field_product_template__kit_cost_total
+msgid "Kit Cost Total"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit_line__product_template_id
+#: model:ir.model.fields,field_description:acs_hms.field_product_product__is_kit_product
+#: model:ir.model.fields,field_description:acs_hms.field_product_template__is_kit_product
+msgid "Kit Product"
 msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__acs_kit_qty
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__acs_kit_qty
+#: model:ir.model.fields,field_description:acs_hms.field_prescription_order__acs_kit_qty
 msgid "Kit Qty"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_consumable_line__move_ids
+msgid "Kit Stock Moves"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_product_product__kit_amount_total
+#: model:ir.model.fields,field_description:acs_hms.field_product_template__kit_amount_total
+msgid "Kit Total"
 msgstr ""
 
 #. module: acs_hms
@@ -2616,11 +2965,6 @@ msgid "Kpi Acs Treatment Total Value"
 msgstr ""
 
 #. module: acs_hms
-#: model:drug.form,name:acs_hms.drug_form_6
-msgid "LIQUID"
-msgstr ""
-
-#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__lab_report
 msgid "Lab Report"
 msgstr ""
@@ -2643,47 +2987,18 @@ msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_hms_patient__last_evaluation_id
-msgid "Last Appointment"
+msgid "Last Evaluation"
 msgstr ""
 
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_patient_form
-msgid "Last Appointment:"
-msgstr ""
-
-#. module: acs_hms
-#: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_acs_ethnicity____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_acs_family_member____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_acs_family_relation____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_acs_medical_alert____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_acs_pain_level____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit_line____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_appointment_cabin____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_appointment_purpose____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_disease_gene____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_diseases_category____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_hms_diseases____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_hms_patient_disease____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_hms_patient_family_diseases____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_hms_patient_genetic_risk____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_hms_patient_medication____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_hms_treatment____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_medicament_dosage____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_medicament_group____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_medicament_group_line____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_prescription_line____last_update
-#: model:ir.model.fields,field_description:acs_hms.field_prescription_order____last_update
-msgid "Last Modified on"
+msgid "Last Evaluation:"
 msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason__write_uid
+#: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason_wiz__write_uid
 #: model:ir.model.fields,field_description:acs_hms.field_acs_ethnicity__write_uid
 #: model:ir.model.fields,field_description:acs_hms.field_acs_family_member__write_uid
 #: model:ir.model.fields,field_description:acs_hms.field_acs_family_relation__write_uid
@@ -2693,6 +3008,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__write_uid
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit__write_uid
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit_line__write_uid
+#: model:ir.model.fields,field_description:acs_hms.field_acs_reschedule_appointments__write_uid
 #: model:ir.model.fields,field_description:acs_hms.field_appointment_cabin__write_uid
 #: model:ir.model.fields,field_description:acs_hms.field_appointment_purpose__write_uid
 #: model:ir.model.fields,field_description:acs_hms.field_disease_gene__write_uid
@@ -2709,11 +3025,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_medicament_group_line__write_uid
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_line__write_uid
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_order__write_uid
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group__write_uid
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group_line__write_uid
 msgid "Last Updated by"
 msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason__write_date
+#: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason_wiz__write_date
 #: model:ir.model.fields,field_description:acs_hms.field_acs_ethnicity__write_date
 #: model:ir.model.fields,field_description:acs_hms.field_acs_family_member__write_date
 #: model:ir.model.fields,field_description:acs_hms.field_acs_family_relation__write_date
@@ -2723,6 +3042,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__write_date
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit__write_date
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit_line__write_date
+#: model:ir.model.fields,field_description:acs_hms.field_acs_reschedule_appointments__write_date
 #: model:ir.model.fields,field_description:acs_hms.field_appointment_cabin__write_date
 #: model:ir.model.fields,field_description:acs_hms.field_appointment_purpose__write_date
 #: model:ir.model.fields,field_description:acs_hms.field_disease_gene__write_date
@@ -2739,6 +3059,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_medicament_group_line__write_date
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_line__write_date
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_order__write_date
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group__write_date
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group_line__write_date
 msgid "Last Updated on"
 msgstr ""
 
@@ -2755,6 +3077,16 @@ msgid "Line"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_procedure_group_form
+msgid "Lines"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model,name:acs_hms.model_hms_consumable_line
+msgid "List of Consumables"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_disease_gene__location
 msgid "Location"
 msgstr ""
@@ -2766,7 +3098,17 @@ msgstr ""
 
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Location to manage consumed products in Patient Procedure."
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
 msgid "Location to take consumed products in Consultation."
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Location to take consumed products in Patient Procedures."
 msgstr ""
 
 #. module: acs_hms
@@ -2780,23 +3122,28 @@ msgid "Logo"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_consumed_product_table
+msgid "Lot/Serial No."
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+msgid "Lot/Serial Number"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields.selection,name:acs_hms.selection__acs_patient_evaluation__bmi_state__low_weight
 msgid "Low Weight"
 msgstr ""
 
 #. module: acs_hms
-#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__message_main_attachment_id
-#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__message_main_attachment_id
-#: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit__message_main_attachment_id
-#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__message_main_attachment_id
-#: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__message_main_attachment_id
-#: model:ir.model.fields,field_description:acs_hms.field_prescription_order__message_main_attachment_id
-msgid "Main Attachment"
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_diseases_search
+msgid "Main Category"
 msgstr ""
 
 #. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_diseases_search
-msgid "Main Category"
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__manual_planned_duration
+msgid "Manual Duration"
 msgstr ""
 
 #. module: acs_hms
@@ -2873,6 +3220,11 @@ msgid "Medical Emergency"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_users_form_simple_modif
+msgid "Medical License"
+msgstr ""
+
+#. module: acs_hms
 #: model:res.groups,name:acs_hms.group_hms_medical_officer
 msgid "Medical Officer"
 msgstr ""
@@ -2912,6 +3264,11 @@ msgid "Medicaments Group"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_patient_medication__product_id
+msgid "Medication"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.actions.act_window,name:acs_hms.action_medicament_dosage
 #: model:ir.ui.menu,name:acs_hms.menu_medicine_medicament_dosage
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_medicament_dosage_form
@@ -2919,8 +3276,11 @@ msgid "Medication Dosage"
 msgstr ""
 
 #. module: acs_hms
-#: model:ir.model.fields,field_description:acs_hms.field_hms_patient_medication__template
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_patient_medication_search
+msgid "Medication Product"
+msgstr ""
+
+#. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_line_search
 msgid "Medication Template"
 msgstr ""
@@ -2931,6 +3291,7 @@ msgid "Medications"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_consumed_product_table
 #: model_terms:ir.ui.view,arch_db:acs_hms.report_prescription_table
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_order_search
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hospital_hms_treatment_form
@@ -2944,9 +3305,14 @@ msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_medicament_group_line__product_id
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_line_tree
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_order_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hospital_hms_treatment_form
 msgid "Medicine Name"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.actions.report,name:acs_hms.action_report_hms_medicines_label
+msgid "Medicines Label"
 msgstr ""
 
 #. module: acs_hms
@@ -3070,15 +3436,17 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_acs_ethnicity__name
 #: model:ir.model.fields,field_description:acs_hms.field_acs_family_relation__name
 #: model:ir.model.fields,field_description:acs_hms.field_acs_medical_alert__name
+#: model:ir.model.fields,field_description:acs_hms.field_acs_pain_level__name
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__name
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__name
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit_line__name
 #: model:ir.model.fields,field_description:acs_hms.field_hms_diseases__name
 #: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__name
 #: model:ir.model.fields,field_description:acs_hms.field_medicament_dosage__name
+#: model:ir.model.fields,field_description:acs_hms.field_prescription_line__name
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_treatment_document
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_ethnicity_search
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_form
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_popup_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_product_kit_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_appointment_cabin_form_form
@@ -3089,7 +3457,13 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_medical_alert_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_medicament_dosage_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_medicament_group_form
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_procedure_group_form
 msgid "Name"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_hms_medicines_label_document
+msgid "Name :-"
 msgstr ""
 
 #. module: acs_hms
@@ -3106,11 +3480,6 @@ msgstr ""
 #. module: acs_hms
 #: model:ir.model.fields.selection,name:acs_hms.selection__hms_patient_family_diseases__relative__nephew
 msgid "Nephew"
-msgstr ""
-
-#. module: acs_hms
-#: model:physician.specialty,name:acs_hms.physician_specialty_2
-msgid "Neurologist"
 msgstr ""
 
 #. module: acs_hms
@@ -3193,12 +3562,15 @@ msgstr ""
 #: model_terms:ir.actions.act_window,help:acs_hms.act_open_hms_prescription_order_view
 #: model_terms:ir.actions.act_window,help:acs_hms.act_open_medical_alerts
 #: model_terms:ir.actions.act_window,help:acs_hms.act_open_medicament_group_view
+#: model_terms:ir.actions.act_window,help:acs_hms.action_acs_cancel_reason
 #: model_terms:ir.actions.act_window,help:acs_hms.action_acs_family_relation
 #: model_terms:ir.actions.act_window,help:acs_hms.action_acs_patient_evaluation
 #: model_terms:ir.actions.act_window,help:acs_hms.action_acs_product_kit
 #: model_terms:ir.actions.act_window,help:acs_hms.action_appointment
 #: model_terms:ir.actions.act_window,help:acs_hms.action_hms_genetic_disease
 #: model_terms:ir.actions.act_window,help:acs_hms.action_hms_patient_disease
+#: model_terms:ir.actions.act_window,help:acs_hms.action_medicament_dosage
+#: model_terms:ir.actions.act_window,help:acs_hms.action_procedure_group
 #: model_terms:ir.actions.act_window,help:acs_hms.action_referring_doctors
 msgid "No Record Found"
 msgstr ""
@@ -3206,6 +3578,11 @@ msgstr ""
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.acs_no_details
 msgid "No Related Details Available. Please check check it again."
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+msgid "No."
 msgstr ""
 
 #. module: acs_hms
@@ -3223,12 +3600,14 @@ msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_hr_department__note
+#: model:ir.model.fields.selection,name:acs_hms.selection__prescription_line__display_type__line_note
 msgid "Note"
 msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_ethnicity__notes
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__notes
+#: model:ir.model.fields,field_description:acs_hms.field_prescription_order__notes
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_ethnicity_search
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
 msgid "Notes"
@@ -3242,6 +3621,12 @@ msgstr ""
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
 msgid "Notes..."
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__name
+#: model:ir.model.fields,field_description:acs_hms.field_prescription_order__name
+msgid "Number"
 msgstr ""
 
 #. module: acs_hms
@@ -3271,7 +3656,7 @@ msgstr ""
 #: model:ir.model.fields,help:acs_hms.field_hms_appointment__message_needaction_counter
 #: model:ir.model.fields,help:acs_hms.field_hms_treatment__message_needaction_counter
 #: model:ir.model.fields,help:acs_hms.field_prescription_order__message_needaction_counter
-msgid "Number of messages which requires an action"
+msgid "Number of messages requiring action"
 msgstr ""
 
 #. module: acs_hms
@@ -3289,16 +3674,6 @@ msgstr ""
 #: model:ir.model.fields,help:acs_hms.field_prescription_line__quantity
 msgid ""
 "Number of units of the medicament. Example : 30 capsules of amoxicillin"
-msgstr ""
-
-#. module: acs_hms
-#: model:ir.model.fields,help:acs_hms.field_acs_patient_evaluation__message_unread_counter
-#: model:ir.model.fields,help:acs_hms.field_acs_patient_procedure__message_unread_counter
-#: model:ir.model.fields,help:acs_hms.field_acs_product_kit__message_unread_counter
-#: model:ir.model.fields,help:acs_hms.field_hms_appointment__message_unread_counter
-#: model:ir.model.fields,help:acs_hms.field_hms_treatment__message_unread_counter
-#: model:ir.model.fields,help:acs_hms.field_prescription_order__message_unread_counter
-msgid "Number of unread messages"
 msgstr ""
 
 #. module: acs_hms
@@ -3333,11 +3708,6 @@ msgid "Old Prescription"
 msgstr ""
 
 #. module: acs_hms
-#: model:physician.specialty,name:acs_hms.physician_specialty_3
-msgid "Orthopaedic"
-msgstr ""
-
-#. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hospital_hms_treatment_form
 msgid "Other Information"
@@ -3361,11 +3731,6 @@ msgid "Oxygen Saturation, percentage of oxygen bound to hemoglobin"
 msgstr ""
 
 #. module: acs_hms
-#: model:physician.specialty,name:acs_hms.physician_specialty_4
-msgid "Paediatric"
-msgstr ""
-
-#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__pain
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__pain
 #: model:ir.model.fields,field_description:acs_hms.field_hms_patient__pain
@@ -3383,7 +3748,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__pain_level
 #: model:ir.model.fields,field_description:acs_hms.field_hms_patient__pain_level
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_form
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_popup_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_patient_form
 msgid "Pain Level"
@@ -3445,6 +3809,7 @@ msgid "Paternal"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model,name:acs_hms.model_hms_patient
 #: model:ir.model.fields,field_description:acs_hms.field_acs_family_member__patient_id
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__patient_id
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__patient_id
@@ -3455,6 +3820,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_hms_patient_medication__patient_id
 #: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__patient_id
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_order__patient_id
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_treatment_document
 #: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_search
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_search
@@ -3463,12 +3829,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_order_search
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_treatment_search
 msgid "Patient"
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/patient.py:0
-#, python-format
-msgid "Patient %s Chart"
 msgstr ""
 
 #. module: acs_hms
@@ -3500,6 +3860,7 @@ msgstr ""
 
 #. module: acs_hms
 #: model:ir.actions.act_window,name:acs_hms.action_acs_patient_evaluation
+#: model:ir.model,name:acs_hms.model_acs_patient_evaluation
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_search
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_tree
 msgid "Patient Evaluation"
@@ -3526,6 +3887,16 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_patient_genetic_risk_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_patient_genetic_risk_tree
 msgid "Patient Genetic Risks"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_res_config_settings__patient_head_circum_measure_uom
+msgid "Patient Head Circumference unit of measure"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__acs_head_circum_name
+msgid "Patient Head Circumference unit of measure label"
 msgstr ""
 
 #. module: acs_hms
@@ -3563,6 +3934,11 @@ msgid "Patient Name"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model,name:acs_hms.model_acs_patient_procedure
+#: model:ir.model.fields,field_description:acs_hms.field_account_bank_statement_line__procedure_id
+#: model:ir.model.fields,field_description:acs_hms.field_account_move__procedure_id
+#: model:ir.model.fields,field_description:acs_hms.field_account_payment__procedure_id
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_list
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hospital_hms_treatment_form
@@ -3609,7 +3985,6 @@ msgstr ""
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_res_config_settings__group_patient_registartion_invoicing
 #: model:res.groups,name:acs_hms.group_patient_registartion_invoicing
-#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
 msgid "Patient Registration Invoicing"
 msgstr ""
 
@@ -3727,20 +4102,28 @@ msgid "Personal Information"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model,name:acs_hms.model_hms_physician
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__physician_id
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__physician_id
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__physician_id
 #: model:ir.model.fields,field_description:acs_hms.field_hms_patient_disease__physician_id
-#: model:ir.model.fields,field_description:acs_hms.field_hms_patient_medication__doctor
+#: model:ir.model.fields,field_description:acs_hms.field_hms_patient_medication__physician_id
 #: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__physician_id
 #: model:ir.model.fields,field_description:acs_hms.field_medicament_group__physician_id
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_treatment_document
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_search
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_search
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_patient_medication_search
 msgid "Physician"
 msgstr ""
 
 #. module: acs_hms
-#: model:ir.model.fields,help:acs_hms.field_hms_patient_medication__doctor
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_users_form_simple_modif
+msgid "Physician Data"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,help:acs_hms.field_hms_patient_medication__physician_id
 msgid "Physician who prescribed the medicament"
 msgstr ""
 
@@ -3757,6 +4140,8 @@ msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,help:acs_hms.field_hms_appointment__physician_id
+#: model:ir.model.fields,help:acs_hms.field_hms_appointment__refered_from_physician_id
+#: model:ir.model.fields,help:acs_hms.field_hms_appointment__refered_to_physician_id
 msgid "Physician's Name"
 msgstr ""
 
@@ -3772,76 +4157,13 @@ msgid "Physicians"
 msgstr ""
 
 #. module: acs_hms
-#: code:addons/acs_hms/models/patient.py:0
-#: code:addons/acs_hms/models/treatment.py:0
-#, python-format
-msgid "Please Configure Registration Product in Configuration first."
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/patient.py:0
-#, python-format
-msgid "Please Delete Exiting relateion and create new!"
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/appointment.py:0
-#, python-format
-msgid "Please Set Consultation Service first."
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/appointment.py:0
-#, python-format
-msgid "Please Set Followup activity Type on Configiration."
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/procedure.py:0
-#, python-format
-msgid "Please Set Product first."
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/appointment.py:0
-#, python-format
-msgid ""
-"Please define a appointment location from where the consumables will be "
-"taken."
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/appointment.py:0
-#, python-format
-msgid ""
-"Please define a appointment location where the consumables will be used."
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/procedure.py:0
-#, python-format
-msgid ""
-"Please define a stock location from where the consumables will be taken."
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/procedure.py:0
-#, python-format
-msgid ""
-"Please define a stock usage location where the consumables will be used."
-msgstr ""
-
-#. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_order_search
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_treatment_search
 msgid "Pregancy Warning"
 msgstr ""
 
 #. module: acs_hms
-#: code:addons/acs_hms/models/prescription.py:0
-#: code:addons/acs_hms/models/prescription.py:0
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_order__pregnancy_warning
-#, python-format
 msgid "Pregnancy Warning"
 msgstr ""
 
@@ -3901,23 +4223,13 @@ msgstr ""
 
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_line_form
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_line_tree
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_order_form
 msgid "Prescription Line"
 msgstr ""
 
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_order_form
 msgid "Prescription Lines"
-msgstr ""
-
-#. module: acs_hms
-#: model:ir.model.fields,field_description:acs_hms.field_prescription_order__notes
-msgid "Prescription Notes"
-msgstr ""
-
-#. module: acs_hms
-#: model:ir.model.fields,field_description:acs_hms.field_prescription_order__name
-msgid "Prescription Number"
 msgstr ""
 
 #. module: acs_hms
@@ -3928,18 +4240,13 @@ msgstr ""
 #. module: acs_hms
 #: model:ir.actions.act_window,name:acs_hms.act_open_hms_prescription_order_view
 #: model:ir.actions.report,name:acs_hms.report_hms_prescription_id
+#: model:ir.model,name:acs_hms.model_prescription_order
 msgid "Prescription Order"
 msgstr ""
 
 #. module: acs_hms
 #: model:ir.model,name:acs_hms.model_prescription_line
 msgid "Prescription Order Line"
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/prescription.py:0
-#, python-format
-msgid "Prescription Order can be delete only in Draft state."
 msgstr ""
 
 #. module: acs_hms
@@ -3961,18 +4268,15 @@ msgid "Prescriptions"
 msgstr ""
 
 #. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_hospital_hms_treatment_form
-msgid "Preview Documents"
-msgstr ""
-
-#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__price_unit
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group_line__price_unit
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_treatment_document
 msgid "Price"
 msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,help:acs_hms.field_acs_product_kit_line__unit_price
+#: model:ir.model.fields,help:acs_hms.field_procedure_group_line__price_unit
 msgid "Price at which the product is sold to customers."
 msgstr ""
 
@@ -4015,20 +4319,58 @@ msgstr ""
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__product_id
 #: model:ir.model.fields,field_description:acs_hms.field_hms_consumable_line__procedure_id
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group_line__product_id
 #: model:ir.model.fields,field_description:acs_hms.field_stock_move__procedure_id
+#: model:ir.model.fields.selection,name:acs_hms.selection__account_move__hospital_invoice_type__procedure
 #: model:ir.model.fields.selection,name:acs_hms.selection__product_template__hospital_product_type__procedure
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_search
 msgid "Procedure"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.actions.act_window,name:acs_hms.action_procedure_group
+#: model:ir.model,name:acs_hms.model_procedure_group
+#: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__procedure_group_id
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group_line__group_id
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_procedure_group_form
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_procedure_group_tree
+msgid "Procedure Group"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model,name:acs_hms.model_procedure_group_line
+msgid "Procedure Group Line"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.ui.menu,name:acs_hms.menu_procedure_group
+msgid "Procedure Groups"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group_line__procedure_time
+#: model:ir.model.fields,field_description:acs_hms.field_product_product__procedure_time
+#: model:ir.model.fields,field_description:acs_hms.field_product_template__procedure_time
+msgid "Procedure Time"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.actions.report,name:acs_hms.action_procedures_report
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_treatment_document
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_search
 msgid "Procedures"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__procedure_to_invoice_ids
+msgid "Procedures to Invoice"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model,name:acs_hms.model_product_template
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit_line__product_id
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_line__product_id
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
 msgid "Product"
 msgstr ""
 
@@ -4036,6 +4378,7 @@ msgstr ""
 #: model:ir.model,name:acs_hms.model_acs_product_kit
 #: model:ir.ui.menu,name:acs_hms.menu_acs_product_kit
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_product_kit_form
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_product_kit_line_form
 msgid "Product Kit"
 msgstr ""
 
@@ -4082,12 +4425,13 @@ msgid "QR Code"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hospital_hms_treatment_form
 msgid "Qty"
 msgstr ""
 
 #. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_line_tree
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_order_form
 msgid "Qty Dose"
 msgstr ""
 
@@ -4104,6 +4448,7 @@ msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit_line__product_qty
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_consumed_product_table
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_line_search
 msgid "Quantity"
 msgstr ""
@@ -4111,6 +4456,7 @@ msgstr ""
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__rbs
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__rbs
+#: model:ir.model.fields,field_description:acs_hms.field_hms_patient__rbs
 msgid "RBS"
 msgstr ""
 
@@ -4145,12 +4491,24 @@ msgstr ""
 #. module: acs_hms
 #: model:ir.model.fields,help:acs_hms.field_acs_patient_evaluation__rbs
 #: model:ir.model.fields,help:acs_hms.field_hms_appointment__rbs
+#: model:ir.model.fields,help:acs_hms.field_hms_patient__rbs
 msgid ""
 "Random blood sugar measures blood glucose regardless of when you last ate."
 msgstr ""
 
 #. module: acs_hms
-#: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason__cancel_reason
+#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__rating_ids
+#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__rating_ids
+#: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit__rating_ids
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__rating_ids
+#: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__rating_ids
+#: model:ir.model.fields,field_description:acs_hms.field_prescription_order__rating_ids
+msgid "Ratings"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason__name
+#: model:ir.model.fields,field_description:acs_hms.field_acs_cancel_reason_wiz__cancel_reason
 msgid "Reason"
 msgstr ""
 
@@ -4176,14 +4534,38 @@ msgid "Recessive Gene"
 msgstr ""
 
 #. module: acs_hms
-#: code:addons/acs_hms/models/procedure.py:0
-#, python-format
-msgid "Record can be deleted only in Canceled state."
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__refer_reason
+msgid "Refer Reason"
 msgstr ""
 
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
 msgid "Refer. To"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__refered_to_appointment_id
+msgid "Refered Appointment"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__refered_from_appointment_id
+msgid "Refered From Appointment"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__refered_from_reason
+msgid "Refered From Reason"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__refered_from_physician_id
+msgid "Refered from Physician"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__refered_to_physician_id
+msgid "Refered to Physician"
 msgstr ""
 
 #. module: acs_hms
@@ -4233,14 +4615,8 @@ msgstr ""
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_hms_patient__registration_product_id
 #: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__registration_product_id
-#: model:product.product,name:acs_hms.hms_registration_service_0
 #: model:product.template,name:acs_hms.hms_registration_service_0_product_template
 msgid "Registration Service"
-msgstr ""
-
-#. module: acs_hms
-#: model:ir.model,name:acs_hms.model_acs_cancel_reason
-msgid "Reject Reason"
 msgstr ""
 
 #. module: acs_hms
@@ -4260,8 +4636,52 @@ msgid "Relative"
 msgstr ""
 
 #. module: acs_hms
-#: model:appointment.purpose,name:acs_hms.appointment_purpose_reports
-msgid "Reports"
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Reminder"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__reminder_date
+msgid "Reminder Date"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_res_company__acs_reminder_day
+#: model:ir.model.fields,field_description:acs_hms.field_res_config_settings__acs_reminder_day
+msgid "Reminder Days"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_res_company__acs_reminder_hours
+#: model:ir.model.fields,field_description:acs_hms.field_res_config_settings__acs_reminder_hours
+msgid "Reminder Hours"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__acs_reminder_sent
+msgid "Reminder Sent"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
+msgid "Reopen"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_reschedule_appointments_form
+msgid "Reschedule All Selected Appointments"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.actions.act_window,name:acs_hms.action_acs_reschedule_appointments
+#: model:ir.model,name:acs_hms.model_acs_reschedule_appointments
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_reschedule_appointments_form
+msgid "Reschedule Appointments"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_acs_reschedule_appointments__acs_reschedule_time
+msgid "Reschedule Selected Appointments by (Hours)"
 msgstr ""
 
 #. module: acs_hms
@@ -4346,11 +4766,36 @@ msgid "Search Treatments"
 msgstr ""
 
 #. module: acs_hms
-#: model:ir.model.fields,help:acs_hms.field_hms_diseases__category
+#: model:ir.model.fields.selection,name:acs_hms.selection__prescription_line__display_type__line_section
+msgid "Section"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_hms_treatment_appointment_tree
+msgid "Select Treatment"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,help:acs_hms.field_hms_diseases__category_id
 msgid ""
 "Select the category for this disease This is usuallyassociated to the "
 "standard. For instance, the chapter on the ICD-10will be the main category "
 "for the disease"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_res_config_settings__acs_auto_appo_confirmation_mail
+msgid "Send Appointment Confirmation Mail"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.actions.server,name:acs_hms.ir_cron_send_reminder_action_ir_actions_server
+msgid "Send Appointment reminder"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Send appointment confirmation mail on appointment confirmation."
 msgstr ""
 
 #. module: acs_hms
@@ -4360,16 +4805,39 @@ msgid "Send by Email"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Send patient appointment reminder."
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_res_company__acs_auto_appo_confirmation_mail
+msgid "Sent Appointment Confirmation Mail"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_family_relation__sequence
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit__sequence
 #: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit_line__sequence
+#: model:ir.model.fields,field_description:acs_hms.field_hms_diseases__sequence
+#: model:ir.model.fields,field_description:acs_hms.field_prescription_line__sequence
+#: model:ir.model.fields,field_description:acs_hms.field_procedure_group_line__sequence
 msgid "Sequence"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Set Default planned duration for appointments"
 msgstr ""
 
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
 msgid ""
 "Set days to consider next appointment as follow-up if less than given days."
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Set the default Patient Head Circumference measure."
 msgstr ""
 
 #. module: acs_hms
@@ -4468,6 +4936,21 @@ msgid ""
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_patient__show_cancellation_warning_flag
+msgid "Show Cancellation Flag"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__acs_show_conumable_create_invoice
+msgid "Show Consumable Create Invoice Button"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__acs_show_create_invoice
+msgid "Show Create Invoice Button"
+msgstr ""
+
+#. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_patient_form
 msgid "Show Evaluation Charts"
 msgstr ""
@@ -4478,18 +4961,22 @@ msgid "Show Full details"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid ""
+"Show flag on patient when total cancelled appointments are more than "
+"configured number."
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,help:acs_hms.field_hms_patient_medication__adverse_reaction
 msgid "Side effects or adverse reactions that the patient experienced"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_physician__signature
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_physician_form
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_users_form_simple_modif
 msgid "Signature"
-msgstr ""
-
-#. module: acs_hms
-#: model:hms.diseases,name:acs_hms.hms_diseases_2
-msgid "Sinus Headache"
 msgstr ""
 
 #. module: acs_hms
@@ -4516,6 +5003,7 @@ msgid "Specific Code for the Disease (eg, Code for ICD-10)"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_consumed_product_table
 #: model_terms:ir.ui.view,arch_db:acs_hms.report_prescription_table
 msgid "Sr.No"
 msgstr ""
@@ -4531,17 +5019,22 @@ msgid "Start Date"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_treatment_document
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_search
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_search
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_search
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_treatment_search
+msgid "State"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__state
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__state
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__state
 #: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__state
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_line__state
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_order__state
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_search
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_search
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_search
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_treatment_search
-msgid "State"
+msgid "Status"
 msgstr ""
 
 #. module: acs_hms
@@ -4565,14 +5058,41 @@ msgid "Status of the disease"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Stock Location"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_res_company__appointment_stock_location_id
 #: model:ir.model.fields,field_description:acs_hms.field_res_config_settings__appointment_stock_location_id
 msgid "Stock Location for Consumed Products in Appointment"
 msgstr ""
 
 #. module: acs_hms
-#: model:drug.company,name:acs_hms.drug_company_2
-msgid "Sun Pharma"
+#: model:ir.model.fields,field_description:acs_hms.field_res_company__procedure_stock_location_id
+#: model:ir.model.fields,field_description:acs_hms.field_res_config_settings__procedure_stock_location_id
+msgid "Stock Location for Consumed Products in Procedure"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model,name:acs_hms.model_stock_move
+msgid "Stock Move"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+msgid "Stock Usage Location"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__subject
+msgid "Subject"
+msgstr ""
+
+#. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_consumed_product_table
+msgid "Subtotal"
 msgstr ""
 
 #. module: acs_hms
@@ -4589,30 +5109,14 @@ msgstr ""
 
 #. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_form
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_popup_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_patient_form
 msgid "Systolic/Diastolic BP"
 msgstr ""
 
 #. module: acs_hms
-#: model:drug.form,name:acs_hms.drug_form_7
-msgid "TABLET"
-msgstr ""
-
-#. module: acs_hms
-#: model:medicament.dosage,name:acs_hms.medication_dosage_1
-msgid "Take one in morning"
-msgstr ""
-
-#. module: acs_hms
-#: model:medicament.dosage,name:acs_hms.medication_dosage_2
-msgid "Take one in morning and evening"
-msgstr ""
-
-#. module: acs_hms
-#: model:medicament.dosage,name:acs_hms.medication_dosage_0
-msgid "Take one in morning, noon and evening."
+#: model:ir.model.fields,help:acs_hms.field_prescription_line__display_type
+msgid "Technical field for UX purpose."
 msgstr ""
 
 #. module: acs_hms
@@ -4655,18 +5159,6 @@ msgid ""
 msgstr ""
 
 #. module: acs_hms
-#: code:addons/acs_hms/models/treatment.py:0
-#, python-format
-msgid "There is no Procedure to Invoice or all are already Invoiced."
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/appointment.py:0
-#, python-format
-msgid "There is no consumed product to invoice."
-msgstr ""
-
-#. module: acs_hms
 #: model:ir.model.fields.selection,name:acs_hms.selection__hms_patient__grpah_data_filter__month
 #: model_terms:ir.ui.view,arch_db:acs_hms.patient_evalution_kanban_view
 msgid "This Month"
@@ -4681,6 +5173,11 @@ msgstr ""
 #. module: acs_hms
 #: model:ir.model.fields.selection,name:acs_hms.selection__hms_patient__grpah_data_filter__year
 msgid "This Year"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,help:acs_hms.field_res_company__birthday_mail_template_id
+msgid "This will set the default mail template for birthday wishes."
 msgstr ""
 
 #. module: acs_hms
@@ -4706,13 +5203,18 @@ msgid "Today's Prescription"
 msgstr ""
 
 #. module: acs_hms
-#: model:drug.company,name:acs_hms.drug_company_1
-msgid "Torrent"
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_form
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_product_kit_line_form
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_product_kit_line_tree
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hospital_hms_treatment_form
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_procedure_group_form
+msgid "Total"
 msgstr ""
 
 #. module: acs_hms
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_product_kit_form
-msgid "Total"
+#: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit_line__total_standard_price
+msgid "Total Cost Price"
 msgstr ""
 
 #. module: acs_hms
@@ -4722,7 +5224,7 @@ msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_medicament_group_line__quantity
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_line_tree
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_order_form
 msgid "Total Qty"
 msgstr ""
 
@@ -4737,7 +5239,14 @@ msgid "Total Quantity"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hospital_hms_treatment_form
+msgid "Treatement Detail"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.actions.act_window,name:acs_hms.acs_action_form_hospital_treatment
+#: model:ir.actions.report,name:acs_hms.action_treatment_report
+#: model:ir.model,name:acs_hms.model_hms_treatment
 #: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__treatment_id
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__treatment_id
 #: model:ir.model.fields,field_description:acs_hms.field_hms_patient_disease__treatment_id
@@ -4745,6 +5254,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_order__treatment_id
 #: model:ir.model.fields.selection,name:acs_hms.selection__account_move__hospital_invoice_type__treatment
 #: model_terms:ir.ui.view,arch_db:acs_hms.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_prescription_order_search
 msgid "Treatment"
 msgstr ""
@@ -4785,9 +5295,11 @@ msgid "Treatment Sheet"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_hms_patient__treatment_ids
 #: model:ir.ui.menu,name:acs_hms.action_menu_treatment
 #: model:ir.ui.menu,name:acs_hms.main_menu_treatment
 #: model:ir.ui.menu,name:acs_hms.menu_treatment
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_hms_treatment_appointment_tree
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_treatment_calendar
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_patient_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_physician_form
@@ -4827,6 +5339,12 @@ msgid "Unique UID"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_acs_procedures_document
+#: model_terms:ir.ui.view,arch_db:acs_hms.report_consumed_product_table
+msgid "Unit Price"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_medicament_group_line__dosage_uom_id
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_line__dosage_uom_id
 msgid "Unit of Dosage"
@@ -4839,33 +5357,7 @@ msgstr ""
 
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_prescription_line__quantity
-#: model:product.product,uom_name:acs_hms.hms_consultation_service_0
-#: model:product.product,uom_name:acs_hms.hms_followup_service_0
-#: model:product.product,uom_name:acs_hms.hms_registration_service_0
-#: model:product.template,uom_name:acs_hms.hms_consultation_service_0_product_template
-#: model:product.template,uom_name:acs_hms.hms_followup_service_0_product_template
-#: model:product.template,uom_name:acs_hms.hms_registration_service_0_product_template
 msgid "Units"
-msgstr ""
-
-#. module: acs_hms
-#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__message_unread
-#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__message_unread
-#: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit__message_unread
-#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__message_unread
-#: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__message_unread
-#: model:ir.model.fields,field_description:acs_hms.field_prescription_order__message_unread
-msgid "Unread Messages"
-msgstr ""
-
-#. module: acs_hms
-#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_evaluation__message_unread_counter
-#: model:ir.model.fields,field_description:acs_hms.field_acs_patient_procedure__message_unread_counter
-#: model:ir.model.fields,field_description:acs_hms.field_acs_product_kit__message_unread_counter
-#: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__message_unread_counter
-#: model:ir.model.fields,field_description:acs_hms.field_hms_treatment__message_unread_counter
-#: model:ir.model.fields,field_description:acs_hms.field_prescription_order__message_unread_counter
-msgid "Unread Messages Counter"
 msgstr ""
 
 #. module: acs_hms
@@ -4891,19 +5383,32 @@ msgid "Urgent Appointment"
 msgstr ""
 
 #. module: acs_hms
-#: model:physician.specialty,name:acs_hms.physician_specialty_1
-msgid "Urologist"
-msgstr ""
-
-#. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_res_company__appointment_usage_location_id
 #: model:ir.model.fields,field_description:acs_hms.field_res_config_settings__appointment_usage_location_id
 msgid "Usage Location for Consumed Products in Appointment"
 msgstr ""
 
 #. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_res_company__procedure_usage_location_id
+#: model:ir.model.fields,field_description:acs_hms.field_res_config_settings__procedure_usage_location_id
+msgid "Usage Location for Consumed Products in Procedure"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model,name:acs_hms.model_res_users
+msgid "User"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,help:acs_hms.field_acs_product_kit_line__standard_price
+msgid ""
+"Value of the product (automatically computed in AVCO).\n"
+"        Used to value the product when the purchase cost is not known (e.g. inventory adjustment).\n"
+"        Used to compute margins on sale orders."
+msgstr ""
+
+#. module: acs_hms
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_form
-#: model_terms:ir.ui.view,arch_db:acs_hms.view_hms_appointment_form
 #: model_terms:ir.ui.view,arch_db:acs_hms.view_hospital_hms_treatment_form
 msgid "View Invoice"
 msgstr ""
@@ -4932,6 +5437,12 @@ msgstr ""
 #. module: acs_hms
 #: model:ir.model.fields,field_description:acs_hms.field_hms_appointment__waiting_date_end
 msgid "Waiting end Date"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.model.fields,field_description:acs_hms.field_res_company__acs_flag_days
+#: model:ir.model.fields,field_description:acs_hms.field_res_config_settings__acs_flag_days
+msgid "Warning Flag Days"
 msgstr ""
 
 #. module: acs_hms
@@ -4980,8 +5491,12 @@ msgid "Working Schedule"
 msgstr ""
 
 #. module: acs_hms
-#: model:ir.actions.act_window,name:acs_hms.action_resource_calendar
 #: model:ir.ui.menu,name:acs_hms.menu_working_schedule
+msgid "Working Schedules"
+msgstr ""
+
+#. module: acs_hms
+#: model:ir.actions.act_window,name:acs_hms.action_resource_calendar
 msgid "Working Times"
 msgstr ""
 
@@ -4992,32 +5507,8 @@ msgid "Worsening"
 msgstr ""
 
 #. module: acs_hms
-#: code:addons/acs_hms/models/appointment.py:0
-#: code:addons/acs_hms/models/evaluation.py:0
-#, python-format
-msgid "You can not delete record in done state"
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/prescription.py:0
-#, python-format
-msgid "You cannot confirm a prescription order without any order line."
-msgstr ""
-
-#. module: acs_hms
-#: code:addons/acs_hms/models/diseases.py:0
-#, python-format
-msgid "You cannot create a recursive hierarchy."
-msgstr ""
-
-#. module: acs_hms
-#: model:medicament.dosage,name:acs_hms.medication_dosage_6
-msgid "after meals or with milk."
-msgstr ""
-
-#. module: acs_hms
-#: model:medicament.dosage,name:acs_hms.medication_dosage_5
-msgid "after snacks or with milk"
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_evaluation_form
+msgid "bpm"
 msgstr ""
 
 #. module: acs_hms
@@ -5026,24 +5517,19 @@ msgid "chromosome number"
 msgstr ""
 
 #. module: acs_hms
+#: model_terms:ir.ui.view,arch_db:acs_hms.patient_kanban_view
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_patient_form
+msgid "days"
+msgstr ""
+
+#. module: acs_hms
 #: model:ir.model.fields,help:acs_hms.field_disease_gene__gene_id
 msgid "default code from NCBI Entrez database."
 msgstr ""
 
 #. module: acs_hms
-#: model:medicament.dosage,name:acs_hms.medication_dosage_4
-msgid "on empty stomach"
-msgstr ""
-
-#. module: acs_hms
-#: model:medicament.dosage,name:acs_hms.medication_dosage_7
-msgid "two at bedtime with water"
-msgstr ""
-
-#. module: acs_hms
-#: model:mail.template,report_name:acs_hms.acs_appointment_email
-#: model:mail.template,report_name:acs_hms.acs_prescription_email
-msgid "{{ (object.name or '').replace('/','_') }}"
+#: model_terms:ir.ui.view,arch_db:acs_hms.view_acs_patient_procedure_list
+msgid "total"
 msgstr ""
 
 #. module: acs_hms
