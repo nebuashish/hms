@@ -3,6 +3,7 @@
 
     <template id="report_hospital_discharge_document">
         <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context({'lang':doc.patient_id.lang})"/>
             <div class="page acs_report">
 
                 <div class="mt32 mb32 text-center">
@@ -198,7 +199,7 @@
     <template id="report_hospital_discharge">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
-                <t t-call="acs_hms_hospitalization.report_hospital_discharge_document" t-lang="doc.patient_id.partner_id.lang"/>
+                <t t-call="acs_hms_hospitalization.report_hospital_discharge_document"/>
             </t>
         </t>
     </template>

@@ -31,12 +31,15 @@
         </field>
     </record>
 
-    <!-- Appontment View -->
+    <!-- Appointment View -->
     <record id="view_hms_appointment_form" model="ir.ui.view">
         <field name="name">hms.appointment.form</field>
         <field name="model">hms.appointment</field>
         <field name="inherit_id" ref="acs_hms.view_hms_appointment_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_pause']" position="before">
+                <button name="%(acs_plan_vaccinations_action)d" string="Plan Vaccination" class="oe_highlight" type='action' invisible="state=='draft'" groups="acs_hms_vaccination.group_hms_vaccination"/>
+            </xpath>
             <div name="button_box" position="inside">
                 <button name="action_view_vaccinations" class="oe_stat_button" icon="fa-medkit" type="object" groups="acs_hms_vaccination.group_hms_vaccination">
                     <field string="Vaccinations" name="vaccination_count" widget="statinfo"/>
@@ -75,7 +78,7 @@
                     <button name="action_cancel" string="Cancel" type="object" invisible="state!='scheduled'"/>
                     <button name="action_create_invoice" string="Create Invoice" type="object" invisible="state!='to_invoice'" class="oe_highlight" groups="account.group_account_invoice"/>
                     <button name="view_invoice" string="View Invoice" type="object" invisible="not invoice_id" class="oe_highlight" groups="account.group_account_invoice"/>
-                    <button name="action_shedule" string="Shedule" type="object" invisible="state!='cancel'"/>
+                    <button name="action_schedule" string="Schedule" type="object" invisible="state!='cancel'"/>
                     <field name="state" widget="statusbar" statusbar_visible="scheduled,done"/>
                     <field name="invoice_id" invisible="1"/>
                 </header>
@@ -106,11 +109,7 @@
                         </group>
                     </group>
                 </sheet>
-		<!-- <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers"/>
-                    <field name="activity_ids" widget="mail_activity"/>
-                    <field name="message_ids" widget="mail_thread"/>
-		</div> -->
+                <chatter/>
             </form>
         </field>
     </record>
@@ -133,7 +132,7 @@
                 <filter name="my_app" string="My Vaccination" domain="[('physician_id.user_id', '=',uid)]"/>
                 <separator/>
                 <filter name="not_done" string="Not Done" domain="[('state','!=','done')]"/>
-                <filter name="scheduled" string="Shedule" domain="[('state','=','scheduled')]"/>
+                <filter name="scheduled" string="Schedule" domain="[('state','=','scheduled')]"/>
                 <group expand="0" string="Group By...">
                     <filter name="group_by_lot" string="Lot Number" domain="[]" context="{'group_by':'lot_id'}"/>
                     <filter name="group_by_patient" string="Patient" domain="[]" context="{'group_by':'patient_id'}"/>
@@ -171,6 +170,7 @@
 
     <record id="action_vaccination_vac" model="ir.actions.act_window">
         <field name="name">Vaccination</field>
+        <field name="path">almightyhms-vaccination</field>
         <field name="res_model">acs.vaccination</field>
         <field name="view_mode">list,form,calendar,pivot</field>
         <field name="context">{'search_default_today': 1,'search_default_not_done': 1}</field>
@@ -219,6 +219,7 @@
 
     <record id="action_hms_vaccination_group" model="ir.actions.act_window">
         <field name="name">Vaccination Group</field>
+        <field name="path">almightyhms-vaccination-group</field>
         <field name="res_model">vaccination.group</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
@@ -230,6 +231,7 @@
 
     <record id="product_template_action_vaccines" model="ir.actions.act_window">
         <field name="name">Vaccines</field>
+        <field name="path">almightyhms-vaccines</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">product.template</field>
         <field name="view_mode">kanban,list,form</field>

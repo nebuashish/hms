@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 #╔══════════════════════════════════════════════════════════════════════╗
 #║                                                                      ║
 #║                  ╔═══╦╗       ╔╗  ╔╗     ╔═══╦═══╗                   ║
@@ -23,7 +24,7 @@
     Hospitalization is include Inpatient Registration, Surgery, Care, Discharge. Hospital related Flows. ACS HMS
     """,
     'license': 'OPL-1',
-    'version': '1.0.2',
+    'version': '1.0.23',
     'author': 'Almighty Consulting Solutions Pvt. Ltd.',
     'support': 'info@almightycs.com',
     'website': 'www.almightycs.com',
@@ -44,13 +45,14 @@
         'views/death_register.xml',
         'views/care_plan_template_view.xml',
         'views/res_config_settings_views.xml',
+        'views/template.xml',
         'views/digest_view.xml',
-        'views/hms_ocr_view.xml',
         'report/report_hospital_discharge.xml',
         'report/report_visiting_pass.xml',
         'report/report_hospitalization_patient_card.xml',
         'report/ward_patient_list_report.xml',
         'report/report_hospitalization_forecast.xml',
+        'report/report_death_register.xml',
         'data/sequence.xml',
         'data/hms_data.xml',
         'data/digest_data.xml',

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 #╔══════════════════════════════════════════════════════════════════════╗
 #║                                                                      ║
 #║                  ╔═══╦╗       ╔╗  ╔╗     ╔═══╦═══╗                   ║
@@ -19,9 +20,9 @@
     'name': 'Hospital Vaccination Management',
     'summary': 'Hospital Vaccination Management to manage patient Vaccination flow and history',
     'description': """
-        This Module will add a Page in Patient for managing Vaccine for Paediatrics in HMS. acs hms
+        This Module will add a Page in Patient for managing Vaccine for Pediatrics in HMS. acs hms
     """,
-    'version': '1.0.1',
+    'version': '1.0.8',
     'category': 'Medical',
     'author': 'Almighty Consulting Solutions Pvt. Ltd.',
     'website': 'https://www.almightycs.com',

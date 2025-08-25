@@ -1,4 +1,5 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 from odoo import api, fields, models, _
 from datetime import date, datetime, timedelta as td
 from odoo.exceptions import UserError
@@ -9,7 +10,7 @@ class VaccinationGroupLine(models.Model):
     _description = "Vaccination Group Line"
 
     group_id = fields.Many2one('vaccination.group', 'Group')
-    product_id = fields.Many2one('product.product', 'Product', required=True)
+    product_id = fields.Many2one('product.product', 'Product', required=True, domain=[('hospital_product_type', '=', "vaccination")])
     date_due_day = fields.Integer('Days to add',help="Days to add for next date")
 
 
@@ -26,7 +27,7 @@ class ACSVaccination(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'acs.hms.mixin']
     _description = "Vaccination"
 
-    name = fields.Char(size=256, string='Name', tracking=True)
+    name = fields.Char(size=256, string='Name', tracking=True,default='New')
     patient_id = fields.Many2one('hms.patient', string='Patient', required=True, tracking=True)
     product_id = fields.Many2one('product.product', 'Vaccination', required=True, 
         domain=[('hospital_product_type', '=', "vaccination")],
@@ -49,7 +50,7 @@ class ACSVaccination(models.Model):
         ('done', 'Done'),
         ('cancel', 'Cancelled'),
     ], string='Status', default='scheduled', tracking=True)
-    invoice_id = fields.Many2one('account.move', string='Invoice', ondelete='cascade', copy=False)
+    invoice_id = fields.Many2one('account.move', string='Invoice', copy=False)
     physician_id = fields.Many2one('hms.physician', ondelete='restrict', string='Physician', 
         index=True, tracking=True)
     move_id = fields.Many2one('stock.move', string='Stock Move')
@@ -74,7 +75,7 @@ class ACSVaccination(models.Model):
     def action_cancel(self):
         self.state = 'cancel'
 
-    def action_shedule(self):
+    def action_schedule(self):
         self.state = 'scheduled'
 
     def unlink(self):
@@ -85,20 +86,38 @@ class ACSVaccination(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        for values in vals_list:
-            values['name'] = self.env['ir.sequence'].next_by_code('acs.vaccination') or 'New Vaccination'
+        for vals in vals_list:
+            if vals.get('name', _("New")) == _("New"):
+                vals['name'] = self.env['ir.sequence'].with_company(vals.get('company_id')).next_by_code('acs.vaccination') or _("New")
         return super().create(vals_list)
-
+    
+    #method to create get invoice data and set passed invoice id.
+    def acs_common_invoice_vaccination_data(self, invoice_id=False):
+        data = []
+        if self.ids:
+            data = self.get_acs_vaccination_invoice_data()
+            if invoice_id:
+                self.invoice_id = invoice_id.id
+        return data
+ 
+    def get_acs_vaccination_invoice_data(self):
+        product_data = []
+        for rec in self:
+            product_id = rec.product_id
+            if not product_id:
+                raise UserError(_("Please Set Product first."))
+            product_data.append({'product_id': product_id})
+        return product_data
+ 
     def action_create_invoice(self):
-        product_id = self.product_id
-        if not product_id:
-            raise UserError(_("Please Set Product first."))
-        product_data = [{'product_id': product_id}]
+        product_data = self.get_acs_vaccination_invoice_data()
         inv_data = {
             'physician_id': self.physician_id and self.physician_id.id or False,
+            'hospital_invoice_type': 'vaccination'
         }
         acs_context = {'commission_partner_ids':self.physician_id.partner_id.id}
         invoice = self.with_context(acs_context).acs_create_invoice(partner=self.patient_id.partner_id, patient=self.patient_id, product_data=product_data, inv_data=inv_data)
+        invoice.vaccination_id = self.id
         self.invoice_id = invoice.id
         if self.state == 'to_invoice':
             self.state = 'done'

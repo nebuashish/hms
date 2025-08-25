@@ -26,7 +26,7 @@
                         </group>
                         <group>
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
-                            <field name="state" required="1"/>
+                            <field name="state" required="1" invisible="1"/>
                             <field name="telephone_number"/>
                         </group>
                     </group>
@@ -44,9 +44,9 @@
                 <field name="name"/>
                 <field name="building_id"/>
                 <field name="note"/>
-                <filter name="free" string="Free" domain="[('state','=','free')]"/>
+                <!-- <filter name="free" string="Free" domain="[('state','=','free')]"/>
                 <filter name="reserved" string="Reserved" domain="[('state','=','reserved')]"/>
-                <filter name="occupied" string="Occupied" domain="[('state','=','occupied')]"/>
+                <filter name="occupied" string="Occupied" domain="[('state','=','occupied')]"/> -->
                 <newline />
                 <group expand="0" string="Group By...">
                     <filter name="group_by_building" string="Building" domain="[]" context="{'group_by':'building_id'}"/>
@@ -58,6 +58,7 @@
 
     <record model="ir.actions.act_window" id="act_open_acs_hospital_ot">
         <field name="name">Operation Theater</field>
+        <field name="path">almightyhms-operation-theater</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">acs.hospital.ot</field>
         <field name="view_mode">list,form</field>

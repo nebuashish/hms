@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError, UserError
-from datetime import date, datetime, timedelta
-import logging
-_logger = logging.getLogger(__name__)
 
 
 class AcsHospitalizationForecast(models.TransientModel):
@@ -73,13 +71,14 @@ class AcsHospitalizationForecast(models.TransientModel):
                             pricelist_id = self.partner_id.property_product_pricelist
                         price = pricelist_id._get_product_price(product, product_data.get('quantity',1.0))
                     else:
-                        price = product_data.get('price_unit', product.lst_price)
+                        price = product_data.get('price_unit', product.list_price)
                     
                     tax_ids = product.taxes_id
                     if tax_ids:
                         if fiscal_position_id:
                             tax_ids = fiscal_position_id.map_tax(tax_ids._origin)
                         tax_ids = [(6, 0, tax_ids.ids)]
+
                     line = ForecastLine.create({
                         'order_id': self.id,
                         'name': product_data.get('name',product.get_product_multiline_description_sale()),

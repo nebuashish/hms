@@ -11,7 +11,7 @@
         </record>
 
         <record id="admission_checklist_data_03" model="inpatient.checklist.template">
-            <field name="name">Share General Information &amp; Facilitis</field>
+            <field name="name">Share General Information &amp; Facilities</field>
         </record>
 
         <record id="admission_checklist_data_04" model="inpatient.checklist.template">

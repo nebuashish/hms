@@ -34,7 +34,7 @@
                                     <strong>Bed No.:</strong>
                                 </td>
                                 <td style="width: 300;">
-                                    <span t-field="o.bed_id.id"/>
+                                    <span t-field="o.bed_id.name"/>
                                 </td>
                                 <td style="width: 200;">
                                     <strong>Attendee Name:</strong>

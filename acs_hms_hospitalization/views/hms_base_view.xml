@@ -1,22 +1,6 @@
 <?xml version="1.0"?>
 <odoo>
 
-        <record id="custom_view_move_form" model="ir.ui.view"> 
-        <field name="name">account.move.form</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_move_form"/>
-	<field name="arch" type="xml">
-	    <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='quantity']" position="before">
-                <field name="ward_id"/>
-            </xpath>
-            <field name="l10n_in_state_id" position="before">
-		    <!-- <field name="ward_id"/> -->
-		    <field name="category"/>
-                <field name="sub_category"/>
-            </field>
-        </field>
-</record>
-
     <!-- Invoice -->
     <record id="invoice_form" model="ir.ui.view">
         <field name="name">account.move.form</field>
@@ -25,7 +9,11 @@
         <field name="arch" type="xml">
             <group name="general" position="inside">
                 <group name="hospitalization" string="Hospitalization Details" groups="acs_hms_hospitalization.group_acs_hms_hospitalization_user">
-                    <field name="hospitalization_id" readonly="state!='draft'"/>
+                    <label for="hospitalization_id"/>
+                    <div name="hospitalization_id" class="o_row">
+                        <field name="hospitalization_id" nolabel="1" options="{'no_create': True}" readonly="state!='draft'"/>
+                        <button name="acs_update_invoice_line" string="Update Data" type="object" class="oe_inline fa fa-arrow-right oe_link" invisible="not hospitalization_id" title="Update Invoice Data"/>
+                    </div>
                 </group>
             </group>
         </field>
@@ -69,7 +57,7 @@
         <field name="arch" type="xml">
             <button name="view_invoice" position="before">
                 <button name="action_hospitalization" string="Hospitalization" type="object" class="oe_stat_button" icon="fa-bed" title="Hospitalization" invisible="state=='done' and not hospitalization_ids" groups="acs_hms_hospitalization.group_acs_hms_hospitalization_user"/>
-                <field name="hospitalization_ids" invisible="1"/>
+                <field name="hospitalization_ids" invisible="1" groups="acs_hms_hospitalization.group_acs_hms_hospitalization_user"/>
             </button>
         </field>
     </record>

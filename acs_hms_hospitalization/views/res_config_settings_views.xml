@@ -18,6 +18,9 @@
                     <setting help="Allow bed reservation flow for patient in Hospitalization." id="allow_bed_reservation_setting">
                         <field name="allow_bed_reservation" class="o_light_label" string="Allow Bed Reservation"/>
                     </setting>
+                    <setting string="Death Register QrCode" help="Allow user to view death register report by scanning QrCode from report." id="acs_death_register_qrcode_setting">
+                        <field name="acs_death_register_qrcode"/>
+                    </setting>
                 </block>
             </xpath>
         </field>

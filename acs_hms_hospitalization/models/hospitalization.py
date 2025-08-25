@@ -3,13 +3,11 @@
 from odoo import api, fields, models, _
 from datetime import datetime
 from odoo.exceptions import ValidationError, UserError
-import logging
-_logger = logging.getLogger(__name__)
 
 
 class Hospitalization(models.Model):
     _name = "acs.hospitalization"
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'acs.hms.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'acs.hms.mixin', 'product.catalog.mixin']
     _description = "Patient Hospitalization"
     _order = "id desc"
 
@@ -61,6 +59,7 @@ class Hospitalization(models.Model):
             rec.accommodation_count = len(rec.accommodation_history_ids)
             rec.evaluation_count = len(rec.evaluation_ids)
             rec.procedure_count = len(rec.procedure_ids)
+            rec.acs_payment_count = len(rec.sudo().acs_payment_ids)
 
     name = fields.Char(string='Hospitalization#', copy=False, default="Hospitalization#", tracking=True)
     state = fields.Selection([
@@ -81,11 +80,11 @@ class Hospitalization(models.Model):
     company_id = fields.Many2one('res.company', ondelete="restrict", 
         string='Hospital', default=lambda self: self.env.company)
     department_id = fields.Many2one('hr.department', ondelete="restrict", 
-        string='Department', domain=[('patient_department', '=', True)])
+        string='Department', domain=lambda self: self.acs_get_department_domain())
     attending_physician_ids = fields.Many2many('hms.physician','hosp_pri_att_doc_rel','hosp_id','doc_id',
         string='Primary Doctors')
     relative_id = fields.Many2one('res.partner', ondelete="cascade", 
-        domain=[('type', '=', 'contact')], string='Patient Relative Name')
+        domain=[('type', '=', 'contact')], string='Patient Relative')
     relative_number = fields.Char(string='Patient Relative Number')
     ward_id = fields.Many2one('hospital.ward', ondelete="restrict", string='Ward/Room')
     bed_id = fields.Many2one ('hospital.bed', ondelete="restrict", string='Bed No.')
@@ -120,7 +119,7 @@ class Hospitalization(models.Model):
 
     # Discharge fields
     diagnosis = fields.Text(string="Diagnosis")
-    clinincal_history = fields.Text(string="Clinical Summary")
+    clinical_history = fields.Text(string="Clinical Summary")
     examination = fields.Text(string="Examination")
     investigation = fields.Text(string="Investigation")
     adv_on_dis = fields.Text(string="Advice on Discharge")
@@ -129,6 +128,13 @@ class Hospitalization(models.Model):
     op_note = fields.Text(string="Operative Note")
     post_operative = fields.Text(string="Post Operative Course")
     instructions = fields.Text(string='Instructions')
+    patient_status = fields.Selection([
+        ('recovered', 'Recovered'),
+        ('discharge_against_medical_advice', 'Discharge Against Medical Advice'),
+        ('leave_against_medical_advice', 'Leave Against Medical Advice'),
+        ('referred','Referred'), 
+        ('expired', 'Expired'),], string='Patient Status', tracking=True)
+    expired_date = fields.Datetime(string='Expired Date', required=True, related="death_register_id.date_of_death")
 
     #Legal Details
     legal_case = fields.Boolean('Legal Case')
@@ -143,7 +149,7 @@ class Hospitalization(models.Model):
 
     #For Basic Care Plan
     nurse_id = fields.Many2one('res.users', ondelete="cascade", string='Primary Nurse', 
-        help='Anesthetist data of the patient')
+        help='Anesthetist data of the patient', domain=lambda self: [('employee_ids.department_id.department_type', '=', 'nurse')])
     nursing_plan = fields.Text (string='Nursing Plan')
     physician_ward_round_ids = fields.One2many('ward.rounds', 'hospitalization_id', string='Physician Ward Rounds')
 
@@ -194,11 +200,16 @@ class Hospitalization(models.Model):
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist', check_company=True, 
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
         help="If you change the pricelist, related invoice will be affected.")
-    category = fields.Selection(related='patient_id.category', string='Category',
-        help="Category of the patient. It is used to determine the price of the services provided to the patient.", readonly=True)
-    sub_category = fields.Selection(related='patient_id.sub_category', string='Sub Category',
-        help="Sub Category of the patient. It is used to determine the price of the services provided to the patient.", readonly=True)
+    
+    acs_payment_ids = fields.One2many('account.payment', 'acs_hospitalization_id', string='Payments')
+    acs_payment_count = fields.Integer(compute='_rec_count', string='# Payments')
+    package_id = fields.Many2one('acs.hms.package', string='Package')
+    acs_is_rta = fields.Selection([('yes', 'Yes'), ('no', 'No')], string='Is it RTA?',help='Select "Yes" if the injury was caused by a road traffic accident (RTA).')
+    acs_injury_date = fields.Date(string='Date of Injury')
+    acs_substance_abuse_alcohol = fields.Selection([('yes', 'Yes'), ('no', 'No')], string='Injury/Disease caused due to substance abuse/Alcohol consumption?')
+    acs_test_conducted_substance_abuse = fields.Selection([('yes', 'Yes'), ('no', 'No')], string='Test conducted to establish this (if yes, attach report)')
 
+    
     _sql_constraints = [
         ('name_company_uniq', 'unique (name,company_id)', 'Hospitalization must be unique per company !')
     ]
@@ -207,6 +218,11 @@ class Hospitalization(models.Model):
     def on_change_care_plan_template_id(self):
         if self.care_plan_template_id:
             self.nursing_plan = self.care_plan_template_id.nursing_plan
+    
+    @api.onchange('bed_id')
+    def onchange_bed(self):
+        if self.bed_id and self.bed_id.pricelist_id:
+            self.pricelist_id = self.bed_id.pricelist_id.id
 
     def action_view_evaluation(self):
         action = self.env["ir.actions.actions"]._for_xml_id("acs_hms.action_acs_patient_evaluation")
@@ -224,16 +240,30 @@ class Hospitalization(models.Model):
             'default_hospitalization_id': self.id
         }
         return action
+    
+    def action_view_payments(self):
+        action = self.env["ir.actions.actions"]._for_xml_id("account.action_account_payments")
+        action['domain'] = [('acs_hospitalization_id','=',self.id)]
+        action['context'] = {
+            'default_acs_hospitalization_id': self.id,
+            'default_partner_id': self.patient_id.partner_id.id,
+            'default_ref': self.name,
+            'default_currency_id': self.company_id.currency_id.id   
+        }
+        return action
 
     @api.model_create_multi
     def create(self, vals_list):
-        for values in vals_list:
-            patient_id = values.get('patient_id')
+        for vals in vals_list:
+            patient_id = vals.get('patient_id')
             active_hospitalizations = self.search([('patient_id','=',patient_id),('state','not in',['cancel','done','discharged'])])
             if active_hospitalizations:
                 raise ValidationError(_("Patient Hospitalization is already active at the moment. Please complete it before creating new."))
-            if values.get('name', 'Hospitalization#') == 'Hospitalization#':
-                values['name'] = self.env['ir.sequence'].next_by_code('acs.hospitalization') or 'Hospitalization#'
+            if vals.get('name', _("New")) == _("New"):
+                seq_date = None
+                if vals.get('hospitalization_date'):
+                    seq_date = fields.Datetime.context_timestamp(self, fields.Datetime.to_datetime(vals['hospitalization_date']))
+                vals['name'] = self.env['ir.sequence'].with_company(vals.get('company_id')).next_by_code('acs.hospitalization', sequence_date=seq_date) or _("New")
         return super().create(vals_list)
 
     def action_confirm(self):
@@ -254,6 +284,7 @@ class Hospitalization(models.Model):
 
     def action_hospitalize(self):
         History = self.env['patient.accommodation.history']
+        ConsumableLine = self.env['hms.consumable.line']
         for rec in self:
             if not self.allow_bed_reservation:
                 History.sudo().create({
@@ -267,8 +298,21 @@ class Hospitalization(models.Model):
             rec.state = 'hosp'
             rec.patient_id.write({'hospitalized': True})
 
+            #Add Default Services
+            services_list = self.env['acs.hospitalization.default.service'].search([])
+            for record in services_list:
+                line = ConsumableLine.create({
+                    'product_id': record.product_id.id,
+                    'date': fields.Date.today(),
+                    'qty': record.quantity,
+                    'hospitalization_id': rec.id
+                })
+                line.onchange_product()
+
     def action_discharge(self):
         for rec in self:
+            if not rec.patient_status:
+                raise ValidationError(_("Please set patient status before discharging patient."))
             rec.bed_id.sudo().write({'state': 'free'})
             rec.state = 'discharged'
             rec.discharge_date = datetime.now()
@@ -279,7 +323,7 @@ class Hospitalization(models.Model):
 
     def action_done(self):
         self.state = 'done'
-        self.consume_hopitalization_material()
+        self.acs_consume_material('hospitalization_id')
         if not self.discharge_date:
             self.discharge_date = datetime.now()
 
@@ -340,28 +384,6 @@ class Hospitalization(models.Model):
         source_location_id  = self.company_id.acs_hospitalization_stock_location_id.id
         return source_location_id, dest_location_id
 
-    def consume_hopitalization_material(self):
-        for rec in self:
-            source_location_id, dest_location_id = rec.acs_get_consume_locations()
-            for line in rec.consumable_line_ids.filtered(lambda s: not s.move_id):
-                if line.product_id.is_kit_product:
-                    move_ids = []
-                    for kit_line in line.product_id.acs_kit_line_ids:
-                        if kit_line.product_id.tracking!='none':
-                            raise UserError("In Consumable lines Kit product with component having lot/serial tracking is not allowed. Please remove such kit product from consumable lines.")
-                        move = self.consume_material(source_location_id, dest_location_id,
-                            {'product': kit_line.product_id, 'qty': kit_line.product_qty * line.qty})
-                        move.hospitalization_id = rec.id
-                        move_ids.append(move.id)
-                    #Set move_id on line also to avoid issue
-                    line.move_id = move.id
-                    line.move_ids = [(6,0,move_ids)]
-                else:
-                    move = self.consume_material(source_location_id, dest_location_id,
-                        {'product': line.product_id, 'qty': line.qty, 'lot_id': line.lot_id and line.lot_id.id or False,})
-                    move.hospitalization_id = rec.id
-                    line.move_id = move.id
-
     def get_accommodation_invoice_data(self, invoice_id=False):
         product_data = []
         accommodation_history_ids = []
@@ -374,12 +396,19 @@ class Hospitalization(models.Model):
                 'name': _("Accommodation Charges"),
             })
             for bed_history in accommodation_history_ids:
+                quantity = bed_history.rest_time - bed_history.invoiced_rest_time
                 product_data.append({
                     'product_id': bed_history.bed_id.product_id,
-                    'quantity': bed_history.rest_time - bed_history.invoiced_rest_time,
+                    'quantity': quantity,
                     'accommodation_history_id': bed_history,
-                    
+                    'line_type': 'hospitalization'
                 })
+                if bed_history.bed_id.acs_bed_service_ids:
+                    for bed_service in bed_history.bed_id.acs_bed_service_ids:
+                        product_data.append({
+                            'product_id': bed_service.product_id,
+                            'quantity': quantity * bed_service.quantity,
+                        })
         return product_data
 
     def get_consumable_invoice_data(self, invoice_id=False):
@@ -387,7 +416,7 @@ class Hospitalization(models.Model):
         consumable_line_ids = self.consumable_line_ids.filtered(lambda s: not s.invoice_id)
         if consumable_line_ids:
             product_data.append({
-                'name': _("Consumed Product Charges"),
+                'name': _("Product/Service Charges"),
             })
             for consumable in consumable_line_ids:
                 product_data.append({
@@ -395,6 +424,7 @@ class Hospitalization(models.Model):
                     'quantity': consumable.qty,
                     'lot_id': consumable.lot_id and consumable.lot_id.id or False,
                     'product_uom_id': consumable.product_uom_id.id,
+                    'line_type': 'hospitalization'
                 })
                 if invoice_id:
                     consumable.invoice_id = invoice_id.id
@@ -433,6 +463,7 @@ class Hospitalization(models.Model):
                 product_data.append({
                     'product_id': product,
                     'quantity': ward_data[product],
+                    'line_type': 'hospitalization'
                 })
 
             if invoice_id:
@@ -443,7 +474,7 @@ class Hospitalization(models.Model):
         pres_data = []
         installed_acs_hms_pharmacy = self.env['ir.module.module'].sudo().search([('name','=','acs_hms_pharmacy'),('state','=','installed')])
         if installed_acs_hms_pharmacy:
-            prescription_ids = self.mapped('prescription_ids').filtered(lambda req: req.state=='prescription' and req.deliverd and not req.invoice_id)
+            prescription_ids = self.mapped('prescription_ids').filtered(lambda req: req.state=='prescription' and req.delivered and not req.invoice_id)
             if prescription_ids:
                 pres_data.append({'name': _("IP Medicine Charges")})
                 for record in prescription_ids:
@@ -451,6 +482,7 @@ class Hospitalization(models.Model):
                         pres_data.append({
                             'product_id': line.product_id,
                             'quantity': line.quantity,
+                            'line_type': 'hospitalization'
                         })
                     if invoice_id:
                         record.invoice_id = invoice_id.id
@@ -468,12 +500,11 @@ class Hospitalization(models.Model):
     def acs_hospitalization_nurse_round_data(self, invoice_id=False):
         return []
 
-    #Keep Sub methods for projection flow. Because it just return list of data. Do not create real invoice.
-    def acs_hospitalization_invoicing(self, invoice_id=False):
+    def get_hospitalization_invoice_data(self, invoice_id=False):
         #consumable Invoicing
         consumable_data = self.get_consumable_invoice_data(invoice_id)
 
-        #accomodation Invoicing
+        #accommodation Invoicing
         accommodation_data = self.get_accommodation_invoice_data(invoice_id)
 
         #Physician Rounds Invoicing
@@ -481,12 +512,17 @@ class Hospitalization(models.Model):
 
         #Nurse Round Invoicing
         nurse_round_data = self.acs_hospitalization_nurse_round_data(invoice_id)
+        return consumable_data + accommodation_data + physician_round_data + nurse_round_data
+
+    #Keep Sub methods for projection flow. Because it just return list of data. Do not create real invoice.
+    def acs_hospitalization_invoicing(self, invoice_id=False):
+        hospitalization_data = self.get_hospitalization_invoice_data(invoice_id)
 
         #Procedure Invoicing
         procedure_ids = self.procedure_ids.filtered(lambda proc: not proc.invoice_id)
         procedure_data = procedure_ids.acs_common_invoice_procedure_data(invoice_id)
 
-        #surgey Invoicing
+        #surgery Invoicing
         surgery_data = self.get_surgery_invoice_data(invoice_id)
         
         #Pharmacy Invoicing
@@ -498,13 +534,13 @@ class Hospitalization(models.Model):
         #Radiology Invoicing
         radiology_data = self.acs_hospitalization_radiology_data(invoice_id)
 
-        data = consumable_data + accommodation_data + physician_round_data + nurse_round_data + procedure_data + surgery_data + pres_data + lab_data + radiology_data
-        #create Invoice lines only if invocie is passed
+        data = hospitalization_data + procedure_data + surgery_data + pres_data + lab_data + radiology_data
+        #create Invoice lines only if invoice is passed
         if invoice_id:
             for line in data:
                 pricelist_id = line.get('pricelist_id',False)
                 inv_line = self.with_context(acs_pricelist_id=pricelist_id).acs_create_invoice_line(line, invoice_id)
-                #ACS: As on accomodation history we need to set inv line as special case it is managed here.
+                #ACS: As on accommodation history we need to set inv line as special case it is managed here.
                 if line.get('accommodation_history_id'):
                     bed_history = line.get('accommodation_history_id')
                     bed_history.account_move_line_ids = [(4, inv_line.id)]
@@ -521,8 +557,11 @@ class Hospitalization(models.Model):
         acs_context = {'commission_partner_ids':self.physician_id.partner_id.id, 'acs_pricelist_id': self.pricelist_id.id}
         invoice_id = self.with_context(acs_context).acs_create_invoice(partner=self.patient_id.partner_id, patient=self.patient_id, product_data=product_data, inv_data=inv_data)
         invoice_id.hospitalization_id = self.id
-        
         self.acs_hospitalization_invoicing(invoice_id)
+
+        if self.package_id:
+            invoice_id.acs_package_id = self.package_id.id
+            invoice_id.acs_get_package_invoice_lines()
 
         message = _('Invoice Created.')
         user = self.env.user.sudo()
@@ -556,5 +595,9 @@ class Hospitalization(models.Model):
         rec_id.onchange_hospitalization()
         action['res_id'] = rec_id.id
         return action
+
+    # This method updates or adds a consumable line for the given product and quantity using a common helper function.
+    def _update_order_line_info(self, product_id, quantity, **kwargs):
+        return self.acs_generic_update_order_line_info(model='hms.consumable.line', product_id=product_id, quantity=quantity,link_field='hospitalization_id', extra_vals={'physician_id': self.physician_id.id})
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

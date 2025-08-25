@@ -1,4 +1,5 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 from odoo import api, fields, models,_
 
 
@@ -8,20 +9,53 @@ class AccountMove(models.Model):
     hospitalization_id = fields.Many2one('acs.hospitalization', ondelete="restrict", string='Hospitalization',
         help="Enter the patient hospitalization code")
     hospital_invoice_type = fields.Selection(selection_add=[('hospitalization', 'Hospitalization')])
-    ward_id = fields.Many2one(related="hospitalization_id.ward_id", string="Ward")
-    # related='patient_id.category', 
-    category = fields.Selection([('General', 'General'), ('Government', 'Government'), ('Insurance', 'Insurance'), ('Healthabhi', 'Healthabhi')], string='Category',
-        help="Category of the patient. It is used to determine the price of the services provided to the patient.", readonly=True, store=True)
-    # related='patient_id.sub_category', 
-    sub_category = fields.Selection([('ICICI', 'ICICI')], string='Sub Category',
-        help="Sub Category of the patient. It is used to determine the price of the services provided to the patient.", readonly=True, store=True)
 
+    #In lab module it get implemented.
+    def acs_get_lab_data(self, invoice_id=False):
+        return []
+    
+    #In radio module it get implemented.
+    def acs_get_radiology_data(self, invoice_id=False):
+        return []
+    
+    #In nursing module it get implemented.
+    def acs_get_nurse_round_data(self, invoice_id=False):
+        return []
+    
+    def acs_update_invoice_line(self):
+        for line in self.invoice_line_ids:
+            line.unlink()
 
-class AccountMoveLine(models.Model):
-    _inherit = "account.move.line"
+        #consumable
+        for consumable_line in self.hospitalization_id.consumable_line_ids.filtered(lambda c: c.invoice_id):
+            consumable_line.invoice_id = False
 
-    ward_id = fields.Many2one(related="move_id.ward_id", string="Ward")
+        #Physician Rounds
+        for physician_ward_round_line in self.hospitalization_id.physician_ward_round_ids.filtered(lambda pwr: pwr.invoice_id):
+            physician_ward_round_line.invoice_id = False
 
+        #Procedure
+        for procedure in self.hospitalization_id.procedure_ids.filtered(lambda proc: proc.invoice_id):
+            procedure.invoice_id = False
+
+        #Surgery
+        for surgery in self.hospitalization_id.surgery_ids.filtered(lambda s: s.invoice_id):
+            surgery.invoice_id = False
+
+        #Prescription
+        for prescription in self.hospitalization_id.prescription_ids.filtered(lambda pre: pre.invoice_id):
+            prescription.invoice_id = False
+        
+        #Nurse Rounds
+        self.acs_get_nurse_round_data()
+
+        #Lab
+        self.acs_get_lab_data()
+
+        #Radiology
+        self.acs_get_radiology_data()
+
+        self.hospitalization_id.acs_hospitalization_invoicing(self)
 
 class Prescription(models.Model):
     _inherit = 'prescription.order'
@@ -42,7 +76,12 @@ class ACSAppointment(models.Model):
     def action_hospitalization(self):
         action = self.env["ir.actions.actions"]._for_xml_id("acs_hms_hospitalization.acs_action_form_inpatient")
         action['domain'] = [('appointment_id', '=', self.id)]
-        action['context'] = {'default_patient_id': self.patient_id.id, 'default_appointment_id': self.id, 'default_physician_id': self.physician_id.id}
+        action['context'] = {
+            'default_patient_id': self.patient_id.id,
+            'default_department_id': self.department_id and self.department_id.id or False,
+            'default_appointment_id': self.id,
+            'default_diseases_ids': [(6,0,self.diseases_ids.ids)],
+            'default_physician_id': self.physician_id.id}
         return action
 
 
@@ -92,8 +131,8 @@ class ACSSurgery(models.Model):
     hospitalization_id = fields.Many2one('acs.hospitalization', ondelete="restrict", string='Hospitalization')
 
 
-class ACSMedicamentLine(models.Model):
-    _inherit = "medicament.line"
+class AcsPrescriptionLine(models.Model):
+    _inherit = "prescription.line"
     
     hospitalization_id = fields.Many2one('acs.hospitalization', ondelete="restrict", string='Inpatient')
 
@@ -133,3 +172,9 @@ class Physician(models.Model):
         action['domain'] = [('physician_id','=',self.id)]
         action['context'] = {'default_physician_id': self.id}
         return action
+    
+class AccountPayment(models.Model):
+    _inherit = "account.payment"
+
+    acs_hospitalization_id = fields.Many2one('acs.hospitalization', ondelete="restrict", string='Hospitalization',
+        help="Enter the patient hospitalization code")

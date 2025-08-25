@@ -1,10 +1,24 @@
-# -*- encoding: utf-8 -*-
-from odoo import api, fields, models, _
-import logging
-_logger = logging.getLogger(__name__)
+# -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
+from odoo import api, fields, models,_
+
+
+class AcsHospitalBedService(models.Model):
+    _name="acs.hospital.bed.service"
+    _description = "Bed Service"
+    _order = "sequence"
+    _rec_name= "product_id"
+
+    product_id = fields.Many2one("product.product", ondelete="cascade", string="Product", required=True)
+    sequence = fields.Integer(string='Sequence', default=60)
+    quantity = fields.Float(string='Quantity', default=1)
+    bed_id = fields.Many2one("hospital.bed", ondelete="cascade", string="Bed", required=True)
+    description = fields.Char(string="Description")
+
 
 class Bed(models.Model):
     _name = 'hospital.bed'
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'acs.hms.mixin']
     _description = 'Bed'
 
     def _get_patient(self):
@@ -44,10 +58,13 @@ class Bed(models.Model):
     invoice_policy = fields.Selection([
         ('full', 'Days (Full)'),
         ('hourly', 'Hours')], string='Invoice Policy', default='full', required=True)
-    department_id = fields.Many2one('hr.department', related="ward_id.department_id", string='Department', store=True, readonly=True)
+    department_id = fields.Many2one('hr.department', related="ward_id.department_id", string='Department', store=True, readonly=True, domain=lambda self: self.acs_get_department_domain())
+    pricelist_id = fields.Many2one('product.pricelist', string='Pricelist', check_company=True, 
+        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+    acs_bed_service_ids = fields.One2many('acs.hospital.bed.service', 'bed_id', 'Bed Services')
 
     @api.onchange('product_id')
-    def onchnage_product_id(self):
+    def onchange_product_id(self):
         if not self.name:
             self.name = self.product_id.name
 
@@ -68,6 +85,7 @@ class Bed(models.Model):
 class ACSHospitalWard(models.Model):
     _name = 'hospital.ward'
     _description = 'Ward/Room'
+    _inherit = 'acs.hms.mixin'
 
     def _rec_count(self):
         for rec in self:
@@ -99,8 +117,9 @@ class ACSHospitalWard(models.Model):
         string='Wards/Room Type',required=True, default='general')
     company_id = fields.Many2one('res.company', ondelete='restrict', 
         string='Hospital', default=lambda self: self.env.company)
-    department_id = fields.Many2one('hr.department', ondelete='restrict', 
-        domain=[('patient_department', '=', True)], string='Department')
+    department_id = fields.Many2one('hr.department', ondelete='restrict',
+        domain=lambda self: self.acs_get_department_domain(), string='Department')
+    start_time = fields.Float(string='Billing Start Time (UTC)', default=0.0)
 
     #Facility
     private = fields.Boolean(string='Private',
@@ -134,71 +153,6 @@ class ACSHospitalWard(models.Model):
         default = dict(default or {}, name=new_name)
         return super(ACSHospitalWard, self).copy(default)
 
-#    @api.model
-#    def create(self, vals):
-#        ward = super(ACSHospitalWard, self).create(vals)
-#        ward._sync_room_type_attribute()
-#        return ward
-
-#    def write(self, vals):
-#        old_name = self.name
-#        res = super(ACSHospitalWard, self).write(vals)
-
-#        # If ward name is changed, update the attribute value
-#        if 'name' in vals:
-#            for ward in self:
-#                ward._sync_room_type_attribute(name_changed=True, old_name=old_name)
-#        return res
-
-    def _sync_room_type_attribute(self, name_changed=False, old_name=None):
-        """Utility method to sync Room Type attribute values"""
-        attribute = self.env['product.attribute'].search([('name', '=', 'Room Type')], limit=1)
-        if not attribute:
-            return
-
-        value_obj = self.env['product.attribute.value']
-
-        for ward in self:
-            _logger.error("\n \n nasme_ %s - %s", name_changed, old_name)
-            if name_changed and old_name:
-                # Try to find the existing value with old ward name
-                existing_value = value_obj.search([
-                    ('name', '=', old_name),
-                    ('attribute_id', '=', attribute.id)
-                ], limit=1)
-                if existing_value:
-                    existing_value.name = ward.name
-                    # Ensure value is linked to all templates
-                    product_templates = self.env['product.template'].search([
-                        ('attribute_line_ids.attribute_id', '=', attribute.id)
-                    ])
-                    for template in product_templates:
-                        line = template.attribute_line_ids.filtered(lambda l: l.attribute_id.id == attribute.id)
-                        if existing_value.id not in line.value_ids.ids:
-                            line.value_ids = [(4, existing_value.id)]
-                    continue  # Skip creation below
-
-            # If value with new name doesn't exist, create it
-            new_value = value_obj.search([
-                ('name', '=', ward.name),
-                ('attribute_id', '=', attribute.id)
-            ], limit=1)
-
-            if not new_value:
-                new_value = value_obj.create({
-                    'name': ward.name,
-                    'attribute_id': attribute.id
-                })
-
-            # Add this value to all product templates using Room Type
-            product_templates = self.env['product.template'].search([
-                ('attribute_line_ids.attribute_id', '=', attribute.id)
-            ])
-            for template in product_templates:
-                line = template.attribute_line_ids.filtered(lambda l: l.attribute_id.id == attribute.id)
-                if new_value.id not in line.value_ids.ids:
-                    line.value_ids = [(4, new_value.id)]
-
 
 class ACSHospitalBuilding(models.Model):
     _name = 'hospital.building'
@@ -219,7 +173,7 @@ class ACSHospitalOT(models.Model):
     name = fields.Char(string='Name', index=True, required=True, 
         help='Name of the Operating Room')
     physician_id = fields.Many2one('hms.physician', string='Physician', ondelete="restrict")
-    building_id = fields.Many2one('hospital.building', string='Bulding', index=True, ondelete="restrict")
+    building_id = fields.Many2one('hospital.building', string='Building', index=True, ondelete="restrict")
     telephone_number = fields.Integer(string='Telephone Number',
         help='Telephone number / Extension')
     state = fields.Selection([
@@ -229,6 +183,17 @@ class ACSHospitalOT(models.Model):
         ('na', 'Not available')], string='Current Status', default="free")
     note = fields.Text(string='Extra Info')
     company_id = fields.Many2one('res.company', ondelete='restrict', 
-        string='Hospital', default=lambda self: self.env.company) 
+        string='Hospital', default=lambda self: self.env.company)
+
+
+class AcsDefaultHospitalizationServices(models.Model):
+    _name="acs.hospitalization.default.service"
+    _description = "Default Hospitalization Service"
+    _order = "sequence"
+
+    name = fields.Char(string="Name", required=True)
+    product_id = fields.Many2one("product.product", ondelete="cascade", string="Product", required=True)
+    sequence = fields.Integer(string='Sequence', default=60)
+    quantity = fields.Float(string='Quantity', default=1)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

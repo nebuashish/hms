@@ -62,6 +62,7 @@
 
     <record model="ir.actions.act_window" id="action_accommodation_history">
         <field name="name">Accommodation History</field>
+        <field name="path">almightyhms-accommodation-history</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">patient.accommodation.history</field>
         <field name="view_mode">list,form</field>
@@ -110,7 +111,8 @@
                             <field name="ward_id" required="True" readonly="state!='free'"/>
                             <field name="invoice_policy" readonly="state!='free'"/>
                             <field name="patient_id" readonly="1"/>
-                            <field name="department_id" groups="acs_hms.group_allow_multi_department" readonly="state!='free'"/>
+                            <field name="department_id" groups="acs_hms.group_allow_multi_department" readonly="state!='free'" options="{'no_open': True, 'no_create': True}"/>
+                            <field name="pricelist_id" groups="product.group_product_pricelist" options="{'no_open':True,'no_create': True}"/>                            
                         </group>
                         <group>
                             <field name="product_id" required="True" domain="[('hospital_product_type','=','bed')]" context="{'default_hospital_product_type':'bed'}" readonly="state!='free'"/>
@@ -118,10 +120,24 @@
                             <field name="bed_type" readonly="state!='free'"/>
                             <field name="telephone" readonly="state!='free'"/>
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" readonly="state!='free'"/>
+                            <field name="company_id" invisible="1"/>
                         </group>
                     </group>
+                    <notebook>
+                        <page name="other_services" string="Other Services">
+                            <field name="acs_bed_service_ids">
+                                <list string="Default Services" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="description"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
                     <field name="notes" nolabel="1" placeholder="Notes..."/>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -143,6 +159,10 @@
                     <filter name="group_by_ward" string="Ward" domain="[]" context="{'group_by':'ward_id'}"/>
                     <filter name="group_by_type" string="Group By Types" context="{'group_by':'bed_type'}"/>
                 </group>
+                <searchpanel>
+                    <field name="state" icon="fa-bars" enable_counters="1"/>
+                    <field name="ward_id"  icon="fa-building" enable_counters="1"/>
+                </searchpanel>
             </search>
         </field>
     </record>
@@ -153,42 +173,59 @@
         <field name="type">kanban</field>
         <field name="arch" type="xml">
             <kanban>
-                <field name="id"/>
-                <field name="name"/>
                 <field name="ward_id"/>
-                <field name="product_id"/>
                 <field name="bed_type"/>
                 <field name="state"/>
                 <field name="patient_id"/>
                 <templates>
-                    <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click">
-                            <div class="o_kanban_image" t-attf-style="color:#{record.state.raw_value=='reserved' ? 'blue' : record.state.raw_value=='occupied' ? 'red' : record.state.raw_value=='free' ? 'green': 'grey'}">
-                                <span class="fa fa-bed fa-4x" aria-label="" title="Bed"/>
+                    <t t-name="card" class="flex-row">
+                        <aside class="mr16">
+                            <span class="fa fa-bed fa-4x" title="Bed" t-attf-style="color:#{record.state and record.state.raw_value=='reserved' ? 'blue' : record.state and record.state.raw_value=='occupied' ? 'red' : record.state and record.state.raw_value=='free' ? 'green': 'grey'}"></span>
+                        </aside>
+                        <main class="ps-2 ps-md-0">
+                            <div class="mb-1">
+                                <field name="display_name" class="mb-0 fw-bold fs-5"/>
                             </div>
-                            <div class="oe_kanban_details">
-                                <strong class="oe_partner_heading"><field name="display_name"/></strong>
-                                <ul>
-                                    <li t-if="record.ward_id.raw_value"><b>Ward:</b> <field name="ward_id"/></li>
-                                    <li t-if="record.bed_type.raw_value"><b>Bed Type:</b> <field name="bed_type"/></li>
-                                    <li t-if="record.patient_id.raw_value"><b>Patient:</b> <field name="patient_id"/></li>
-                                </ul>
-                            </div>
-                        </div>
+                            <ul class="list-unstyled">
+                                <li t-if="record.ward_id">
+                                    <b>Ward:</b> <field name="ward_id"/>
+                                </li>
+                                <li t-if="record.bed_type">
+                                    <b>Bed Type:</b> <field name="bed_type"/>
+                                </li>
+                                <li t-if="record.patient_id">
+                                    <b>Patient:</b> <field name="patient_id"/>
+                                </li>
+                            </ul>
+                        </main>
                     </t>
                 </templates>
             </kanban>
         </field>
     </record>
 
-    <record model="ir.actions.act_window" id="action_bed">
+    <record id="action_bed_conf" model="ir.actions.act_window">
         <field name="name">Beds</field>
+        <field name="path">almightyhms-hospital-beds</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">hospital.bed</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Click to add a Bed.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_bed" model="ir.actions.act_window">
+        <field name="name">Beds</field>
+        <field name="path">almightyhms-hospital-bed</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hospital.bed</field>
+        <field name="view_mode">kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                There are no record's to show.
             </p>
         </field>
     </record>

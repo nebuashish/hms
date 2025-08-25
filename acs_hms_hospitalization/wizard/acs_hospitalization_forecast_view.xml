@@ -35,15 +35,15 @@
                     </group>
                     <notebook>
                         <page name="lines" string="Lines">
-                            <field name="line_ids" widget="section_and_note_one2many" readonly="1">
+                            <field name="line_ids" widget="product_label_section_and_note_field_o2m" readonly="1">
                                 <list string="Invoice Lines" editable="bottom">
-                                    <field name="display_type" invisible="1"/>
+                                    <field name="display_type" column_invisible="1"/>
                                     <field name="sequence" widget="handle"/>
-                                    <field name="product_id" required="not display_type"/>
+                                    <field name="product_id" required="not display_type" widget="product_label_section_and_note_field"/>
                                     <field name="name" widget="section_and_note_text"/>
                                     <field name="product_uom_qty" string="Qty" required="not display_type"/>
                                     <field name="product_uom_id" options='{"no_open": True}' required="not display_type" groups="uom.group_uom"/>
-                                    <field name="product_uom_category_id" invisible="1"/>
+                                    <field name="product_uom_category_id" column_invisible="1"/>
                                     <field name="price_unit"/>
                                     <field name="discount"/>
                                     <field name="tax_ids" widget="many2many_tags"/>
@@ -71,6 +71,7 @@
 
     <record id="action_acs_hospitalization_forecast" model="ir.actions.act_window">
         <field name="name">Hospitalization Invoice Forecast</field>
+        <field name="path">almightyhms-hospitalization-invoice-forecast</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">acs.hospitalization.forecast</field>
         <field name="view_mode">form</field>

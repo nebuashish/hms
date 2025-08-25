@@ -1,6 +1,7 @@
 # coding=utf-8
 
 from odoo import api, fields, models, _
+from datetime import datetime, time, timedelta
 
 
 class AdmissionCheckListTemplate(models.Model):
@@ -44,13 +45,32 @@ class PatientAccommodationHistory(models.Model):
     _rec_name = "patient_id"
     _description = "Patient Accommodation History"
 
-    def _rest_time(self):
+    def get_acs_rest_time(self):
         for registration in self:
             rest_time = 0
             end_date = registration.end_date or fields.Datetime.now()
             if end_date and registration.start_date:
                 diff = end_date - registration.start_date
                 if registration.bed_id.invoice_policy=='full':
+                    if registration.bed_id.ward_id.start_time:
+                        custom_time = registration.bed_id.ward_id.start_time
+                        start_date = registration.start_date
+                        # Convert custom_time float to hours and minutes
+                        custom_hour = int(custom_time)
+                        custom_minute = int((custom_time - custom_hour) * 60)
+                        
+                        # Adjust start_date to custom time
+                        start_date_custom = datetime.combine(start_date.date(), time(custom_hour, custom_minute))
+                        if start_date < start_date_custom:
+                            start_date_custom += timedelta(days=-1)
+
+                        # Adjust end_date to custom time
+                        end_date_custom = datetime.combine(end_date.date(), time(custom_hour, custom_minute))
+                        if end_date > end_date_custom:
+                            end_date_custom += timedelta(days=1)
+
+                        # Calculate the difference
+                        diff = end_date_custom - start_date_custom
                     rest_time = diff.days if diff.days > 0 else 1
                 else:
                     total_seconds = int(diff.total_seconds())
@@ -68,7 +88,7 @@ class PatientAccommodationHistory(models.Model):
     bed_id = fields.Many2one('hospital.bed', ondelete="restrict", string='Bed No.')
     start_date = fields.Datetime(string='Start Date')
     end_date = fields.Datetime(string='End Date')
-    rest_time = fields.Float(compute=_rest_time, string='Rest Time')
+    rest_time = fields.Float(compute='get_acs_rest_time', string='Rest Time')
     company_id = fields.Many2one('res.company', ondelete='restrict', 
         string='Hospital', related='hospitalization_id.company_id') 
     invoice_policy = fields.Selection(related="bed_id.invoice_policy", string='Invoice Policy', readonly=True)

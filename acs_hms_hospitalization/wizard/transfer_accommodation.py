@@ -1,6 +1,8 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
+# Part of AlmightyCS. See LICENSE file for full copyright and licensing details.
 from odoo import models, fields, api,_
-from datetime import datetime
+from odoo.exceptions import ValidationError, UserError
+
 
 class TransferAccommodation(models.TransientModel):
     _name = "transfer.accommodation"
@@ -12,6 +14,7 @@ class TransferAccommodation(models.TransientModel):
     current_bed = fields.Many2one ('hospital.bed', 'Current Bed No.')
     new_ward = fields.Many2one ('hospital.ward', 'Ward/Room')
     new_bed = fields.Many2one ('hospital.bed', 'Bed No.')
+    acs_transfer_date = fields.Datetime('Transfer Date', default=fields.Datetime.now())
 
     @api.model
     def default_get(self,fields):
@@ -26,25 +29,25 @@ class TransferAccommodation(models.TransientModel):
         })
         return res
 
-    def transfer_accommodation(self):
-        context = self._context or {}
-        history_obj = self.env['patient.accommodation.history']
-        for data in self:
-            hist_id = history_obj.search([('hospitalization_id','=',data.hospitalization_id.id), ('bed_id','=',data.current_bed.id)])
-            hist_id.write({'end_date': datetime.now()})
-            data.current_bed.write({'state': 'free'})
-            data.new_bed.write({'state': 'occupied'})
-            history_obj.create({
-                'hospitalization_id': data.hospitalization_id.id,
-                'patient_id': data.patient_id.id,
-                'ward_id': data.new_ward.id,
-                'bed_id': data.new_bed.id,
-                'start_date': datetime.now(),
-            })
-            data.hospitalization_id.write({
-                'ward_id': data.new_ward.id,
-                'bed_id': data.new_bed.id,
-            })
+    def acs_transfer_accommodation(self):
+        HistoryObj = self.env['patient.accommodation.history']
+        hist_id = HistoryObj.search([('hospitalization_id','=',self.hospitalization_id.id), ('bed_id','=',self.current_bed.id),('end_date','=',False)])
+        if hist_id.start_date >= self.acs_transfer_date:
+            raise ValidationError("The transfer date can't be set before the start date!")
+        hist_id.sudo().end_date = self.acs_transfer_date
+        self.sudo().current_bed.state = 'free'
+        self.sudo().new_bed.state = 'occupied'
+        HistoryObj.create({
+            'hospitalization_id': self.hospitalization_id.id,
+            'patient_id': self.patient_id.id,
+            'ward_id': self.new_ward.id,
+            'bed_id': self.new_bed.id,
+            'start_date': self.acs_transfer_date,
+        })
+        self.hospitalization_id.write({
+            'ward_id': self.new_ward.id,
+            'bed_id': self.new_bed.id,
+        })
         return {'type': 'ir.actions.act_window_close'}
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

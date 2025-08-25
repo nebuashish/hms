@@ -26,6 +26,7 @@
 
     <record id="acs_plan_vaccinations_action" model="ir.actions.act_window">
         <field name="name">Plan Patient Vaccinations</field>
+        <field name="path">almightyhms-plan-patient-vaccinations</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">acs.plan.vaccinations</field>
         <field name="view_id" ref="view_acs_plan_vaccinations_wizard"/>
